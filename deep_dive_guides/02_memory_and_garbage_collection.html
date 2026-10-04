@@ -8,6 +8,28 @@
   <style>
     .code-font { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
   </style>
+  <!-- Prism.js One Dark IDE Syntax Highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #0d1117 !important;
+      border: 1px solid #30363d !important;
+      border-radius: 0.75rem !important;
+      padding: 1.1rem !important;
+      font-size: 0.95rem !important;
+      line-height: 1.6 !important;
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
+    }
+    code[class*="language-"] {
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
+      font-size: 0.95rem !important;
+    }
+  </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
 
@@ -56,15 +78,15 @@
         <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
           <div class="flex items-center justify-between">
             <span class="font-bold text-indigo-400 text-sm">Thread Stack</span>
-            <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px]">Per-Thread</span>
+            <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs">Per-Thread</span>
           </div>
           <p class="text-slate-400 leading-relaxed">
-            Allocated private for every active thread. Holds primitive values (e.g. <code class="font-mono text-[11px]">int x = 5</code>) and reference pointers to heap objects.
+            Allocated private for every active thread. Holds primitive values (e.g. <code class="font-mono text-sm">int x = 5</code>) and reference pointers to heap objects.
           </p>
-          <div class="p-2.5 rounded bg-slate-950 border border-slate-800 text-[11px] text-slate-300">
+          <div class="p-2.5 rounded bg-slate-950 border border-slate-800 text-sm text-slate-300">
             <strong>Lifecycle:</strong> Ultra-fast LIFO. Freed automatically when a method exits. Never touched by Garbage Collector!
           </div>
-          <div class="text-[11px] text-rose-400">
+          <div class="text-sm text-rose-400">
             <strong>Crash Failure:</strong> <code class="font-mono">StackOverflowError</code> (e.g. infinite recursion).
           </div>
         </div>
@@ -72,15 +94,15 @@
         <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
           <div class="flex items-center justify-between">
             <span class="font-bold text-emerald-400 text-sm">Heap Memory</span>
-            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px]">Shared</span>
+            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs">Shared</span>
           </div>
           <p class="text-slate-400 leading-relaxed">
-            The largest region, shared across all threads. Every instance created with <code class="font-mono text-[11px]">new User()</code> or Spring Singleton lives here.
+            The largest region, shared across all threads. Every instance created with <code class="font-mono text-sm">new User()</code> or Spring Singleton lives here.
           </p>
-          <div class="p-2.5 rounded bg-slate-950 border border-slate-800 text-[11px] text-slate-300">
+          <div class="p-2.5 rounded bg-slate-950 border border-slate-800 text-sm text-slate-300">
             <strong>Lifecycle:</strong> Managed completely by the Garbage Collector (Young and Old Generations).
           </div>
-          <div class="text-[11px] text-rose-400">
+          <div class="text-sm text-rose-400">
             <strong>Crash Failure:</strong> <code class="font-mono">OutOfMemoryError: Java heap space</code>.
           </div>
         </div>
@@ -88,15 +110,15 @@
         <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
           <div class="flex items-center justify-between">
             <span class="font-bold text-amber-400 text-sm">Metaspace</span>
-            <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px]">Native RAM</span>
+            <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs">Native RAM</span>
           </div>
           <p class="text-slate-400 leading-relaxed">
             Stores class bytecodes, method metadata, static variables, and reflection references.
           </p>
-          <div class="p-2.5 rounded bg-slate-950 border border-slate-800 text-[11px] text-slate-300">
+          <div class="p-2.5 rounded bg-slate-950 border border-slate-800 text-sm text-slate-300">
             <strong>Lifecycle:</strong> Lives in native OS memory (outside Heap). Introduced in Java 8 to replace PermGen.
           </div>
-          <div class="text-[11px] text-rose-400">
+          <div class="text-sm text-rose-400">
             <strong>Crash Failure:</strong> <code class="font-mono">OutOfMemoryError: Metaspace</code>.
           </div>
         </div>
@@ -113,7 +135,7 @@
         The JVM's GC relies on the <strong>Weak Generational Hypothesis</strong>: *"Most objects die shortly after creation (e.g. temporary DTOs, HTTP request strings, loop variables)."*
       </p>
 
-      <div class="p-6 rounded-xl bg-slate-900 border border-slate-800 space-y-4 text-xs">
+      <div class="p-6 rounded-xl bg-slate-900 border border-slate-800 space-y-4 text-sm">
         <div class="font-bold text-slate-200">The Journey of a Java Object through the Heap Generations:</div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -160,12 +182,12 @@
         A memory leak in Java occurs when an object is <strong>no longer needed by your business logic, but an active reference path from a GC Root still exists</strong>, preventing the GC from ever freeing it.
       </p>
 
-      <div class="space-y-4 text-xs">
+      <div class="space-y-4 text-sm">
         
         <!-- Leak 1: Static Collections -->
         <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
           <div class="font-bold text-rose-400 text-sm">Leak 1: Unbounded Static Collections (The In-Memory Cache Trap)</div>
-          <pre class="code-font text-[11px] text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>@Service
+          <pre class="language-java code-font text-sm text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">@Service
 public class UserService {
     // STATIC collection stays alive for the ENTIRE lifetime of the JVM process!
     private static final Map&lt;String, UserDTO&gt; userCache = new HashMap&lt;&gt;();
@@ -176,14 +198,14 @@ public class UserService {
     }
 }</code></pre>
           <div class="text-emerald-400 font-semibold">
-            Senior Fix: Never use raw HashMaps as caches. Always use Caffeine / Redis with strict eviction policies: <code class="font-mono text-[11px]">Caffeine.newBuilder().maximumSize(10_000).expireAfterWrite(Duration.ofMinutes(10))</code>.
+            Senior Fix: Never use raw HashMaps as caches. Always use Caffeine / Redis with strict eviction policies: <code class="font-mono text-sm">Caffeine.newBuilder().maximumSize(10_000).expireAfterWrite(Duration.ofMinutes(10))</code>.
           </div>
         </div>
 
         <!-- Leak 2: ThreadLocal -->
         <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
           <div class="font-bold text-rose-400 text-sm">Leak 2: Forgotten ThreadLocal Variables in Servlet Filters</div>
-          <pre class="code-font text-[11px] text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>public class TenantFilter extends OncePerRequestFilter {
+          <pre class="language-java code-font text-sm text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">public class TenantFilter extends OncePerRequestFilter {
     public static final ThreadLocal&lt;SecurityContext&gt; contextHolder = new ThreadLocal&lt;&gt;();
 
     @Override
@@ -195,7 +217,7 @@ public class UserService {
     }
 }</code></pre>
           <div class="text-emerald-400 font-semibold">
-            Senior Fix: Always wrap ThreadLocal cleanups in a <code class="font-mono text-[11px]">try ... finally { contextHolder.remove(); }</code> block.
+            Senior Fix: Always wrap ThreadLocal cleanups in a <code class="font-mono text-sm">try ... finally { contextHolder.remove(); }</code> block.
           </div>
         </div>
 
@@ -249,5 +271,7 @@ public class UserService {
   <script src="gemini_assistant.js"></script>
 </body>
 </html>
+
+
 
 

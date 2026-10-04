@@ -8,6 +8,28 @@
   <style>
     .code-font { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
   </style>
+  <!-- Prism.js One Dark IDE Syntax Highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #0d1117 !important;
+      border: 1px solid #30363d !important;
+      border-radius: 0.75rem !important;
+      padding: 1.1rem !important;
+      font-size: 0.95rem !important;
+      line-height: 1.6 !important;
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
+    }
+    code[class*="language-"] {
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
+      font-size: 0.95rem !important;
+    }
+  </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
 
@@ -50,15 +72,15 @@
         Given a list of Order objects with <code class="font-mono text-xs">customerId</code> and <code class="font-mono text-xs">amount</code>, produce a summary map: <code class="font-mono text-xs">{ customerId -> totalSpent }</code>.
       </p>
 
-      <div class="space-y-4 text-xs">
+      <div class="space-y-4 text-sm">
         
         <!-- Node.js Version -->
         <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
           <div class="flex items-center justify-between">
             <span class="font-bold text-emerald-400">Node.js (Array.prototype.reduce)</span>
-            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px]">JavaScript Standard</span>
+            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-xs">JavaScript Standard</span>
           </div>
-          <pre class="code-font text-[11px] text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>// Node.js: reduce into an accumulator object
+          <pre class="language-javascript code-font text-sm text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-javascript">// Node.js: reduce into an accumulator object
 function calculateCustomerTotals(orders) {
   return orders.reduce((acc, order) => {
     const { customerId, amount } = order;
@@ -74,9 +96,9 @@ function calculateCustomerTotals(orders) {
         <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
           <div class="flex items-center justify-between">
             <span class="font-bold text-sky-400">Java 8 (Streams & Collectors.groupingBy)</span>
-            <span class="px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 text-[10px]">Java 8 Functional Pipeline</span>
+            <span class="px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 text-xs">Java 8 Functional Pipeline</span>
           </div>
-          <pre class="code-font text-[11px] text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>// Java 8: Streams API with Collector composition
+          <pre class="language-java code-font text-sm text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">// Java 8: Streams API with Collector composition
 public Map&lt;String, Double&gt; calculateCustomerTotals(List&lt;Order&gt; orders) {
     return orders.stream()
         .collect(Collectors.groupingBy(
@@ -91,9 +113,9 @@ public Map&lt;String, Double&gt; calculateCustomerTotals(List&lt;Order&gt; order
         <div class="p-4 rounded-xl bg-slate-900 border border-indigo-500/40 bg-indigo-950/20 space-y-2">
           <div class="flex items-center justify-between">
             <span class="font-bold text-indigo-300">Modern Java 21 (Records + Pattern Matching + Parallel Stream)</span>
-            <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px]">Modern Java Clean Architecture</span>
+            <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-xs">Modern Java Clean Architecture</span>
           </div>
-          <pre class="code-font text-[11px] text-indigo-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>// 1. In Java 16+, 'record' replaces boilerplate POJO DTOs with auto-generated getters, equals, hashCode:
+          <pre class="language-java code-font text-sm text-indigo-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">// 1. In Java 16+, 'record' replaces boilerplate POJO DTOs with auto-generated getters, equals, hashCode:
 public record Order(String customerId, double amount, String status) {}
 
 // 2. High-throughput calculation across millions of records using multi-core parallelStream:
@@ -120,7 +142,7 @@ public Map&lt;String, Double&gt; calculateHighVolumeTotals(List&lt;Order&gt; ord
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
         <div class="p-4 rounded-xl bg-slate-900 border border-rose-800/40 bg-rose-950/20 space-y-2">
           <div class="font-bold text-rose-400">âŒ Java 8 Flaw: Naive HashMap in Spring Bean</div>
-          <pre class="code-font text-[11px] text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>@Service
+          <pre class="language-java code-font text-sm text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">@Service
 public class TokenCacheService {
     // DISASTER: Multiple threads calling put/get simultaneously!
     private Map&lt;String, UserToken&gt; cache = new HashMap&lt;&gt;();
@@ -139,7 +161,7 @@ public class TokenCacheService {
 
         <div class="p-4 rounded-xl bg-slate-900 border border-emerald-800/40 bg-emerald-950/20 space-y-2">
           <div class="font-bold text-emerald-400">âœ… Senior Code: Atomic computeIfAbsent in ConcurrentHashMap</div>
-          <pre class="code-font text-[11px] text-emerald-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>@Service
+          <pre class="language-java code-font text-sm text-emerald-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">@Service
 public class TokenCacheService {
     // Thread-safe with segment-level lock striping
     private final ConcurrentMap&lt;String, UserToken&gt; cache = 
@@ -171,5 +193,7 @@ public class TokenCacheService {
   <script src="gemini_assistant.js"></script>
 </body>
 </html>
+
+
 
 

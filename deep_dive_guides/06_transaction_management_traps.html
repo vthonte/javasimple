@@ -8,6 +8,28 @@
   <style>
     .code-font { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
   </style>
+  <!-- Prism.js One Dark IDE Syntax Highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #0d1117 !important;
+      border: 1px solid #30363d !important;
+      border-radius: 0.75rem !important;
+      padding: 1.1rem !important;
+      font-size: 0.95rem !important;
+      line-height: 1.6 !important;
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
+    }
+    code[class*="language-"] {
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
+      font-size: 0.95rem !important;
+    }
+  </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
 
@@ -52,7 +74,7 @@
         <!-- Node.js / Prisma Interactive Transaction -->
         <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
           <div class="font-bold text-emerald-400">Node.js (Prisma $transaction closure)</div>
-          <pre class="code-font text-[11px] text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>async function transferMoney(fromId, toId, amount) {
+          <pre class="language-java code-font text-sm text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">async function transferMoney(fromId, toId, amount) {
   // Prisma $transaction: Executes all steps inside 1 DB transaction
   return await prisma.$transaction(async (tx) => {
     // 1. Deduct from sender
@@ -80,7 +102,7 @@
         <!-- Spring Boot Declarative Transaction -->
         <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
           <div class="font-bold text-indigo-400">Java Spring Boot (@Transactional)</div>
-          <pre class="code-font text-[11px] text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>@Service
+          <pre class="language-java code-font text-sm text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">@Service
 public class BankTransferService {
 
     private final AccountRepository accountRepo;
@@ -114,11 +136,11 @@ public class BankTransferService {
         Code Lab 2: The Self-Invocation Bug & The 2 Senior Refactoring Solutions
       </h2>
 
-      <div class="space-y-4 text-xs">
+      <div class="space-y-4 text-sm">
         
         <div class="p-5 rounded-xl bg-slate-900 border border-rose-800/40 bg-rose-950/20 space-y-2">
           <div class="font-bold text-rose-400 text-sm">âŒ The Broken Code (Self-Invocation):</div>
-          <pre class="code-font text-[11px] text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>@Service
+          <pre class="language-java code-font text-sm text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">@Service
 public class OrderService {
 
     public void processOrder(Order order) {
@@ -133,7 +155,7 @@ public class OrderService {
         auditRepo.save(new AuditLog("ORDER_CREATED"));
     }
 }</code></pre>
-          <p class="text-slate-400 text-[11px]">
+          <p class="text-slate-400 text-sm">
             <strong>Why:</strong> Spring creates a proxy <em>around</em> the bean. When <code class="font-mono text-rose-300">processOrder</code> is called, execution enters the real object. Inside the real object, <code class="font-mono text-rose-300">this</code> points to the plain Java instance, not the proxy wrapper!
           </p>
         </div>
@@ -141,7 +163,7 @@ public class OrderService {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="p-4 rounded-xl bg-slate-900 border border-emerald-800/40 bg-emerald-950/20 space-y-2">
             <div class="font-bold text-emerald-400">âœ… Senior Solution 1: Clean Architectural Separation</div>
-            <pre class="code-font text-[11px] text-emerald-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>@Service
+            <pre class="language-java code-font text-sm text-emerald-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">@Service
 public class OrderService {
     // Inject the dedicated transactional collaborator:
     private final OrderWriterService orderWriter;
@@ -160,7 +182,7 @@ public class OrderService {
 
           <div class="p-4 rounded-xl bg-slate-900 border border-emerald-800/40 bg-emerald-950/20 space-y-2">
             <div class="font-bold text-emerald-400">âœ… Senior Solution 2: Programmatic TransactionTemplate</div>
-            <pre class="code-font text-[11px] text-emerald-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>@Service
+            <pre class="language-java code-font text-sm text-emerald-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">@Service
 public class OrderService {
     private final TransactionTemplate txTemplate;
 
@@ -198,5 +220,7 @@ public class OrderService {
   <script src="gemini_assistant.js"></script>
 </body>
 </html>
+
+
 
 

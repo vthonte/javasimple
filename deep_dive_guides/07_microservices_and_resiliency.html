@@ -8,6 +8,28 @@
   <style>
     .code-font { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
   </style>
+  <!-- Prism.js One Dark IDE Syntax Highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #0d1117 !important;
+      border: 1px solid #30363d !important;
+      border-radius: 0.75rem !important;
+      padding: 1.1rem !important;
+      font-size: 0.95rem !important;
+      line-height: 1.6 !important;
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
+    }
+    code[class*="language-"] {
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
+      font-size: 0.95rem !important;
+    }
+  </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
 
@@ -51,7 +73,7 @@
 
       <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3 text-xs">
         <div class="font-bold text-rose-400 text-sm">The Naive Code Pattern Found in Inexperienced Codebases:</div>
-        <pre class="code-font text-[11px] text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>@Transactional
+        <pre class="language-java code-font text-sm text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">@Transactional
 public void placeOrder(Order order) {
     orderRepository.save(order); // Step 1: Write to PostgreSQL
     kafkaTemplate.send("order-created", order); // Step 2: Publish to Kafka
@@ -73,13 +95,13 @@ public void placeOrder(Order order) {
         The Industry Standard Solution: Transactional Outbox Pattern
       </h2>
 
-      <div class="p-6 rounded-xl bg-slate-900 border border-slate-800 space-y-4 text-xs">
+      <div class="p-6 rounded-xl bg-slate-900 border border-slate-800 space-y-4 text-sm">
         <p class="text-slate-300 leading-relaxed">
           Instead of publishing to Kafka directly inside the HTTP request, write the event into an <code class="font-mono text-emerald-400 text-xs">OUTBOX</code> table in the <strong>exact same relational database transaction</strong>!
         </p>
 
         <div class="p-4 rounded-lg bg-slate-950 border border-slate-800">
-          <pre class="code-font text-[11px] text-emerald-200 overflow-x-auto"><code>@Transactional
+          <pre class="language-java code-font text-sm text-emerald-200 overflow-x-auto"><code class="language-java">@Transactional
 public void placeOrder(Order order) {
     orderRepository.save(order); // 1. Save business entity
 
@@ -112,7 +134,7 @@ public void placeOrder(Order order) {
           <p class="text-slate-400 leading-relaxed">
             Each service acts independently and listens to domain events from Kafka.
             <br><br>
-            Order Service emits <code class="font-mono text-[11px]">OrderCreated</code> $\rightarrow$ Payment Service listens and charges card, emits <code class="font-mono text-[11px]">PaymentSuccess</code> $\rightarrow$ Inventory Service listens and reserves stock.
+            Order Service emits <code class="font-mono text-sm">OrderCreated</code> $\rightarrow$ Payment Service listens and charges card, emits <code class="font-mono text-sm">PaymentSuccess</code> $\rightarrow$ Inventory Service listens and reserves stock.
             <br><br>
             <strong>Pros:</strong> Simple, decoupled. <br>
             <strong>Cons:</strong> Hard to debug when 8+ services are involved; cyclic dependencies.
@@ -126,7 +148,7 @@ public void placeOrder(Order order) {
             <br><br>
             "OrderOrchestrator calls Payment âž” calls Inventory âž” confirms Order".
             <br><br>
-            If Inventory fails: Orchestrator explicitly invokes <code class="font-mono text-[11px]">refundPayment()</code> compensating transaction. State is visible in one place.
+            If Inventory fails: Orchestrator explicitly invokes <code class="font-mono text-sm">refundPayment()</code> compensating transaction. State is visible in one place.
           </p>
         </div>
       </div>
@@ -145,7 +167,7 @@ public void placeOrder(Order order) {
         </p>
 
         <div class="p-4 rounded-lg bg-slate-950 border border-slate-800">
-          <pre class="code-font text-[11px] text-sky-200 overflow-x-auto"><code>@Service
+          <pre class="language-java code-font text-sm text-sky-200 overflow-x-auto"><code class="language-java">@Service
 public class PaymentGatewayClient {
 
     @CircuitBreaker(name = "stripeBreaker", fallbackMethod = "fallbackCharge")
@@ -180,5 +202,7 @@ public class PaymentGatewayClient {
   <script src="gemini_assistant.js"></script>
 </body>
 </html>
+
+
 
 

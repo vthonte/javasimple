@@ -8,6 +8,28 @@
   <style>
     .code-font { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
   </style>
+  <!-- Prism.js One Dark IDE Syntax Highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #0d1117 !important;
+      border: 1px solid #30363d !important;
+      border-radius: 0.75rem !important;
+      padding: 1.1rem !important;
+      font-size: 0.95rem !important;
+      line-height: 1.6 !important;
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
+    }
+    code[class*="language-"] {
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
+      font-size: 0.95rem !important;
+    }
+  </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
 
@@ -47,15 +69,15 @@
         Code Lab 1: Wiring Controller $\rightarrow$ Service $\rightarrow$ Repository
       </h2>
 
-      <div class="space-y-4 text-xs">
+      <div class="space-y-4 text-sm">
         
         <!-- Express / Node.js -->
         <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
           <div class="flex items-center justify-between">
             <span class="font-bold text-emerald-400">1. Node.js (Express - Manual Factory / Imports)</span>
-            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px]">No Built-in Container</span>
+            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-xs">No Built-in Container</span>
           </div>
-          <pre class="code-font text-[11px] text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>// user.service.js
+          <pre class="language-java code-font text-sm text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">// user.service.js
 import db from '../db.js';
 import emailClient from '../mailer.js';
 
@@ -81,9 +103,9 @@ router.post('/register', (req, res) => userService.registerUser(req.body.email))
         <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
           <div class="flex items-center justify-between">
             <span class="font-bold text-sky-400">2. Node.js (NestJS - TypeScript IoC Container)</span>
-            <span class="px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 text-[10px]">Reflection-based DI (Inspired by Spring!)</span>
+            <span class="px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 text-xs">Reflection-based DI (Inspired by Spring!)</span>
           </div>
-          <pre class="code-font text-[11px] text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>// user.service.ts
+          <pre class="language-java code-font text-sm text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">// user.service.ts
 @Injectable()
 export class UserService {
   constructor(
@@ -114,9 +136,9 @@ export class UserController {
         <div class="p-4 rounded-xl bg-slate-900 border border-indigo-500/40 bg-indigo-950/20 space-y-2">
           <div class="flex items-center justify-between">
             <span class="font-bold text-indigo-300">3. Spring Boot (Modern Java 21 - Constructor Injection)</span>
-            <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px]">Enterprise Production Standard</span>
+            <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-xs">Enterprise Production Standard</span>
           </div>
-          <pre class="code-font text-[11px] text-indigo-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>// 1. Service Layer
+          <pre class="language-java code-font text-sm text-indigo-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">// 1. Service Layer
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -150,7 +172,7 @@ public class UserController {
         return ResponseEntity.ok(userService.registerUser(req.email()));
     }
 }</code></pre>
-          <div class="text-[11px] text-emerald-400">
+          <div class="text-sm text-emerald-400">
             <strong>Why NestJS and Spring look identical:</strong> NestJS was explicitly designed by copying Spring Framework's architecture! If you understand NestJS DI, you already understand 95% of Spring's IoC container.
           </div>
         </div>
@@ -169,7 +191,7 @@ public class UserController {
       </p>
 
       <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 text-xs">
-        <pre class="code-font text-[11px] text-emerald-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>@Component
+        <pre class="language-java code-font text-sm text-emerald-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">@Component
 public class CacheWarmerManager {
 
     private final RedisTemplate&lt;String, String&gt; redisTemplate;
@@ -215,5 +237,7 @@ public class CacheWarmerManager {
   <script src="gemini_assistant.js"></script>
 </body>
 </html>
+
+
 
 
