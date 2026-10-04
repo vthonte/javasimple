@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Dive Topic: Distributed Transactions, Dual-Write & Saga Pattern</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0.75rem !important;
+      padding: 1rem !important;
+      font-size: 0.9rem !important;
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="../index.html" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-semibold">
+        ← All Curriculum Topics
+      </a>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-cyan-700 font-mono font-bold">Track 6: Distributed Systems</span>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-slate-500 font-mono">Topic: Saga & Outbox</span>
+    </div>
+    <div>
+      <span class="px-2.5 py-1 rounded-full bg-cyan-100 text-cyan-800 text-xs font-semibold">Senior / Lead Bar</span>
+    </div>
+  </header>
+
+  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-10">
+    
+    <div class="space-y-3 border-b border-slate-200 pb-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-50 text-cyan-700 border border-cyan-200 text-xs font-semibold">
+        🌐 Microservices Architecture • Data Consistency
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        Distributed Transactions: The Dual-Write Problem, Transactional Outbox & Saga Pattern
+      </h1>
+      <p class="text-slate-600 text-base leading-relaxed">
+        Why 2-Phase Commit (2PC) fails in cloud microservices: solving the Dual-Write trap using PostgreSQL WAL + Debezium CDC, and implementing Choreography vs Orchestration Sagas with compensating transactions.
+      </p>
+    </div>
+
+    <!-- ELI5 MENTAL MODEL -->
+    <section class="p-6 rounded-2xl bg-cyan-50/70 border border-cyan-200 space-y-3">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">💡</span>
+        <h2 class="text-lg font-bold text-cyan-950">ELI5: The Travel Booking Trip (Sagas)</h2>
+      </div>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        You book a vacation that requires 3 steps: Flight, Hotel, and Rental Car. Each belongs to a different company (different microservices with separate databases). You cannot wrap all 3 in a single SQL transaction.
+      </p>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        The <strong>Saga Pattern</strong> is a series of local transactions. Flight is booked successfully. Hotel is booked successfully. But the Rental Car is sold out! The Saga initiates <strong>Compensating Transactions</strong>: it automatically sends messages to cancel the Hotel reservation and refund the Flight ticket, returning the system to a clean, consistent state!
+      </p>
+    </section>
+
+    <!-- TRANSACTIONAL OUTBOX PATTERN -->
+    <section class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+        <span>📬</span> The Transactional Outbox Pattern in Code
+      </h2>
+      <p class="text-xs text-slate-600 leading-relaxed">
+        Instead of calling Kafka inside your transaction, insert the event into an <code class="font-mono text-cyan-700">outbox</code> table in the same DB transaction:
+      </p>
+
+      <pre class="language-java"><code class="language-java">@Transactional
+public OrderDTO createOrder(CreateOrderRequest req) {
+    // 1. Insert into orders table
+    Order order = orderRepository.save(new Order(req.userId(), req.amount()));
+
+    // 2. Insert into outbox table in the SAME transaction!
+    OutboxEvent event = new OutboxEvent(
+        "OrderCreated",
+        order.getId().toString(),
+        objectMapper.writeValueAsString(new OrderCreatedPayload(order.getId(), req.userId()))
+    );
+    outboxRepository.save(event);
+
+    return new OrderDTO(order.getId());
+    // Both commit atomically! Zero chance of dual-write corruption!
+}</code></pre>
+    </section>
+
+    <!-- SAGA: CHOREOGRAPHY VS ORCHESTRATION -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-slate-900">Saga Architecture: Choreography vs. Orchestration</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+        <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+          <div class="font-bold text-indigo-800 text-sm">Choreography (Event-Driven)</div>
+          <p class="text-slate-600 font-sans">
+            Services listen to events and decide next action autonomously. No central coordinator. Simple for 2-3 services, but difficult to track workflows when &gt; 5 services interact.
+          </p>
+        </div>
+        <div class="p-4 bg-cyan-50 border border-cyan-200 rounded-xl space-y-2">
+          <div class="font-bold text-cyan-800 text-sm">Orchestration (Workflow Engine)</div>
+          <p class="text-slate-600 font-sans">
+            A central orchestrator (e.g. Temporal, Camunda, or Spring StateMachine) coordinates calls, tracks status, and handles rollbacks explicitly. Clear visibility into business transactions.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cross-Links -->
+    <div class="p-4 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 flex flex-wrap items-center justify-between gap-3">
+      <span>Read next: <a href="resilience_and_circuit_breakers.html" class="text-indigo-600 font-semibold hover:underline">Topic: Circuit Breakers & Resilience4j</a> and <a href="transactions_and_isolation.html" class="text-indigo-600 font-semibold hover:underline">Topic: Transactions & Isolation</a></span>
+      <a href="../index.html" class="text-slate-900 font-bold hover:underline">Back to Curriculum Index →</a>
+    </div>
+
+  </main>
+  <script src="../voice_narrator.js"></script>
+  <script src="../gemini_assistant.js"></script>
+</body>
+</html>

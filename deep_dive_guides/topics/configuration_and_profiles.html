@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Dive Topic: Configuration & Profiles (application.yml & Profiles)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0.75rem !important;
+      padding: 1rem !important;
+      font-size: 0.9rem !important;
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="../index.html" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-semibold">
+        ← All Curriculum Topics
+      </a>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-emerald-700 font-mono font-bold">Track 2: Spring Boot Fundamentals</span>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-slate-500 font-mono">Topic: Configuration & Profiles</span>
+    </div>
+    <div>
+      <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">Newbie to Pro</span>
+    </div>
+  </header>
+
+  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-10">
+    
+    <div class="space-y-3 border-b border-slate-200 pb-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
+        ⚙️ Configuration Architecture • 12-Factor App
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        Configuration, Environment Variables & Profiles (Node .env vs Spring YAML)
+      </h1>
+      <p class="text-slate-600 text-base leading-relaxed">
+        How Spring Boot loads configuration: application.properties vs application.yml, switching environments with Profiles (dev vs stage vs prod), and type-safe binding with @ConfigurationProperties.
+      </p>
+    </div>
+
+    <!-- ELI5 MENTAL MODEL -->
+    <section class="p-6 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-3">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">💡</span>
+        <h2 class="text-lg font-bold text-emerald-950">ELI5: The Chameleon's Wardrobe (Spring Profiles)</h2>
+      </div>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        In Node, you usually have <code class="font-mono bg-white px-1 py-0.5 rounded text-amber-700">.env.development</code> and <code class="font-mono bg-white px-1 py-0.5 rounded text-amber-700">.env.production</code> loaded by <code class="font-mono">dotenv</code>.
+      </p>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        Spring Boot has native, built-in <strong>Profiles</strong>. You create <code class="font-mono text-emerald-800">application-dev.yml</code> (connecting to localhost Postgres) and <code class="font-mono text-emerald-800">application-prod.yml</code> (connecting to AWS RDS). By passing a single environment variable <code class="font-mono bg-white px-1 py-0.5 rounded text-indigo-700">SPRING_PROFILES_ACTIVE=prod</code>, Spring changes its entire behavior without changing a single line of Java code!
+      </p>
+    </section>
+
+    <!-- CODE LAB: TYPE-SAFE CONFIGURATION -->
+    <section class="space-y-6">
+      <h2 class="text-xl font-bold text-slate-900">Type-Safe Configuration: The Senior Way</h2>
+
+      <p class="text-xs text-slate-600">
+        In Node, developers read raw strings with <code class="font-mono text-amber-700">process.env.JWT_SECRET</code>, risking runtime crashes if misspelled. In Spring Boot, you bind entire YAML blocks to a strongly typed Java class:
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div>
+          <div class="font-bold text-slate-800 mb-1">application.yml</div>
+          <pre class="language-yaml"><code class="language-yaml">app:
+  jwt:
+    secret-key: "my-super-secret-key-that-is-very-long"
+    expiration-ms: 86400000 # 24 hours
+  stripe:
+    api-key: "sk_test_12345"
+    timeout-seconds: 5</code></pre>
+        </div>
+        <div>
+          <div class="font-bold text-indigo-800 mb-1">JwtProperties.java (@ConfigurationProperties)</div>
+          <pre class="language-java"><code class="language-java">@ConfigurationProperties(prefix = "app.jwt")
+@Validated
+public record JwtProperties(
+    @NotBlank String secretKey,
+    @Positive long expirationMs
+) {}</code></pre>
+          <p class="text-[11px] text-slate-500 mt-1">If the secret key is missing or expiration is negative, the app <strong>fails fast at boot</strong> with a clear error!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ENVIRONMENT VARIABLE OVERRIDE IN DOCKER/K8S -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-slate-900">Relaxed Binding: Overriding YAML in Kubernetes</h2>
+      <p class="text-xs text-slate-600">
+        Spring Boot supports <strong>Relaxed Binding</strong>. You don't need to touch the YAML file in production; just set an uppercase environment variable in Docker or Kubernetes:
+      </p>
+      
+      <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono space-y-2">
+        <div class="text-slate-600">YAML property: <code class="text-indigo-700">app.jwt.secret-key</code></div>
+        <div class="text-emerald-700 font-bold">Linux / Docker Env Var: <code class="bg-white p-1 rounded border">APP_JWT_SECRET_KEY=prod-secret</code></div>
+        <div class="text-slate-600 mt-1">YAML property: <code class="text-indigo-700">spring.datasource.password</code></div>
+        <div class="text-emerald-700 font-bold">Linux / Docker Env Var: <code class="bg-white p-1 rounded border">SPRING_DATASOURCE_PASSWORD=db-password</code></div>
+      </div>
+    </section>
+
+    <!-- Cross-Links -->
+    <div class="p-4 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 flex flex-wrap items-center justify-between gap-3">
+      <span>Read next: <a href="spring_boot_actuator.html" class="text-indigo-600 font-semibold hover:underline">Topic: Spring Boot Actuator</a> and <a href="spring_boot_for_beginners.html" class="text-indigo-600 font-semibold hover:underline">Topic: Spring Boot 101</a></span>
+      <a href="../index.html" class="text-slate-900 font-bold hover:underline">Back to Curriculum Index →</a>
+    </div>
+
+  </main>
+  <script src="../voice_narrator.js"></script>
+  <script src="../gemini_assistant.js"></script>
+</body>
+</html>

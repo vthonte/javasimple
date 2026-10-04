@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Dive Topic: Spring Boot Actuator & Production Observability</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0.75rem !important;
+      padding: 1rem !important;
+      font-size: 0.9rem !important;
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="../index.html" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-semibold">
+        ← All Curriculum Topics
+      </a>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-emerald-700 font-mono font-bold">Track 2: Spring Boot Fundamentals</span>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-slate-500 font-mono">Topic: Actuator & Observability</span>
+    </div>
+    <div>
+      <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">Production Ready</span>
+    </div>
+  </header>
+
+  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-10">
+    
+    <div class="space-y-3 border-b border-slate-200 pb-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
+        📡 Observability • Kubernetes Readiness
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        Spring Boot Actuator: Health Checks, Metrics & Kubernetes Probes
+      </h1>
+      <p class="text-slate-600 text-base leading-relaxed">
+        Production-ready features out of the box: Liveness and Readiness probes for Kubernetes, exposing Prometheus metrics, inspecting thread dumps, and securing sensitive actuator endpoints.
+      </p>
+    </div>
+
+    <!-- ELI5 MENTAL MODEL -->
+    <section class="p-6 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-3">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">💡</span>
+        <h2 class="text-lg font-bold text-emerald-950">ELI5: The Hospital Heart Monitor & Vitals Dashboard</h2>
+      </div>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        In Node, developers manually code custom <code class="font-mono bg-white px-1 py-0.5 rounded text-amber-700">app.get('/health', ...)</code> routes and install <code class="font-mono">prom-client</code> to measure traffic and memory.
+      </p>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        <strong>Spring Boot Actuator</strong> adds a full telemetry dashboard with zero custom code. Adding <code class="font-mono text-emerald-800">spring-boot-starter-actuator</code> instantly wires health checks for your database, Redis cache, and disk space, plus tracks JVM memory and HTTP request percentiles.
+      </p>
+    </section>
+
+    <!-- KUBERNETES PROBES: LIVENESS VS READINESS -->
+    <section class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+        <span>☸️</span> Kubernetes Liveness vs. Readiness Probes
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+        <div class="p-4 bg-sky-50 border border-sky-200 rounded-xl space-y-2">
+          <div class="font-bold text-sky-800 text-sm">/actuator/health/liveness</div>
+          <p class="text-slate-600 font-sans">
+            <strong>Question:</strong> "Is the JVM running and not deadlocked?"<br>
+            <strong>Action if FAIL:</strong> Kubernetes kills the container and restarts the pod!
+          </p>
+        </div>
+        <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl space-y-2">
+          <div class="font-bold text-emerald-800 text-sm">/actuator/health/readiness</div>
+          <p class="text-slate-600 font-sans">
+            <strong>Question:</strong> "Is the database reachable and cache warm?"<br>
+            <strong>Action if FAIL:</strong> Kubernetes stops sending user traffic, but does NOT restart the pod.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONFIGURATION & EXPOSURE -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-slate-900">Configuring & Securing Actuator Endpoints</h2>
+      <p class="text-xs text-slate-600">By default, only <code class="font-mono">/health</code> is exposed over HTTP for security. Expose metrics and prometheus in <code class="font-mono">application.yml</code>:</p>
+
+      <pre class="language-yaml"><code class="language-yaml">management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,prometheus" # NEVER expose 'env' or 'shutdown' publicly!
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true # Enables K8s liveness & readiness groups
+  metrics:
+    export:
+      prometheus:
+        enabled: true # Scraped by Prometheus / Grafana at /actuator/prometheus</code></pre>
+    </section>
+
+    <!-- Cross-Links -->
+    <div class="p-4 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 flex flex-wrap items-center justify-between gap-3">
+      <span>Read next: <a href="profiling_and_debugging.html" class="text-indigo-600 font-semibold hover:underline">Topic: Profiling & Live Debugging</a> and <a href="spring_boot_for_beginners.html" class="text-indigo-600 font-semibold hover:underline">Topic: Spring Boot 101</a></span>
+      <a href="../index.html" class="text-slate-900 font-bold hover:underline">Back to Curriculum Index →</a>
+    </div>
+
+  </main>
+  <script src="../voice_narrator.js"></script>
+  <script src="../gemini_assistant.js"></script>
+</body>
+</html>

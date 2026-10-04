@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Dive Topic: Spring Boot Auto-Configuration Demystified</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0.75rem !important;
+      padding: 1rem !important;
+      font-size: 0.9rem !important;
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="../index.html" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-semibold">
+        ← All Curriculum Topics
+      </a>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-emerald-700 font-mono font-bold">Track 2: Spring Boot Fundamentals</span>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-slate-500 font-mono">Topic: Auto-Configuration</span>
+    </div>
+    <div>
+      <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">Newbie to Pro</span>
+    </div>
+  </header>
+
+  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-10">
+    
+    <div class="space-y-3 border-b border-slate-200 pb-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
+        ⚙️ Spring Boot Internals • Behind the Magic
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        Spring Boot Auto-Configuration Demystified
+      </h1>
+      <p class="text-slate-600 text-base leading-relaxed">
+        How does Spring Boot "know" you added PostgreSQL or Redis? Understanding condition annotations (@ConditionalOnClass, @ConditionalOnMissingBean), how HikariCP connection pools get created automatically, and how to inspect conditions in production.
+      </p>
+    </div>
+
+    <!-- ELI5 MENTAL MODEL -->
+    <section class="p-6 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-3">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">💡</span>
+        <h2 class="text-lg font-bold text-emerald-950">ELI5: The Smart Smartphone (Sensors & Adaptation)</h2>
+      </div>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        When you plug headphones into your phone, you don't open the settings menu and configure audio drivers manually. The phone has a hardware sensor that detects the headphone jack and routes audio automatically. But if you connect Bluetooth headphones, it adapts and routes audio to Bluetooth instead.
+      </p>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        <strong>Spring Boot Auto-Configuration</strong> works the same way. At startup, it scans your classpath. If it spots the <code class="font-mono bg-white px-1 py-0.5 rounded text-emerald-800">org.postgresql.Driver</code> class in your dependencies, it says: <em>"Aha! The developer wants PostgreSQL! Let me automatically create a HikariCP connection pool and configure a DataSource bean for them."</em>
+      </p>
+    </section>
+
+    <!-- CONDITIONAL ANNOTATIONS -->
+    <section class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+        <span>🔍</span> The "Magic" Annotations Behind Auto-Configuration
+      </h2>
+      <p class="text-xs text-slate-600 leading-relaxed">
+        Auto-configuration is NOT magic. It is plain Java code with <strong>Conditional Annotations</strong>. Here is the actual source code pattern inside Spring Boot's <code class="font-mono text-emerald-700">DataSourceAutoConfiguration</code>:
+      </p>
+
+      <pre class="language-java"><code class="language-java">@Configuration
+// 1. Only run if DataSource is on the classpath!
+@ConditionalOnClass({ DataSource.class, EmbeddedDatabaseType.class })
+// 2. Only run if the user didn't write their own custom DataSource bean!
+@ConditionalOnMissingBean(type = "javax.sql.DataSource")
+public class DataSourceAutoConfiguration {
+
+    @Bean
+    @ConfigurationProperties(prefix = "spring.datasource.hikari")
+    public HikariDataSource dataSource(DataSourceProperties properties) {
+        // Automatically builds HikariCP connection pool using application.properties!
+        return properties.initializeDataSourceBuilder().type(HikariDataSource.class).build();
+    }
+}</code></pre>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+          <span class="font-bold text-slate-800">@ConditionalOnClass</span>
+          <p class="text-slate-600">Triggers ONLY if a specific library JAR exists in <code class="font-mono">pom.xml</code>.</p>
+        </div>
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+          <span class="font-bold text-slate-800">@ConditionalOnMissingBean</span>
+          <p class="text-slate-600">Lets you override defaults! If you write your own <code class="font-mono">@Bean DataSource</code>, Spring Boot's auto-config gracefully steps aside.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEBUGGING AUTO-CONFIGURATION -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-slate-900">How to Inspect Auto-Configuration in Terminal</h2>
+      <p class="text-xs text-slate-600">Wondering what Spring Boot configured and what it skipped? Run with <code class="font-mono text-indigo-700">--debug</code>:</p>
+      <pre class="language-bash"><code class="language-bash">java -jar app.jar --debug</code></pre>
+      
+      <div class="p-4 rounded-xl bg-slate-900 text-slate-100 font-mono text-xs space-y-2">
+        <div class="text-emerald-400">============================</div>
+        <div class="text-emerald-400">CONDITIONS EVALUATION REPORT</div>
+        <div class="text-emerald-400">============================</div>
+        <div class="text-slate-300">Positive matches: (Auto-configured successfully)</div>
+        <div class="text-slate-400">• DataSourceAutoConfiguration matched:</div>
+        <div class="text-slate-400">&nbsp;&nbsp;- @ConditionalOnClass found DataSource.class</div>
+        <div class="text-slate-400">&nbsp;&nbsp;- @ConditionalOnMissingBean (types: javax.sql.DataSource) found no existing bean</div>
+        <div class="text-slate-300 mt-2">Negative matches: (Skipped)</div>
+        <div class="text-slate-400">• MongoAutoConfiguration: @ConditionalOnClass did not find MongoClient.class</div>
+      </div>
+    </section>
+
+    <!-- Cross-Links -->
+    <div class="p-4 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 flex flex-wrap items-center justify-between gap-3">
+      <span>Read next: <a href="configuration_and_profiles.html" class="text-indigo-600 font-semibold hover:underline">Topic: Configuration & Profiles</a> and <a href="spring_boot_for_beginners.html" class="text-indigo-600 font-semibold hover:underline">Topic: Spring Boot 101</a></span>
+      <a href="../index.html" class="text-slate-900 font-bold hover:underline">Back to Curriculum Index →</a>
+    </div>
+
+  </main>
+  <script src="../voice_narrator.js"></script>
+  <script src="../gemini_assistant.js"></script>
+</body>
+</html>

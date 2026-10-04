@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Dive Topic: Spring Boot Testing (JUnit 5, Mockito & MockMvc)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0.75rem !important;
+      padding: 1rem !important;
+      font-size: 0.9rem !important;
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="../index.html" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-semibold">
+        ← All Curriculum Topics
+      </a>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-emerald-700 font-mono font-bold">Track 2: Spring Boot Fundamentals</span>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-slate-500 font-mono">Topic: Testing</span>
+    </div>
+    <div>
+      <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">Newbie to Pro</span>
+    </div>
+  </header>
+
+  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-10">
+    
+    <div class="space-y-3 border-b border-slate-200 pb-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
+        🧪 Testing Pyramid • Quality Gates
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        Spring Boot Testing: JUnit 5, Mockito & MockMvc (Jest vs Spring Test)
+      </h1>
+      <p class="text-slate-600 text-base leading-relaxed">
+        Writing clean, fast backend tests: Pure Unit Tests with JUnit 5 + Mockito vs Web Slice Tests with @WebMvcTest vs Full Integration Tests with @SpringBootTest and Testcontainers.
+      </p>
+    </div>
+
+    <!-- ELI5 MENTAL MODEL -->
+    <section class="p-6 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-3">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">💡</span>
+        <h2 class="text-lg font-bold text-emerald-950">ELI5: The 3 Layers of the Testing Pyramid</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+        <div class="p-3.5 bg-white rounded-xl border border-emerald-100 shadow-sm space-y-1">
+          <span class="font-bold text-emerald-800 block">1. Pure Unit Test (Fastest: 5ms)</span>
+          <p class="text-slate-600">Tests 1 class in isolation. No Spring container is booted. Use Mockito to fake dependencies.</p>
+        </div>
+        <div class="p-3.5 bg-white rounded-xl border border-emerald-100 shadow-sm space-y-1">
+          <span class="font-bold text-sky-800 block">2. Web Slice (@WebMvcTest: 100ms)</span>
+          <p class="text-slate-600">Boots ONLY the web controller layer + JSON serializer. No database or external services.</p>
+        </div>
+        <div class="p-3.5 bg-white rounded-xl border border-emerald-100 shadow-sm space-y-1">
+          <span class="font-bold text-purple-800 block">3. Integration Test (@SpringBootTest: 2s)</span>
+          <p class="text-slate-600">Boots the entire application context and tests real database transactions end-to-end.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CODE LAB 1: PURE UNIT TEST WITH MOCKITO -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-slate-900">Level 1: Pure Service Unit Test (Mockito)</h2>
+      <p class="text-xs text-slate-600">Compares directly to Jest mocks (<code class="font-mono">jest.spyOn</code>):</p>
+
+      <pre class="language-java"><code class="language-java">@ExtendWith(MockitoExtension.class)
+class UserServiceTest {
+
+    @Mock
+    private UserRepository userRepository;
+
+    @InjectMocks
+    private UserService userService;
+
+    @Test
+    void shouldCreateUserSuccessfully() {
+        // Given
+        CreateUserRequest req = new CreateUserRequest("alice", "alice@test.com", 25);
+        User savedUser = new User(101L, "alice", "alice@test.com");
+        
+        // Mocking behavior (like jest.fn().mockResolvedValue)
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+
+        // When
+        UserDTO result = userService.create(req);
+
+        // Then (AssertJ assertions)
+        assertThat(result.id()).isEqualTo(101L);
+        assertThat(result.email()).isEqualTo("alice@test.com");
+        verify(userRepository, times(1)).save(any(User.class));
+    }
+}</code></pre>
+    </section>
+
+    <!-- CODE LAB 2: CONTROLLER SLICE TEST WITH MOCKMVC -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-slate-900">Level 2: Web Slice Test with MockMvc</h2>
+      <p class="text-xs text-slate-600">Simulates real HTTP requests (like Supertest in Node) without starting a real network socket:</p>
+
+      <pre class="language-java"><code class="language-java">@WebMvcTest(UserController.class)
+class UserControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private UserService userService; // Injected into controller
+
+    @Test
+    void shouldReturn400WhenEmailIsInvalid() throws Exception {
+        // Sending invalid JSON payload
+        String invalidPayload = """
+            { "username": "bob", "email": "not-an-email", "age": 20 }
+            """;
+
+        mockMvc.perform(post("/api/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(invalidPayload))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.email").value("Must be a valid email format"));
+    }
+}</code></pre>
+    </section>
+
+    <!-- Cross-Links -->
+    <div class="p-4 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 flex flex-wrap items-center justify-between gap-3">
+      <span>Read next: <a href="spring_boot_actuator.html" class="text-indigo-600 font-semibold hover:underline">Topic: Spring Boot Actuator</a> and <a href="global_exception_handling.html" class="text-indigo-600 font-semibold hover:underline">Topic: Global Exception Handling</a></span>
+      <a href="../index.html" class="text-slate-900 font-bold hover:underline">Back to Curriculum Index →</a>
+    </div>
+
+  </main>
+  <script src="../voice_narrator.js"></script>
+  <script src="../gemini_assistant.js"></script>
+</body>
+</html>

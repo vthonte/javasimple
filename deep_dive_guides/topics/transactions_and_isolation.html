@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Dive Topic: Transactions, Isolation Levels & Propagation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0.75rem !important;
+      padding: 1rem !important;
+      font-size: 0.9rem !important;
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="../index.html" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-semibold">
+        ← All Curriculum Topics
+      </a>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-amber-700 font-mono font-bold">Track 5: Database Persistence</span>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-slate-500 font-mono">Topic: Transactions & Isolation</span>
+    </div>
+    <div>
+      <span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-semibold">Beginner to Pro</span>
+    </div>
+  </header>
+
+  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-10">
+    
+    <div class="space-y-3 border-b border-slate-200 pb-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-semibold">
+        💳 ACID Transactions • Concurrency Control
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        Transaction Management: Propagation, Isolation Levels & Rollback Rules
+      </h1>
+      <p class="text-slate-600 text-base leading-relaxed">
+        How Spring manages database transactions: why checked exceptions do NOT trigger rollback by default, REQUIRED vs REQUIRES_NEW propagation, dirty reads vs phantom reads, and Optimistic Locking (@Version) vs Pessimistic Locking.
+      </p>
+    </div>
+
+    <!-- ELI5 MENTAL MODEL -->
+    <section class="p-6 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-3">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">💡</span>
+        <h2 class="text-lg font-bold text-amber-950">ELI5: The Bank Vault & The Notary Public</h2>
+      </div>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        When you transfer \$100 from Account A to Account B, you step into a secure bank vault with a Notary (<code class="font-mono bg-white px-1 py-0.5 rounded text-amber-800">@Transactional</code>). Both ledger updates must happen. If a robber bursts in before B is credited, the Notary tears up the papers (<code class="font-mono">ROLLBACK</code>) so A never loses their money.
+      </p>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        <strong>The catch:</strong> If the Notary hears a minor noise (a Java <em>Checked Exception</em>), by default the Notary says: <em>"That wasn't fatal, let's keep the transaction!"</em> You must explicitly tell Spring: <code class="font-mono bg-white px-1 py-0.5 rounded text-rose-700">@Transactional(rollbackFor = Exception.class)</code> to protect against ALL errors!
+      </p>
+    </section>
+
+    <!-- PROPAGATION TYPES: REQUIRED VS REQUIRES_NEW -->
+    <section class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+        <span>🔄</span> Propagation: REQUIRED vs. REQUIRES_NEW
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+        <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+          <span class="font-bold text-indigo-800 block text-xs">Propagation.REQUIRED (Default)</span>
+          <p class="text-slate-600 font-sans mt-1">
+            "Join existing transaction if one exists; create new one if none."<br>
+            If Child method fails, <strong>Parent transaction is marked rollback-only</strong>!
+          </p>
+        </div>
+        <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl space-y-1">
+          <span class="font-bold text-amber-800 block text-xs">Propagation.REQUIRES_NEW</span>
+          <p class="text-slate-600 font-sans mt-1">
+            "Suspend parent transaction, open an independent second physical DB connection, commit independently, then resume parent."<br>
+            <strong>Best use:</strong> Audit logs that must save even if payment rolls back!
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- OPTIMISTIC VS PESSIMISTIC LOCKING -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-slate-900">Preventing Lost Updates: Optimistic vs Pessimistic Locking</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        
+        <div class="p-4 bg-white border border-slate-200 rounded-xl space-y-2">
+          <div class="font-bold text-emerald-800">1. Optimistic Locking (@Version)</div>
+          <p class="text-slate-600">Zero DB locks! Adds a <code class="font-mono">version</code> integer column. When updating: <code class="font-mono">WHERE id = ? AND version = 1</code>. If another thread beat you to it, version is 2, and Hibernate throws <code class="font-mono text-rose-700">OptimisticLockException</code>. High throughput!</p>
+          <pre class="language-java"><code class="language-java">@Entity
+public class Product {
+    @Id private Long id;
+    private int stock;
+    
+    @Version
+    private int version; // Auto-incremented by Hibernate!
+}</code></pre>
+        </div>
+
+        <div class="p-4 bg-white border border-slate-200 rounded-xl space-y-2">
+          <div class="font-bold text-rose-800">2. Pessimistic Locking (SELECT FOR UPDATE)</div>
+          <p class="text-slate-600">Locks the database row immediately in PostgreSQL. Other transactions wait until this transaction completes. High safety, lower concurrency.</p>
+          <pre class="language-java"><code class="language-java">public interface ProductRepository extends JpaRepository&lt;Product, Long&gt; {
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT p FROM Product p WHERE p.id = :id")
+    Optional&lt;Product&gt; findByIdForUpdate(Long id);
+}</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cross-Links -->
+    <div class="p-4 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 flex flex-wrap items-center justify-between gap-3">
+      <span>Read next: <a href="distributed_transactions_saga.html" class="text-indigo-600 font-semibold hover:underline">Topic: Distributed Transactions & Saga</a> and <a href="hibernate_and_jpa.html" class="text-indigo-600 font-semibold hover:underline">Topic: Hibernate & JPA Internals</a></span>
+      <a href="../index.html" class="text-slate-900 font-bold hover:underline">Back to Curriculum Index →</a>
+    </div>
+
+  </main>
+  <script src="../voice_narrator.js"></script>
+  <script src="../gemini_assistant.js"></script>
+</body>
+</html>

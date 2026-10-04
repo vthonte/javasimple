@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Dive Topic: Collections Internals (HashMap Hashing & Treeification)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0.75rem !important;
+      padding: 1rem !important;
+      font-size: 0.9rem !important;
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="../index.html" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-semibold">
+        ← All Curriculum Topics
+      </a>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-purple-700 font-mono font-bold">Track 1: Java Foundations</span>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-slate-500 font-mono">Topic: Collections Internals</span>
+    </div>
+    <div>
+      <span class="px-2.5 py-1 rounded-full bg-purple-100 text-purple-800 text-xs font-semibold">Beginner to Pro</span>
+    </div>
+  </header>
+
+  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-10">
+    
+    <div class="space-y-3 border-b border-slate-200 pb-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-xs font-semibold">
+        📦 Data Structures • Memory Mechanics
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        Collections Internals: HashMap Hashing, Treeification & ConcurrentHashMap
+      </h1>
+      <p class="text-slate-600 text-base leading-relaxed">
+        How HashMap works under the hood: bucket arrays, index calculation with bitwise AND, handling hash collisions, Java 8 Red-Black Tree treeification, and ConcurrentHashMap segment-less CAS locking.
+      </p>
+    </div>
+
+    <!-- ELI5 MENTAL MODEL -->
+    <section class="p-6 rounded-2xl bg-purple-50/70 border border-purple-200 space-y-3">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">💡</span>
+        <h2 class="text-lg font-bold text-purple-950">ELI5: The 16 Mailboxes (How HashMap Finds Your Mail)</h2>
+      </div>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        A <code class="font-mono bg-white px-1 py-0.5 rounded text-purple-800">HashMap</code> starts with <strong>16 mailboxes</strong> (an array of size 16). When you insert a key, Java calculates the key's <code class="font-mono">hashCode()</code> (like a fingerprint number) and uses modulo math to pick mailbox number 0 to 15.
+      </p>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        If two different keys land in the exact same mailbox (a <strong>hash collision</strong>), old Java chained them in a linked list. If a bad actor spammed 10,000 keys into 1 mailbox, lookup slowed down from \(O(1)\) to \(O(N)\) (DoS vulnerability).
+      </p>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        <strong>The Java 8 Breakthrough (Treeification):</strong> When any single bucket gets more than <strong>8 items</strong> (`TREEIFY_THRESHOLD = 8`), Java transforms the linked list into a self-balancing <strong>Red-Black Tree</strong>, ensuring performance never drops below \(O(\log N)\)!
+      </p>
+    </section>
+
+    <!-- ARCHITECTURE FLOWCHART -->
+    <section class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+        <span>📊</span> HashMap Bucket Index Calculation
+      </h2>
+      <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs font-mono">
+        <div>1. Calculate Hash: <code class="text-indigo-700">int h = key.hashCode();</code></div>
+        <div>2. Bit-Spread (reduces collisions): <code class="text-indigo-700">int hash = h ^ (h >>> 16);</code></div>
+        <div>3. Bucket Index (Fast bitwise AND equivalent to modulo): <code class="text-emerald-700 font-bold">index = (n - 1) & hash;</code></div>
+      </div>
+    </section>
+
+    <!-- HASHCODE & EQUALS CONTRACT (PRO TRAP) -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-slate-900">Senior Interview Bar: The hashCode() & equals() Contract</h2>
+      <div class="p-5 rounded-2xl bg-white border border-rose-200 bg-rose-50/30 shadow-sm space-y-3 text-xs">
+        <div class="font-bold text-rose-800">The Silent Bug: Overriding equals() without hashCode()</div>
+        <p class="text-slate-700 leading-relaxed">
+          If two objects are considered equal by <code class="font-mono">equals()</code>, they <strong>MUST have the exact same hashCode()</strong>! If you forget to override <code class="font-mono">hashCode()</code>, two equal objects get different bucket indexes, meaning <code class="font-mono">map.get(key)</code> will return <code class="font-mono text-rose-700 font-bold">null</code> even when the key is right in the map!
+        </p>
+        <p class="text-slate-600">
+          💡 <strong>Senior Fix:</strong> In Modern Java 16+, use <code class="font-mono text-emerald-800 font-bold">record</code> which auto-generates perfectly compliant <code class="font-mono">equals()</code> and <code class="font-mono">hashCode()</code> implementations for you!
+        </p>
+      </div>
+    </section>
+
+    <!-- Cross-Links -->
+    <div class="p-4 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 flex flex-wrap items-center justify-between gap-3">
+      <span>Read next: <a href="streams_and_lambdas.html" class="text-indigo-600 font-semibold hover:underline">Topic: Streams & Lambdas</a> and <a href="../03_collections_and_streams.html" class="text-indigo-600 font-semibold hover:underline">Guide 03: Collections Code Labs</a></span>
+      <a href="../index.html" class="text-slate-900 font-bold hover:underline">Back to Curriculum Index →</a>
+    </div>
+
+  </main>
+  <script src="../voice_narrator.js"></script>
+  <script src="../gemini_assistant.js"></script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Dive Topic: Production Outage Incident Playbooks (On-Call War Room)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0.75rem !important;
+      padding: 1rem !important;
+      font-size: 0.9rem !important;
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="../index.html" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-semibold">
+        ← All Curriculum Topics
+      </a>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-rose-700 font-mono font-bold">Track 6: Production War Room</span>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-slate-500 font-mono">Topic: Outage Playbooks</span>
+    </div>
+    <div>
+      <span class="px-2.5 py-1 rounded-full bg-rose-100 text-rose-800 text-xs font-semibold">Senior On-Call Bar</span>
+    </div>
+  </header>
+
+  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-10">
+    
+    <div class="space-y-3 border-b border-slate-200 pb-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-xs font-semibold">
+        🚨 On-Call War Room • Production Incident Response
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        Live Production Incident Playbooks: 100% CPU, Deadlocks & HikariCP Depletion
+      </h1>
+      <p class="text-slate-600 text-base leading-relaxed">
+        Battle-tested terminal commands and diagnostic sequences used by Senior Site Reliability Engineers (SREs) during live P1/P0 outages on Kubernetes pods.
+      </p>
+    </div>
+
+    <!-- PLAYBOOK 1: 100% CPU SPIKE -->
+    <section class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold text-rose-900 flex items-center gap-2">
+          <span>🔥</span> Playbook 1: 100% CPU Infinite Loop on Linux Pod
+        </h2>
+        <span class="text-xs bg-rose-100 text-rose-800 font-mono px-2 py-0.5 rounded font-bold">Severity: P0</span>
+      </div>
+      
+      <p class="text-xs text-slate-600">
+        Run these 3 commands inside the Kubernetes container terminal to find the exact class and line number causing the loop:
+      </p>
+
+      <pre class="language-bash"><code class="language-bash"># Step 1: Find the exact thread burning CPU (shows Thread ID under PID column)
+top -H -p &lt;JVM_PID&gt;
+# Suppose Thread ID is 4591
+
+# Step 2: Convert the decimal TID to Hexadecimal (JVM thread dump uses Hex nid)
+printf "%x\n" 4591
+# Output: 0x11ef
+
+# Step 3: Grep jstack for that exact hex nid:
+jstack &lt;JVM_PID&gt; | grep -A 25 0x11ef</code></pre>
+      
+      <div class="p-3 bg-slate-900 text-emerald-400 font-mono text-xs rounded-xl">
+        "http-nio-8080-exec-4" #42 daemon prio=5 tid=0x00007f nid=0x11ef runnable [0x00007f]<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;java.lang.Thread.State: RUNNABLE<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;at com.example.service.OrderService.calculateDiscount(OrderService.java:142) &lt;-- ROOT CAUSE!
+      </div>
+    </section>
+
+    <!-- PLAYBOOK 2: HIKARICP POOL STARVATION -->
+    <section class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold text-amber-900 flex items-center gap-2">
+          <span>🚰</span> Playbook 2: Connection Pool Exhaustion (HikariCP Timeout)
+        </h2>
+        <span class="text-xs bg-amber-100 text-amber-800 font-mono px-2 py-0.5 rounded font-bold">Severity: P1</span>
+      </div>
+      
+      <p class="text-xs text-slate-600">
+        <strong>Error in logs:</strong> <code class="text-rose-700 font-mono">Connection is not available, request timed out after 30000ms (HikariPool-1 - Connection timeout)</code>. All threads are stuck waiting for a database socket.
+      </p>
+
+      <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs">
+        <div class="font-bold text-slate-900">How to detect connection leaks in 1 minute:</div>
+        <p class="text-slate-600">Add the leak detection threshold in <code class="font-mono text-indigo-700">application.yml</code>:</p>
+        <pre class="language-yaml"><code class="language-yaml">spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 20
+      connection-timeout: 30000
+      leak-detection-threshold: 5000 # Logs warning with stack trace if connection held > 5s!</code></pre>
+        <p class="text-slate-600">
+          HikariCP will print: <em>"Apparent connection leak detected at com.example.service.ReportService.generateReport() (unclosed connection)"</em>.
+        </p>
+      </div>
+    </section>
+
+    <!-- PLAYBOOK 3: THREAD DEADLOCK -->
+    <section class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold text-purple-900 flex items-center gap-2">
+          <span>🔒</span> Playbook 3: Thread Deadlock Freeze
+        </h2>
+        <span class="text-xs bg-purple-100 text-purple-800 font-mono px-2 py-0.5 rounded font-bold">Severity: P0</span>
+      </div>
+
+      <p class="text-xs text-slate-600">
+        When threads lock each other, run JDK's built-in deadlock analyzer:
+      </p>
+
+      <pre class="language-bash"><code class="language-bash"># Run jcmd to analyze thread locks:
+jcmd &lt;JVM_PID&gt; Thread.print</code></pre>
+
+      <div class="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-950 font-mono space-y-1">
+        <div class="font-bold text-rose-800">Found one Java-level deadlock:</div>
+        <div>"Thread-1" waiting to lock Monitor A (held by "Thread-2")</div>
+        <div>"Thread-2" waiting to lock Monitor B (held by "Thread-1")</div>
+      </div>
+    </section>
+
+    <!-- Cross-Links -->
+    <div class="p-4 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 flex flex-wrap items-center justify-between gap-3">
+      <span>Read next: <a href="profiling_and_debugging.html" class="text-indigo-600 font-semibold hover:underline">Topic: Profiling & JFR</a> and <a href="../08_production_outage_triage.html" class="text-indigo-600 font-semibold hover:underline">Guide 08: Live Outage War Room</a></span>
+      <a href="../index.html" class="text-slate-900 font-bold hover:underline">Back to Curriculum Index →</a>
+    </div>
+
+  </main>
+  <script src="../voice_narrator.js"></script>
+  <script src="../gemini_assistant.js"></script>
+</body>
+</html>

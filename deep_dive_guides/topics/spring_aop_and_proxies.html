@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Dive Topic: Spring AOP & Proxies (JDK Dynamic vs CGLIB)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0.75rem !important;
+      padding: 1rem !important;
+      font-size: 0.9rem !important;
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="../index.html" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-semibold">
+        ← All Curriculum Topics
+      </a>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-indigo-700 font-mono font-bold">Track 4: Spring Framework</span>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-slate-500 font-mono">Topic: AOP & Proxies</span>
+    </div>
+    <div>
+      <span class="px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-800 text-xs font-semibold">Beginner to Pro</span>
+    </div>
+  </header>
+
+  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-10">
+    
+    <div class="space-y-3 border-b border-slate-200 pb-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-semibold">
+        🪄 Metaprogramming • Bytecode Proxies
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        Spring AOP & Dynamic Proxies (JDK Dynamic vs CGLIB)
+      </h1>
+      <p class="text-slate-600 text-base leading-relaxed">
+        How Spring weaves cross-cutting concerns: Pointcuts, JoinPoints, Advices, JDK Dynamic Proxies (interface-based) vs CGLIB (subclass bytecode generation), and why final classes break proxying.
+      </p>
+    </div>
+
+    <!-- ELI5 MENTAL MODEL -->
+    <section class="p-6 rounded-2xl bg-indigo-50/70 border border-indigo-200 space-y-3">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">💡</span>
+        <h2 class="text-lg font-bold text-indigo-950">ELI5: The Stunt Double (Dynamic Proxies)</h2>
+      </div>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        When an action movie star (your Service class) has a dangerous scene involving fire and stunts (database transactions, caching, security checks), the movie director hires a <strong>Stunt Double (CGLIB Proxy)</strong>.
+      </p>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        The audience (the HTTP Controller) thinks they are calling the real actor. But in reality, the Stunt Double steps in front of the camera, opens the safety nets (<code class="font-mono">tx.begin()</code>), lets the actor do the real talking, and secures the landing (<code class="font-mono">tx.commit()</code>).
+      </p>
+    </section>
+
+    <!-- JDK DYNAMIC VS CGLIB PROXIES -->
+    <section class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+        <span>⚖️</span> JDK Dynamic Proxies vs. CGLIB Subclassing
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+        <div class="p-4 bg-sky-50 border border-sky-200 rounded-xl space-y-2">
+          <div class="font-bold text-sky-800 text-sm">JDK Dynamic Proxies (Reflection)</div>
+          <p class="text-slate-600 font-sans">
+            • Requires an <strong>interface</strong> (<code class="font-mono">UserService</code> interface implemented by <code class="font-mono">UserServiceImpl</code>).<br>
+            • Built into core Java (<code class="font-mono">java.lang.reflect.Proxy</code>).<br>
+            • Cannot proxy concrete classes without interfaces.
+          </p>
+        </div>
+        <div class="p-4 bg-purple-50 border border-purple-200 rounded-xl space-y-2">
+          <div class="font-bold text-purple-800 text-sm">CGLIB Proxies (Spring Boot Default)</div>
+          <p class="text-slate-600 font-sans">
+            • Generates a new subclass in bytecode at runtime (<code class="font-mono">UserService$$EnhancerBySpringCGLIB</code>).<br>
+            • Works on concrete classes with no interfaces!<br>
+            • <strong>Limitation:</strong> Cannot proxy <code class="font-mono text-rose-700">final</code> classes or <code class="font-mono text-rose-700">final</code> methods!
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CUSTOM AOP ASPECT IN CODE -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-slate-900">Code Lab: Building a Performance Timing Aspect</h2>
+      <pre class="language-java"><code class="language-java">@Aspect
+@Component
+public class ExecutionTimeAspect {
+
+    private final Logger logger = LoggerFactory.getLogger(ExecutionTimeAspect.class);
+
+    // Intercepts any method inside com.example.service package!
+    @Around("execution(* com.example.service..*(..))")
+    public Object measureExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
+        long start = System.currentTimeMillis();
+        
+        // Execute the target method (calls real bean logic)
+        Object result = joinPoint.proceed();
+        
+        long duration = System.currentTimeMillis() - start;
+        logger.info("Method {} executed in {} ms", joinPoint.getSignature().toShortString(), duration);
+        
+        return result;
+    }
+}</code></pre>
+    </section>
+
+    <!-- Cross-Links -->
+    <div class="p-4 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 flex flex-wrap items-center justify-between gap-3">
+      <span>Read next: <a href="transactions_and_isolation.html" class="text-indigo-600 font-semibold hover:underline">Topic: Transactions & Isolation</a> and <a href="spring_ioc.html" class="text-indigo-600 font-semibold hover:underline">Topic: Spring IoC Container</a></span>
+      <a href="../index.html" class="text-slate-900 font-bold hover:underline">Back to Curriculum Index →</a>
+    </div>
+
+  </main>
+  <script src="../voice_narrator.js"></script>
+  <script src="../gemini_assistant.js"></script>
+</body>
+</html>

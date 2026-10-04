@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Dive Topic: CompletableFuture & Reactive Systems (JS Promise vs Java)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0.75rem !important;
+      padding: 1rem !important;
+      font-size: 0.9rem !important;
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="../index.html" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-semibold">
+        ← All Curriculum Topics
+      </a>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-purple-700 font-mono font-bold">Track 3: Concurrency</span>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-slate-500 font-mono">Topic: CompletableFuture</span>
+    </div>
+    <div>
+      <span class="px-2.5 py-1 rounded-full bg-purple-100 text-purple-800 text-xs font-semibold">Beginner to Pro</span>
+    </div>
+  </header>
+
+  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-10">
+    
+    <div class="space-y-3 border-b border-slate-200 pb-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-xs font-semibold">
+        ⚡ Asynchronous Pipelines • Non-blocking I/O
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        CompletableFuture & Reactive Systems (JavaScript Promises vs. Java)
+      </h1>
+      <p class="text-slate-600 text-base leading-relaxed">
+        Java's equivalent to Promise and async/await: thenApply vs thenCompose (map vs flatMap), combining futures with CompletableFuture.allOf, and comparing Spring WebFlux with modern Java 21 Virtual Threads.
+      </p>
+    </div>
+
+    <!-- ELI5 MENTAL MODEL -->
+    <section class="p-6 rounded-2xl bg-purple-50/70 border border-purple-200 space-y-3">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">💡</span>
+        <h2 class="text-lg font-bold text-purple-950">ELI5: The Pager at the Burger Joint (CompletableFuture)</h2>
+      </div>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        When you order a burger, the cashier doesn't hold you at the counter while your patty fries. They hand you a <strong>beeper/pager</strong> (<code class="font-mono bg-white px-1 py-0.5 rounded text-purple-800">Promise</code> in JS, <code class="font-mono bg-white px-1 py-0.5 rounded text-purple-800">CompletableFuture</code> in Java) and say: <em>"Find a table. When this buzzes, your food is ready."</em>
+      </p>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        You can chain instructions onto the beeper: <em>"When it buzzes, grab ketchup (<code class="font-mono">thenApply</code>), then meet my friend at Table 4 (<code class="font-mono">thenAccept</code>)."</em>
+      </p>
+    </section>
+
+    <!-- ROSETTA STONE: JS PROMISE VS COMPLETABLEFUTURE -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-slate-900">Promise vs. CompletableFuture Method Mapping</h2>
+      <div class="overflow-x-auto text-xs">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200 font-bold text-slate-700">
+              <th class="p-3">JavaScript (Promise)</th>
+              <th class="p-3">Java (CompletableFuture)</th>
+              <th class="p-3">Meaning / Behavior</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr>
+              <td class="p-3 font-mono text-amber-700">Promise.resolve(val)</td>
+              <td class="p-3 font-mono text-purple-700">CompletableFuture.completedFuture(val)</td>
+              <td class="p-3 text-slate-600">Creates an already-resolved future.</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-mono text-amber-700">.then(res => transform(res))</td>
+              <td class="p-3 font-mono text-purple-700">.thenApply(res -> transform(res))</td>
+              <td class="p-3 text-slate-600">Transforms value synchronously (map).</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-mono text-amber-700">.then(res => fetchOther(res))</td>
+              <td class="p-3 font-mono text-purple-700">.thenCompose(res -> fetchOther(res))</td>
+              <td class="p-3 text-slate-600">Flattens nested futures (flatMap).</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-mono text-amber-700">Promise.all([p1, p2])</td>
+              <td class="p-3 font-mono text-purple-700">CompletableFuture.allOf(f1, f2)</td>
+              <td class="p-3 text-slate-600">Waits for all parallel tasks to finish.</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-mono text-amber-700">.catch(err => ...)</td>
+              <td class="p-3 font-mono text-purple-700">.exceptionally(err -> ...)</td>
+              <td class="p-3 text-slate-600">Recovers from failures with a fallback value.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- WEBFLUX VS VIRTUAL THREADS -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-slate-900">Modern Architecture Debate: WebFlux (Reactive) vs. Java 21 Virtual Threads</h2>
+      <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3 text-xs">
+        <p class="text-slate-700 leading-relaxed">
+          For years, high-throughput Java required <strong>Spring WebFlux (Project Reactor / Mono & Flux)</strong>. WebFlux works like Node's event loop with non-blocking Netty sockets, but it comes with huge drawbacks: hard to debug stack traces, complex functional operators, and incompatibility with standard blocking libraries (like JDBC).
+        </p>
+        <div class="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl space-y-1">
+          <span class="font-bold text-emerald-800 block text-xs">🚀 The Industry Shift in 2024–2026:</span>
+          <p class="text-slate-700 leading-relaxed">
+            Java 21 <strong>Virtual Threads</strong> make Spring WebFlux obsolete for 95% of applications! You write simple, readable, synchronous code with Spring MVC, and Virtual Threads scale seamlessly to 1,000,000 concurrent requests without the complexity of reactive pipelines!
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cross-Links -->
+    <div class="p-4 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 flex flex-wrap items-center justify-between gap-3">
+      <span>Read next: <a href="virtual_threads.html" class="text-indigo-600 font-semibold hover:underline">Topic: Java 21 Virtual Threads</a> and <a href="threads_in_java.html" class="text-indigo-600 font-semibold hover:underline">Topic: Java Platform Threads</a></span>
+      <a href="../index.html" class="text-slate-900 font-bold hover:underline">Back to Curriculum Index →</a>
+    </div>
+
+  </main>
+  <script src="../voice_narrator.js"></script>
+  <script src="../gemini_assistant.js"></script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Dive Topic: Spring Security & Stateless JWT Authentication</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0.75rem !important;
+      padding: 1rem !important;
+      font-size: 0.9rem !important;
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="../index.html" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-semibold">
+        ← All Curriculum Topics
+      </a>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-indigo-700 font-mono font-bold">Track 4: Spring Framework</span>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-slate-500 font-mono">Topic: Spring Security & JWT</span>
+    </div>
+    <div>
+      <span class="px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-800 text-xs font-semibold">Beginner to Pro</span>
+    </div>
+  </header>
+
+  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-10">
+    
+    <div class="space-y-3 border-b border-slate-200 pb-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-semibold">
+        🔒 Security Architecture • Enterprise Auth
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        Spring Security & Stateless JWT Authentication (Passport.js vs Spring Security)
+      </h1>
+      <p class="text-slate-600 text-base leading-relaxed">
+        Under the hood of Spring Security 6+: SecurityFilterChain, DelegatingFilterProxy, custom OncePerRequestFilter for Bearer JWT extraction, SecurityContextHolder, and method security (@PreAuthorize).
+      </p>
+    </div>
+
+    <!-- ELI5 MENTAL MODEL -->
+    <section class="p-6 rounded-2xl bg-indigo-50/70 border border-indigo-200 space-y-3">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">💡</span>
+        <h2 class="text-lg font-bold text-indigo-950">ELI5: The Airport Security Checkpoint (SecurityFilterChain)</h2>
+      </div>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        In Express, you add middleware manually: <code class="font-mono bg-white px-1 py-0.5 rounded text-amber-700">app.use('/admin', verifyToken, checkAdminRole)</code>.
+      </p>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        <strong>Spring Security</strong> operates like an airport security checkpoint before anyone can board a plane (your Controller). The request passes through a chain of 15 security filters (<code class="font-mono text-indigo-800">SecurityFilterChain</code>). One guard checks CORS, another checks CSRF, our custom JWT filter checks your boarding pass (Bearer token) and puts your Identity into the <code class="font-mono text-indigo-800">SecurityContextHolder</code> (your VIP badge) for the duration of the flight!
+      </p>
+    </section>
+
+    <!-- ARCHITECTURE FLOWCHART -->
+    <section class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+        <span>📊</span> Stateless JWT Authentication Filter Pipeline
+      </h2>
+      <div class="flex flex-col md:flex-row items-center justify-between gap-3 text-center text-xs font-mono">
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl w-full md:w-1/3">
+          <span class="font-bold text-slate-800 block text-xs">1. HTTP Request</span>
+          <code class="text-slate-600">Authorization: Bearer &lt;JWT&gt;</code>
+        </div>
+        <div class="text-slate-400 font-bold hidden md:block">→</div>
+        <div class="p-3 bg-indigo-50 border border-indigo-200 rounded-xl w-full md:w-1/3">
+          <span class="font-bold text-indigo-800 block text-xs">2. JwtAuthenticationFilter</span>
+          <code class="text-indigo-700">Validates signature & expiry</code>
+          <p class="text-[10px] text-slate-500 mt-1">Populates SecurityContextHolder</p>
+        </div>
+        <div class="text-slate-400 font-bold hidden md:block">→</div>
+        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl w-full md:w-1/3">
+          <span class="font-bold text-emerald-800 block text-xs">3. @PreAuthorize Check</span>
+          <code class="text-emerald-700">hasRole('ADMIN')</code>
+          <p class="text-[10px] text-slate-500 mt-1">Controller runs or 403 Forbidden</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CODE LAB: MODERN SPRING SECURITY 6 CONFIGURATION -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-slate-900">Configuring Stateless Security in Spring Boot 3+</h2>
+      <p class="text-xs text-slate-600">No WebSecurityConfigurerAdapter (deprecated). Modern component-based configuration:</p>
+
+      <pre class="language-java"><code class="language-java">@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity // Enables @PreAuthorize on methods
+public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtFilter;
+    public SecurityConfig(JwtAuthenticationFilter jwtFilter) { this.jwtFilter = jwtFilter; }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http
+            .csrf(csrf -> csrf.disable()) // Safe to disable for stateless JWT APIs
+            .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // No JSESSIONID cookies!
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/auth/**", "/actuator/health").permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+            )
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+            .build();
+    }
+}</code></pre>
+    </section>
+
+    <!-- Cross-Links -->
+    <div class="p-4 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 flex flex-wrap items-center justify-between gap-3">
+      <span>Read next: <a href="spring_aop_and_proxies.html" class="text-indigo-600 font-semibold hover:underline">Topic: Spring AOP & Proxies</a> and <a href="spring_ioc.html" class="text-indigo-600 font-semibold hover:underline">Topic: Spring IoC Container</a></span>
+      <a href="../index.html" class="text-slate-900 font-bold hover:underline">Back to Curriculum Index →</a>
+    </div>
+
+  </main>
+  <script src="../voice_narrator.js"></script>
+  <script src="../gemini_assistant.js"></script>
+</body>
+</html>
