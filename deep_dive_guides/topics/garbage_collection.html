@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Dive Topic: Modern Garbage Collection (G1GC, ZGC, Shenandoah)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0.75rem !important;
+      padding: 1rem !important;
+      font-size: 0.9rem !important;
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="../index.html" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-semibold">
+        ← All Curriculum Topics
+      </a>
+      <span class="text-slate-300">|</span>
+      <a href="../02_memory_and_garbage_collection.html" class="text-xs text-slate-600 hover:text-slate-900 font-medium">
+        Guide 02: JVM Memory
+      </a>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-emerald-600 font-mono font-bold">Topic: Garbage Collection</span>
+    </div>
+    <div>
+      <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">Beginner to Pro</span>
+    </div>
+  </header>
+
+  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-10">
+    
+    <div class="space-y-3 border-b border-slate-200 pb-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
+        🧹 Deep Dive Encyclopedia • Garbage Collection
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        Modern Garbage Collection: G1GC vs. ZGC vs. Shenandoah
+      </h1>
+      <p class="text-slate-600 text-base leading-relaxed">
+        How the JVM eliminated Stop-The-World (STW) pauses: Tri-color marking, colored pointers, load barriers, and choosing the right GC for ultra-low latency APIs.
+      </p>
+    </div>
+
+    <!-- ELI5 MENTAL MODEL -->
+    <section class="p-6 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-3">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">💡</span>
+        <h2 class="text-lg font-bold text-emerald-950">ELI5: The Cleaning Crew While the Office is Open</h2>
+      </div>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        In old Java (Java 7 and earlier), when memory was full, the JVM locked the doors and blew a whistle: <strong>"Stop the World!"</strong>. All HTTP requests froze for 2 to 10 seconds while the janitor swept the floors. Clients timed out and 504 errors erupted.
+      </p>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        <strong>Modern ZGC (Java 21)</strong> cleans the office <em>while people are actively working at their desks</em>. It uses "colored pointers" and "load barriers" so the cleaning pause is <strong>under 1 millisecond</strong>, even on giant 16 Terabyte heaps!
+      </p>
+    </section>
+
+    <!-- COMPARISON MATRIX: G1GC VS ZGC -->
+    <section class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+        <span>📊</span> GC Algorithm Architectural Comparison
+      </h2>
+      <div class="overflow-x-auto text-xs">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200 font-bold text-slate-700">
+              <th class="p-3">GC Algorithm</th>
+              <th class="p-3">Default In</th>
+              <th class="p-3">Typical Pause Time</th>
+              <th class="p-3">Heap Size Target</th>
+              <th class="p-3">Best Use Case</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr>
+              <td class="p-3 font-bold text-sky-700">G1GC (Garbage-First)</td>
+              <td class="p-3 font-mono">Java 9 - 21+ (Default)</td>
+              <td class="p-3 font-mono text-amber-700">10ms – 100ms</td>
+              <td class="p-3 font-mono">4GB – 64GB</td>
+              <td class="p-3 text-slate-600">General purpose web apps balancing throughput and latency.</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-bold text-emerald-700">Generational ZGC</td>
+              <td class="p-3 font-mono">Java 21+ (<code class="bg-slate-100 px-1 rounded">-XX:+UseZGC</code>)</td>
+              <td class="p-3 font-mono text-emerald-700">&lt; 1 millisecond</td>
+              <td class="p-3 font-mono">16GB – 16TB</td>
+              <td class="p-3 text-slate-600">Ultra-low latency APIs, trading apps, high-throughput microservices.</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-bold text-purple-700">Shenandoah</td>
+              <td class="p-3 font-mono">Red Hat JDK / OpenJDK</td>
+              <td class="p-3 font-mono text-purple-700">&lt; 10ms</td>
+              <td class="p-3 font-mono">8GB – 100GB</td>
+              <td class="p-3 text-slate-600">Concurrent compaction using Brooks pointers without colored pointers.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PRO JVM FLAGS FOR PRODUCTION -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-slate-900">Production JVM Flags for Maximum Performance</h2>
+      
+      <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
+        <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Modern Java 21 Flag</span>
+        <h3 class="font-bold text-slate-900">Enabling Generational ZGC in Docker Containers</h3>
+        <pre class="language-bash"><code class="language-bash"># Run Java 21 with sub-millisecond GC pauses:
+java -XX:+UseZGC -XX:+ZGenerational \
+     -Xms4g -Xmx4g \
+     -XX:+AlwaysPreTouch \
+     -jar app.jar</code></pre>
+        <p class="text-xs text-slate-600">
+          <code class="font-mono text-indigo-700">-XX:+AlwaysPreTouch</code> forces the OS to allocate all physical RAM pages at startup so the JVM never pauses during runtime requests!
+        </p>
+      </div>
+    </section>
+
+    <!-- Cross-Links -->
+    <div class="p-4 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 flex flex-wrap items-center justify-between gap-3">
+      <span>Read next: <a href="memory_management.html" class="text-indigo-600 font-semibold hover:underline">Topic: Memory Management</a> and <a href="profiling_and_debugging.html" class="text-indigo-600 font-semibold hover:underline">Topic: Profiling & Debugging</a></span>
+      <a href="../index.html" class="text-slate-900 font-bold hover:underline">Back to Curriculum Index →</a>
+    </div>
+
+  </main>
+  <script src="../voice_narrator.js"></script>
+  <script src="../gemini_assistant.js"></script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Dive Topic: Production Profiling, APM & Live JVM Debugging</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0.75rem !important;
+      padding: 1rem !important;
+      font-size: 0.9rem !important;
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="../index.html" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-semibold">
+        ← All Curriculum Topics
+      </a>
+      <span class="text-slate-300">|</span>
+      <a href="../08_production_outage_triage.html" class="text-xs text-slate-600 hover:text-slate-900 font-medium">
+        Guide 08: Outage War Room
+      </a>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-rose-600 font-mono font-bold">Topic: Profiling & Debugging</span>
+    </div>
+    <div>
+      <span class="px-2.5 py-1 rounded-full bg-rose-100 text-rose-800 text-xs font-semibold">Senior On-Call Bar</span>
+    </div>
+  </header>
+
+  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-10">
+    
+    <div class="space-y-3 border-b border-slate-200 pb-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-xs font-semibold">
+        🚨 Deep Dive Encyclopedia • Production Operations
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        Production Profiling, Async-Profiler & Live JVM Debugging
+      </h1>
+      <p class="text-slate-600 text-base leading-relaxed">
+        How senior engineers profile live Kubernetes pods with near-zero overhead: async-profiler, flame graphs, JDK Flight Recorder (JFR), capturing heap dumps on crash, and diagnosing HikariCP pool starvation.
+      </p>
+    </div>
+
+    <!-- ELI5 MENTAL MODEL -->
+    <section class="p-6 rounded-2xl bg-rose-50/70 border border-rose-200 space-y-3">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">💡</span>
+        <h2 class="text-lg font-bold text-rose-950">ELI5: The Airplane Black Box & Speed Trap (JFR & Profilers)</h2>
+      </div>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        If you run a heavy profiler in production, it often slows down your app by 50% (the "observer effect").
+      </p>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        <strong>JDK Flight Recorder (JFR)</strong> is built directly into the C++ JVM kernel. It functions like an airplane black box, recording CPU cycles, memory allocations, and lock contention continuously with <strong>less than 1% CPU overhead</strong>! If an outage occurs, you pull the flight recording and inspect the exact second of failure in JDK Mission Control.
+      </p>
+    </section>
+
+    <!-- LIVE PROFILING TOOLKIT -->
+    <section class="space-y-4">
+      <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+        <span>🛠️</span> The Production Profiling Toolkit
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm space-y-2">
+          <div class="font-bold text-slate-900">1. Async-Profiler (Flame Graphs)</div>
+          <p class="text-slate-600">The industry gold-standard sampling profiler that avoids safepoint bias. Profiles CPU and memory allocations directly.</p>
+          <pre class="language-bash"><code class="language-bash"># Profile CPU on live Linux PID for 60s:
+./asprof -d 60 -f flamegraph.html &lt;PID&gt;</code></pre>
+        </div>
+        <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm space-y-2">
+          <div class="font-bold text-slate-900">2. JDK Flight Recorder (JFR)</div>
+          <p class="text-slate-600">Built into OpenJDK. Captures socket I/O, GC events, and method CPU execution.</p>
+          <pre class="language-bash"><code class="language-bash"># Start a 5-minute flight recording on live PID:
+jcmd &lt;PID&gt; JFR.start duration=300s filename=recording.jfr</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- AUTOMATIC HEAP DUMP ON OOM -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-slate-900">Must-Have Production Flags: Crash Dump Capture</h2>
+      <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3 text-xs">
+        <p class="text-slate-700 leading-relaxed">
+          If a Java container runs out of memory, Linux Kubernetes kills the pod. Without these flags, <strong>all diagnostic evidence vanishes</strong>! Always add these flags to your Dockerfile:
+        </p>
+        <pre class="language-bash"><code class="language-bash"># Essential JVM Flags for Production Containers:
+java -XX:+HeapDumpOnOutOfMemoryError \
+     -XX:HeapDumpPath=/var/log/dumps/oom.hprof \
+     -XX:+ExitOnOutOfMemoryError \
+     -jar app.jar</code></pre>
+        <p class="text-slate-600">
+          When the app throws <code class="font-mono text-rose-700">OutOfMemoryError</code>, the JVM dumps the full heap to disk in seconds and exits cleanly so Kubernetes restarts the pod immediately. You then download the <code class="font-mono">.hprof</code> file and open it in <strong>Eclipse Memory Analyzer (MAT)</strong> to pinpoint the memory leak!
+        </p>
+      </div>
+    </section>
+
+    <!-- Cross-Links -->
+    <div class="p-4 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 flex flex-wrap items-center justify-between gap-3">
+      <span>Read next: <a href="../08_production_outage_triage.html" class="text-indigo-600 font-semibold hover:underline">Guide 08: Live Outage War Room</a> and <a href="garbage_collection.html" class="text-indigo-600 font-semibold hover:underline">Topic: Garbage Collection</a></span>
+      <a href="../index.html" class="text-slate-900 font-bold hover:underline">Back to Curriculum Index →</a>
+    </div>
+
+  </main>
+  <script src="../voice_narrator.js"></script>
+  <script src="../gemini_assistant.js"></script>
+</body>
+</html>

@@ -98,24 +98,24 @@
         <span>📊</span> JVM Memory Architecture Visualized
       </h3>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-center text-xs font-mono">
-        <div class="p-3 bg-sky-50 border border-sky-200 rounded-xl space-y-1">
-          <span class="font-bold text-sky-800">Thread Stack (Per Thread)</span>
+        <a href="topics/memory_management.html" class="p-3 bg-sky-50 border border-sky-200 hover:border-sky-400 rounded-xl space-y-1 block transition-all group">
+          <span class="font-bold text-sky-800 group-hover:underline">Thread Stack (Per Thread) →</span>
           <div class="text-[11px] text-slate-600">Method Call Frames</div>
           <div class="text-[11px] text-sky-700">Primitive values + Object References</div>
           <div class="text-[10px] text-slate-500">Auto-cleared on method exit</div>
-        </div>
-        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-1">
-          <span class="font-bold text-emerald-800">Heap Memory (Shared)</span>
+        </a>
+        <a href="topics/garbage_collection.html" class="p-3 bg-emerald-50 border border-emerald-200 hover:border-emerald-400 rounded-xl space-y-1 block transition-all group">
+          <span class="font-bold text-emerald-800 group-hover:underline">Heap Memory & GC →</span>
           <div class="text-[11px] text-slate-600">Eden → Survivor → Tenured (Old)</div>
           <div class="text-[11px] text-emerald-700">All Objects (<code class="font-mono">new User()</code>)</div>
           <div class="text-[10px] text-slate-500">Managed by G1GC / ZGC</div>
-        </div>
-        <div class="p-3 bg-purple-50 border border-purple-200 rounded-xl space-y-1">
-          <span class="font-bold text-purple-800">Metaspace (Off-Heap)</span>
+        </a>
+        <a href="topics/jvm.html" class="p-3 bg-purple-50 border border-purple-200 hover:border-purple-400 rounded-xl space-y-1 block transition-all group">
+          <span class="font-bold text-purple-800 group-hover:underline">Metaspace & JIT →</span>
           <div class="text-[11px] text-slate-600">Class Definitions & Metadata</div>
           <div class="text-[11px] text-purple-700">Bytecode, Method tables, Static fields</div>
           <div class="text-[10px] text-slate-500">Allocated in native OS RAM</div>
-        </div>
+        </a>
       </div>
     </div>
 

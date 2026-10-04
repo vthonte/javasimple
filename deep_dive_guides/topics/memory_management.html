@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Dive Topic: JVM Memory Management (Stack, Heap, Metaspace)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0.75rem !important;
+      padding: 1rem !important;
+      font-size: 0.9rem !important;
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="../index.html" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-semibold">
+        ← All Curriculum Topics
+      </a>
+      <span class="text-slate-300">|</span>
+      <a href="../02_memory_and_garbage_collection.html" class="text-xs text-slate-600 hover:text-slate-900 font-medium">
+        Guide 02: JVM Memory
+      </a>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-emerald-600 font-mono font-bold">Topic: Memory Management</span>
+    </div>
+    <div>
+      <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">Beginner to Pro</span>
+    </div>
+  </header>
+
+  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-10">
+    
+    <div class="space-y-3 border-b border-slate-200 pb-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
+        💾 Deep Dive Encyclopedia • Memory Architecture
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        JVM Memory Management (Stack vs Heap vs Metaspace)
+      </h1>
+      <p class="text-slate-600 text-base leading-relaxed">
+        Deep dive into memory layout: Young Generation (Eden, Survivor S0/S1), Old Generation (Tenured), Object Header memory overhead (Mark Word & Klass Word), and ThreadLocal memory leaks.
+      </p>
+    </div>
+
+    <!-- OBJECT HEADER ANATOMY (PRO) -->
+    <section class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+        <span>🔬</span> Pro Concept: The Hidden Cost of Java Objects (Object Header)
+      </h2>
+      <p class="text-xs text-slate-600 leading-relaxed">
+        In Node.js or C++, a 32-bit integer is just 4 bytes. In Java, if you allocate an <code class="font-mono text-indigo-700">Integer</code> object (boxed), it consumes <strong>16 bytes minimum</strong> on a 64-bit JVM due to object overhead:
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs font-mono text-center">
+        <div class="p-3 bg-indigo-50 border border-indigo-200 rounded-xl">
+          <span class="font-bold text-indigo-800 block text-xs">Mark Word (8 bytes)</span>
+          <p class="text-[10px] text-slate-600 mt-1">Identity hashCode, GC age bits (0-15), locking state (biased, thin, fat lock)</p>
+        </div>
+        <div class="p-3 bg-sky-50 border border-sky-200 rounded-xl">
+          <span class="font-bold text-sky-800 block text-xs">Klass Pointer (4-8 bytes)</span>
+          <p class="text-[10px] text-slate-600 mt-1">Pointer to the metadata class in Metaspace (+Compressed OOPs)</p>
+        </div>
+        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+          <span class="font-bold text-emerald-800 block text-xs">Instance Data (4 bytes)</span>
+          <p class="text-[10px] text-slate-600 mt-1">The actual primitive <code class="text-emerald-700">int value = 42;</code></p>
+        </div>
+      </div>
+      <div class="p-3 bg-slate-50 border border-slate-100 rounded-lg text-xs text-slate-700">
+        💡 <strong>Senior Takeaway:</strong> Use primitive types (<code class="font-mono text-emerald-700">int, long, double</code>) whenever possible instead of Boxed objects (<code class="font-mono text-rose-700">Integer, Long, Double</code>) in high-throughput data pipelines to avoid 4x memory inflation and GC pressure!
+      </div>
+    </section>
+
+    <!-- HEAP AGING & PROMOTION FLOWCHART -->
+    <section class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+        <span>📊</span> Object Lifecycle: Eden to Old Generation Promotion
+      </h2>
+      <div class="space-y-3 text-xs font-mono">
+        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+          <span class="font-bold text-emerald-800 block">1. Eden Space (Young Gen)</span>
+          <p class="text-slate-600 text-[11px]">All new objects created via <code class="text-emerald-700">new</code> land here. Fast allocation via Thread-Local Allocation Buffers (TLAB).</p>
+        </div>
+        <div class="text-center text-slate-400 font-bold">↓ Minor GC (Survivor of collection) ↓</div>
+        <div class="p-3 bg-sky-50 border border-sky-200 rounded-xl">
+          <span class="font-bold text-sky-800 block">2. Survivor Spaces (S0 / S1)</span>
+          <p class="text-slate-600 text-[11px]">Bounces between From-Space and To-Space. Each survival increments GC age counter.</p>
+        </div>
+        <div class="text-center text-slate-400 font-bold">↓ Tenuring Threshold reached (default age 15) ↓</div>
+        <div class="p-3 bg-purple-50 border border-purple-200 rounded-xl">
+          <span class="font-bold text-purple-800 block">3. Tenured (Old Generation)</span>
+          <p class="text-slate-600 text-[11px]">Long-lived objects (Spring Singletons, Cache entries). Cleaned during Major/Mixed GC.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- MEMORY LEAK PITFALL: THREADLOCAL -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-slate-900">Senior Production Trap: The ThreadLocal Memory Leak</h2>
+      <div class="p-5 rounded-2xl bg-white border border-rose-200 bg-rose-50/30 shadow-sm space-y-3 text-xs">
+        <p class="text-slate-700 leading-relaxed">
+          In Spring Boot/Tomcat, worker threads are pooled and reused for thousands of HTTP requests. If you store user authentication or request context in a <code class="font-mono text-rose-700">ThreadLocal</code> and forget to call <code class="font-mono text-emerald-700">.remove()</code> in a <code class="font-mono">finally</code> block, that object remains attached to the pooled thread indefinitely, resulting in a silent <strong>OutOfMemoryError</strong> in production!
+        </p>
+        <pre class="language-java"><code class="language-java">// ✅ ALWAYS wrap ThreadLocal cleanup in a try-finally block!
+public static final ThreadLocal&lt;UserContext&gt; CONTEXT = new ThreadLocal&lt;&gt;();
+
+public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) {
+    try {
+        CONTEXT.set(loadUser(req));
+        chain.doFilter(req, res);
+    } finally {
+        CONTEXT.remove(); // CRITICAL: Prevents memory leak in thread pool!
+    }
+}</code></pre>
+      </div>
+    </section>
+
+    <!-- Cross-Links -->
+    <div class="p-4 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 flex flex-wrap items-center justify-between gap-3">
+      <span>Read next: <a href="garbage_collection.html" class="text-indigo-600 font-semibold hover:underline">Topic: Garbage Collection Algorithms</a> and <a href="jvm.html" class="text-indigo-600 font-semibold hover:underline">Topic: JVM Architecture</a></span>
+      <a href="../index.html" class="text-slate-900 font-bold hover:underline">Back to Curriculum Index →</a>
+    </div>
+
+  </main>
+  <script src="../voice_narrator.js"></script>
+  <script src="../gemini_assistant.js"></script>
+</body>
+</html>

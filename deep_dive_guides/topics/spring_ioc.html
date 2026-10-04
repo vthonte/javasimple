@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Dive Topic: Spring IoC Container, Bean Scopes & Lifecycle</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0.75rem !important;
+      padding: 1rem !important;
+      font-size: 0.9rem !important;
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="../index.html" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-semibold">
+        ← All Curriculum Topics
+      </a>
+      <span class="text-slate-300">|</span>
+      <a href="../04_spring_ioc_and_bean_lifecycle.html" class="text-xs text-slate-600 hover:text-slate-900 font-medium">
+        Guide 04: Spring IoC
+      </a>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-sky-600 font-mono font-bold">Topic: Spring IoC Container</span>
+    </div>
+    <div>
+      <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">Beginner to Pro</span>
+    </div>
+  </header>
+
+  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-10">
+    
+    <div class="space-y-3 border-b border-slate-200 pb-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-200 text-xs font-semibold">
+        🍃 Deep Dive Encyclopedia • Spring Framework
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        Spring IoC Container, Bean Scopes & Lifecycle Hooks
+      </h1>
+      <p class="text-slate-600 text-base leading-relaxed">
+        How the ApplicationContext creates and wires beans: Singleton vs Prototype vs Request scopes, BeanFactoryPostProcessor vs BeanPostProcessor, and solving Circular Dependency deadlocks.
+      </p>
+    </div>
+
+    <!-- ELI5 MENTAL MODEL -->
+    <section class="p-6 rounded-2xl bg-sky-50/70 border border-sky-200 space-y-3">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">💡</span>
+        <h2 class="text-lg font-bold text-sky-950">ELI5: The Smart Factory Assembly Floor</h2>
+      </div>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        In standard programming, when Worker A needs a drill, Worker A runs to the hardware store and buys a drill with <code class="font-mono bg-white px-1 py-0.5 rounded text-sky-700">new Drill()</code>. If 500 workers need drills, you end up with 500 duplicate drills wasting money and memory.
+      </p>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        The <strong>Spring IoC Container (Inversion of Control)</strong> is the factory floor manager. At startup, it creates <strong>one central heavy-duty tool rack (ApplicationContext)</strong> holding single instances of tools. When Worker A reports for work, the manager hands Worker A the existing shared tool directly through the constructor.
+      </p>
+    </section>
+
+    <!-- BEAN SCOPES COMPARISON TABLE -->
+    <section class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+        <span>📊</span> The 5 Spring Bean Scopes Explained
+      </h2>
+      <div class="overflow-x-auto text-xs">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200 font-bold text-slate-700">
+              <th class="p-3">Scope</th>
+              <th class="p-3">Lifecycle / Lifetime</th>
+              <th class="p-3">Thread Safety Rule</th>
+              <th class="p-3">Common Usage</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr>
+              <td class="p-3 font-bold text-emerald-700">Singleton (Default)</td>
+              <td class="p-3">1 instance per Spring ApplicationContext.</td>
+              <td class="p-3 text-rose-700 font-semibold">MUST BE STATELESS! (Shared across all threads)</td>
+              <td class="p-3 text-slate-600">@Service, @Repository, @RestController, Clients.</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-bold text-sky-700">Prototype</td>
+              <td class="p-3">A brand new instance created every single time injected.</td>
+              <td class="p-3 text-emerald-700 font-semibold">Thread-safe if not shared.</td>
+              <td class="p-3 text-slate-600">Stateful user sessions, mutable calculation contexts.</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-bold text-purple-700">Request (Web)</td>
+              <td class="p-3">1 instance per incoming HTTP request. Destroyed at response.</td>
+              <td class="p-3 text-emerald-700 font-semibold">Safe for that single HTTP thread.</td>
+              <td class="p-3 text-slate-600">Request tracing headers, tenant ID context.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PRO PITFALL: CIRCULAR DEPENDENCIES -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-slate-900">Senior Architecture: Circular Dependencies</h2>
+      
+      <div class="p-5 rounded-2xl bg-white border border-rose-200 bg-rose-50/30 shadow-sm space-y-3 text-xs">
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-rose-800">The Problem: Service A needs B, Service B needs A</span>
+          <span class="px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-mono">Fatal Startup Error</span>
+        </div>
+        <p class="text-slate-700 leading-relaxed">
+          In Spring Boot 2.6+, circular dependencies are <strong>strictly disabled by default</strong> because they signal poor architectural separation of concerns.
+        </p>
+        <pre class="language-java"><code class="language-java">// ❌ CIRCULAR DEADLOCK: Application fails to start!
+@Service
+public class OrderService {
+    private final PaymentService paymentService;
+    public OrderService(PaymentService paymentService) { this.paymentService = paymentService; }
+}
+
+@Service
+public class PaymentService {
+    private final OrderService orderService; // Needs OrderService!
+    public PaymentService(OrderService orderService) { this.orderService = orderService; }
+}</code></pre>
+        <div class="p-3 bg-white border border-emerald-200 rounded-lg text-emerald-900 space-y-1">
+          <strong>✅ Senior Clean Architecture Fix:</strong>
+          Extract the shared behavior into a third independent coordinator bean (e.g., <code class="font-mono font-bold">OrderPaymentOrchestrator</code>) or use an asynchronous domain event (<code class="font-mono">ApplicationEventPublisher</code>) to decouple the two services!
+        </div>
+      </div>
+    </section>
+
+    <!-- Cross-Links -->
+    <div class="p-4 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 flex flex-wrap items-center justify-between gap-3">
+      <span>Read next: <a href="hibernate_and_jpa.html" class="text-indigo-600 font-semibold hover:underline">Topic: Hibernate & JPA Internals</a> and <a href="../04_spring_ioc_and_bean_lifecycle.html" class="text-indigo-600 font-semibold hover:underline">Guide 04: Spring IoC Code Labs</a></span>
+      <a href="../index.html" class="text-slate-900 font-bold hover:underline">Back to Curriculum Index →</a>
+    </div>
+
+  </main>
+  <script src="../voice_narrator.js"></script>
+  <script src="../gemini_assistant.js"></script>
+</body>
+</html>

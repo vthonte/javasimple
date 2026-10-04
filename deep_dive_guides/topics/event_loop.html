@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Dive Topic: Node.js Event Loop & libuv Architecture</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0.75rem !important;
+      padding: 1rem !important;
+      font-size: 0.9rem !important;
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="../index.html" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-semibold">
+        ← All Curriculum Topics
+      </a>
+      <span class="text-slate-300">|</span>
+      <a href="../01_concurrency_architecture.html" class="text-xs text-slate-600 hover:text-slate-900 font-medium">
+        Guide 01: Concurrency
+      </a>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-emerald-600 font-mono font-bold">Topic: Node.js Event Loop</span>
+    </div>
+    <div>
+      <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">Beginner to Pro</span>
+    </div>
+  </header>
+
+  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-10">
+    
+    <div class="space-y-3 border-b border-slate-200 pb-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
+        ⚙️ Deep Dive Encyclopedia • Node.js Internals
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        The Node.js Event Loop & libuv Architecture
+      </h1>
+      <p class="text-slate-600 text-base leading-relaxed">
+        How single-threaded Node.js handles thousands of concurrent connections: the 6 phases of the libuv event loop, microtask queues, process.nextTick priority, and threadpool blocking traps.
+      </p>
+    </div>
+
+    <!-- ELI5 MENTAL MODEL -->
+    <section class="p-6 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-3">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">💡</span>
+        <h2 class="text-lg font-bold text-emerald-950">ELI5: The Airport Luggage Carousel</h2>
+      </div>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        Imagine a luggage carousel that circles continuously through 6 stations. Passengers (timers, I/O callbacks, close handlers) place bags onto specific stations. The carousel operator (the single main thread) checks each station one-by-one, empties the ready bags, and immediately rotates to the next station.
+      </p>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        <strong>The danger:</strong> If one passenger asks the operator to solve a complex Rubik's cube (CPU intensive hashing or JSON parsing), the operator stops the entire carousel. <strong>Every other passenger in the airport waits and starves!</strong>
+      </p>
+    </section>
+
+    <!-- THE 6 PHASES FLOWCHART -->
+    <section class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+        <span>📊</span> The 6 Phases of libuv Event Loop
+      </h2>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs font-mono">
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+          <span class="font-bold text-indigo-700 block">1. Timers</span>
+          <p class="text-slate-600 text-[11px]">Executes expired <code class="text-indigo-600">setTimeout()</code> and <code class="text-indigo-600">setInterval()</code> callbacks.</p>
+        </div>
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+          <span class="font-bold text-indigo-700 block">2. Pending Callbacks</span>
+          <p class="text-slate-600 text-[11px]">Executes I/O callbacks deferred to the next loop iteration (TCP errors, etc).</p>
+        </div>
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+          <span class="font-bold text-indigo-700 block">3. Idle, Prepare</span>
+          <p class="text-slate-600 text-[11px]">Internal libuv housekeeping only.</p>
+        </div>
+        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-1">
+          <span class="font-bold text-emerald-800 block">4. Poll (Heart of Node)</span>
+          <p class="text-slate-600 text-[11px]">Retrieves new I/O events (incoming HTTP requests, socket reads). Waits here if idle!</p>
+        </div>
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+          <span class="font-bold text-indigo-700 block">5. Check</span>
+          <p class="text-slate-600 text-[11px]">Executes <code class="text-indigo-600">setImmediate()</code> callbacks immediately after poll.</p>
+        </div>
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+          <span class="font-bold text-indigo-700 block">6. Close Callbacks</span>
+          <p class="text-slate-600 text-[11px]">Executes cleanup e.g., <code class="text-indigo-600">socket.on('close', ...)</code>.</p>
+        </div>
+      </div>
+      <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900">
+        <strong>⚡ Microtask Priority:</strong> Between EVERY single phase, Node checks the <strong>nextTickQueue</strong> (<code class="font-mono">process.nextTick</code>) and the <strong>MicrotaskQueue</strong> (<code class="font-mono">Promise.then</code>). They execute BEFORE the loop moves to the next phase!
+      </div>
+    </section>
+
+    <!-- CODE EXAMPLES & PRO PITFALLS -->
+    <section class="space-y-6">
+      <h2 class="text-xl font-bold text-slate-900">Code Labs & Production Pitfalls</h2>
+
+      <!-- Pitfall 1: Event loop blocking -->
+      <div class="p-5 rounded-2xl bg-white border border-rose-200 bg-rose-50/30 shadow-sm space-y-3">
+        <span class="text-xs font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded">Senior Trap #1</span>
+        <h3 class="font-bold text-slate-900">Blocking the Event Loop with Synchronous Operations</h3>
+        <pre class="language-javascript"><code class="language-javascript">// ❌ DANGEROUS: Freezes the entire server for all users!
+app.post('/hash', (req, res) => {
+  // Sync crypto or giant JSON.parse blocks the main thread
+  const hash = crypto.pbkdf2Sync(req.body.password, 'salt', 100000, 64, 'sha512');
+  res.json({ hash: hash.toString('hex') });
+});
+
+// ✅ SENIOR FIX: Asynchronous version uses libuv threadpool (default 4 threads)
+app.post('/hash', (req, res) => {
+  crypto.pbkdf2(req.body.password, 'salt', 100000, 64, 'sha512', (err, key) => {
+    res.json({ hash: key.toString('hex') });
+  });
+});</code></pre>
+      </div>
+
+      <!-- Threadpool tuning -->
+      <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-2">
+        <span class="text-xs font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded">Senior Production Tuning</span>
+        <h3 class="font-bold text-slate-900">Scaling libuv Threadpool (<code class="font-mono">UV_THREADPOOL_SIZE</code>)</h3>
+        <p class="text-xs text-slate-600">
+          Node uses a background C++ threadpool for: <code class="font-mono">fs.*</code> file operations, <code class="font-mono">crypto.*</code> hashing, and <code class="font-mono">dns.lookup()</code>. The default size is only <strong>4 threads</strong>! If 5 users upload files or hash passwords at once, the 5th request is queued.
+        </p>
+        <pre class="language-bash"><code class="language-bash"># Increase libuv worker threads in production Docker / Kubernetes:
+export UV_THREADPOOL_SIZE=64
+node server.js</code></pre>
+      </div>
+    </section>
+
+    <!-- Cross-Links -->
+    <div class="p-4 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 flex flex-wrap items-center justify-between gap-3">
+      <span>Compare with: <a href="threads_in_java.html" class="text-indigo-600 font-semibold hover:underline">Topic: Java Threads</a> and <a href="virtual_threads.html" class="text-indigo-600 font-semibold hover:underline">Topic: Virtual Threads</a></span>
+      <a href="../index.html" class="text-slate-900 font-bold hover:underline">Back to Curriculum Index →</a>
+    </div>
+
+  </main>
+  <script src="../voice_narrator.js"></script>
+  <script src="../gemini_assistant.js"></script>
+</body>
+</html>

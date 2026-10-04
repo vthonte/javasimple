@@ -99,24 +99,24 @@
         <span>📊</span> Concurrency Architecture Visualized
       </h3>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-center text-xs font-mono">
-        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-1">
-          <span class="font-bold text-emerald-800">Node.js libuv</span>
+        <a href="topics/event_loop.html" class="p-3 bg-emerald-50 border border-emerald-200 hover:border-emerald-400 rounded-xl space-y-1 block transition-all group">
+          <span class="font-bold text-emerald-800 group-hover:underline">Node.js libuv →</span>
           <div class="text-[11px] text-slate-600">Single Main Thread</div>
           <div class="text-[11px] text-emerald-700">Async Non-blocking Sockets</div>
           <div class="text-[10px] text-slate-500">Event Loop + 4 Threadpool workers</div>
-        </div>
-        <div class="p-3 bg-sky-50 border border-sky-200 rounded-xl space-y-1">
-          <span class="font-bold text-sky-800">Java 8 Platform Threads</span>
+        </a>
+        <a href="topics/threads_in_java.html" class="p-3 bg-sky-50 border border-sky-200 hover:border-sky-400 rounded-xl space-y-1 block transition-all group">
+          <span class="font-bold text-sky-800 group-hover:underline">Java 8 Platform Threads →</span>
           <div class="text-[11px] text-slate-600">1 Request = 1 OS Thread</div>
           <div class="text-[11px] text-sky-700">Tomcat Thread Pool (default 200)</div>
           <div class="text-[10px] text-slate-500">Blocks OS thread on DB queries</div>
-        </div>
-        <div class="p-3 bg-indigo-50 border border-indigo-200 rounded-xl space-y-1">
-          <span class="font-bold text-indigo-800">Java 21 Project Loom</span>
+        </a>
+        <a href="topics/virtual_threads.html" class="p-3 bg-indigo-50 border border-indigo-200 hover:border-indigo-400 rounded-xl space-y-1 block transition-all group">
+          <span class="font-bold text-indigo-800 group-hover:underline">Java 21 Virtual Threads →</span>
           <div class="text-[11px] text-slate-600">Virtual Threads (Loom)</div>
           <div class="text-[11px] text-indigo-700">Unmounts from OS thread on I/O</div>
           <div class="text-[10px] text-slate-500">Scale to 1,000,000+ concurrent tasks</div>
-        </div>
+        </a>
       </div>
     </div>
 

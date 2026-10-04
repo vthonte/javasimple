@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Dive Topic: Java Platform Threads & Concurrency Model</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0.75rem !important;
+      padding: 1rem !important;
+      font-size: 0.9rem !important;
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="../index.html" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-semibold">
+        ← All Curriculum Topics
+      </a>
+      <span class="text-slate-300">|</span>
+      <a href="../01_concurrency_architecture.html" class="text-xs text-slate-600 hover:text-slate-900 font-medium">
+        Guide 01: Concurrency
+      </a>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-sky-600 font-mono font-bold">Topic: Java Threads</span>
+    </div>
+    <div>
+      <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">Beginner to Pro</span>
+    </div>
+  </header>
+
+  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-10">
+    
+    <div class="space-y-3 border-b border-slate-200 pb-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-200 text-xs font-semibold">
+        🧵 Deep Dive Encyclopedia • Concurrency
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        Java Platform Threads & Thread Pools (ThreadPoolExecutor)
+      </h1>
+      <p class="text-slate-600 text-base leading-relaxed">
+        The classical 1:1 OS thread model: thread lifecycle, OS kernel scheduling, ThreadPoolExecutor internals, race conditions, and synchronizers (CountDownLatch, Semaphore).
+      </p>
+    </div>
+
+    <!-- ELI5 MENTAL MODEL -->
+    <section class="p-6 rounded-2xl bg-sky-50/70 border border-sky-200 space-y-3">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">💡</span>
+        <h2 class="text-lg font-bold text-sky-950">ELI5: The 1:1 Kernel Mapping</h2>
+      </div>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        Unlike Node (1 process doing cooperative async), a traditional Java thread is literally a real Linux/Windows operating system thread. When you call <code class="font-mono bg-white px-1 py-0.5 rounded text-sky-700">new Thread().start()</code>, the JVM asks the Linux kernel to allocate a <strong>1MB native stack</strong> and register the thread with the OS CPU scheduler.
+      </p>
+      <p class="text-sm text-slate-700 leading-relaxed">
+        Because OS threads are expensive to create, Java uses <strong>Thread Pools</strong>: hire 20 workers once, keep them alive forever, and feed them tasks via a queue!
+      </p>
+    </section>
+
+    <!-- THREADPOOL FLOWCHART -->
+    <section class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+        <span>📊</span> ThreadPoolExecutor Task Rejection Flowchart
+      </h2>
+      <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs font-mono">
+        <div class="flex items-center gap-2">
+          <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-800 flex items-center justify-center font-bold">1</span>
+          <span>Task arrives → If running threads &lt; <strong>corePoolSize</strong>: Spawn new thread.</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-800 flex items-center justify-center font-bold">2</span>
+          <span>If corePoolSize reached → Add task to <strong>BlockingQueue</strong>.</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-800 flex items-center justify-center font-bold">3</span>
+          <span>If queue is FULL → Spawn extra threads up to <strong>maximumPoolSize</strong>.</span>
+        </div>
+        <div class="flex items-center gap-2 text-rose-700 font-bold">
+          <span class="w-6 h-6 rounded-full bg-rose-100 text-rose-800 flex items-center justify-center">4</span>
+          <span>If max threads reached & queue is full → Trigger <strong>RejectedExecutionHandler</strong> (Crash or CallerRunsPolicy)!</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- CODE LAB -->
+    <section class="space-y-6">
+      <h2 class="text-xl font-bold text-slate-900">Custom Production Thread Pool Configuration</h2>
+
+      <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
+        <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Production Ready</span>
+        <h3 class="font-bold text-slate-900">Configuring ThreadPoolExecutor Safely</h3>
+        <pre class="language-java"><code class="language-java">ThreadPoolExecutor executor = new ThreadPoolExecutor(
+    10,                         // core pool size
+    50,                         // max pool size
+    60L, TimeUnit.SECONDS,      // keep alive time for idle threads
+    new ArrayBlockingQueue<>(1000), // bounded queue (NEVER use unbounded in prod!)
+    new ThreadFactoryBuilder().setNameFormat("order-proc-%d").build(),
+    new ThreadPoolExecutor.CallerRunsPolicy() // backpressure: caller runs task instead of dropping!
+);</code></pre>
+      </div>
+
+      <!-- Concurrency primitives -->
+      <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
+        <span class="text-xs font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">Coordination Primitives</span>
+        <h3 class="font-bold text-slate-900">Waiting for Multiple Threads: CountDownLatch</h3>
+        <p class="text-xs text-slate-600">The Java equivalent of waiting for a batch of async jobs:</p>
+        <pre class="language-java"><code class="language-java">CountDownLatch latch = new CountDownLatch(3);
+
+for (int i = 0; i < 3; i++) {
+    executor.submit(() -> {
+        try {
+            processTask();
+        } finally {
+            latch.countDown(); // decrements counter
+        }
+    });
+}
+
+latch.await(5, TimeUnit.SECONDS); // Blocks until all 3 finish or timeout!</code></pre>
+      </div>
+    </section>
+
+    <!-- Cross-Links -->
+    <div class="p-4 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 flex flex-wrap items-center justify-between gap-3">
+      <span>Compare with: <a href="virtual_threads.html" class="text-indigo-600 font-semibold hover:underline">Topic: Java 21 Virtual Threads</a> and <a href="event_loop.html" class="text-indigo-600 font-semibold hover:underline">Topic: Node.js Event Loop</a></span>
+      <a href="../index.html" class="text-slate-900 font-bold hover:underline">Back to Curriculum Index →</a>
+    </div>
+
+  </main>
+  <script src="../voice_narrator.js"></script>
+  <script src="../gemini_assistant.js"></script>
+</body>
+</html>
