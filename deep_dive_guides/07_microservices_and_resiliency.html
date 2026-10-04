@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Dive: Microservices Architecture, Sagas & Resiliency Patterns</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .code-font { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="06_transaction_management_traps.html" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-semibold">
+        ← Previous: @Transactional
+      </a>
+      <span class="text-slate-600">|</span>
+      <span class="text-xs text-slate-400 font-mono">Guide 7 of 8</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="08_production_outage_triage.html" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors">
+        Next: Outage Triage →
+      </a>
+    </div>
+  </header>
+
+  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-12">
+    
+    <!-- Title -->
+    <div class="space-y-3 border-b border-slate-800 pb-8">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20 text-xs font-semibold">
+        Deep Dive 07 • Distributed Systems (4-7 Yrs Bar)
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
+        Microservices Boundaries, Distributed Data Consistency (Saga/Outbox) & Resiliency
+      </h1>
+      <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+        Why Two-Phase Commit (2PC) fails at scale, the Choreography vs Orchestration Saga pattern, solving the Dual-Write problem with the Transactional Outbox Pattern, and circuit breakers with Resilience4j.
+      </p>
+    </div>
+
+    <!-- PART 1: The Dual-Write Problem -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+        <span class="w-7 h-7 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center text-sm font-black">1</span>
+        The Dual-Write Problem: Why You Cannot Just Call Kafka in a Transaction
+      </h2>
+
+      <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3 text-xs">
+        <div class="font-bold text-rose-400 text-sm">The Naive Code Pattern Found in Inexperienced Codebases:</div>
+        <pre class="code-font text-[11px] text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>@Transactional
+public void placeOrder(Order order) {
+    orderRepository.save(order); // Step 1: Write to PostgreSQL
+    kafkaTemplate.send("order-created", order); // Step 2: Publish to Kafka
+    // CRITICAL DUAL-WRITE FLAW:
+    // What if Kafka is unreachable? DB rolls back, but maybe message was sent.
+    // What if DB commit fails after Kafka sends? Ghost event sent to consumers!
+}</code></pre>
+
+        <p class="text-slate-300 leading-relaxed">
+          PostgreSQL and Kafka are two separate distributed systems without a shared distributed transaction coordinator (2PC is too slow and creates lock deadlocks).
+        </p>
+      </div>
+    </section>
+
+    <!-- PART 2: The Transactional Outbox Pattern -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+        <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-black">2</span>
+        The Industry Standard Solution: Transactional Outbox Pattern
+      </h2>
+
+      <div class="p-6 rounded-xl bg-slate-900 border border-slate-800 space-y-4 text-xs">
+        <p class="text-slate-300 leading-relaxed">
+          Instead of publishing to Kafka directly inside the HTTP request, write the event into an <code class="font-mono text-emerald-400 text-xs">OUTBOX</code> table in the <strong>exact same relational database transaction</strong>!
+        </p>
+
+        <div class="p-4 rounded-lg bg-slate-950 border border-slate-800">
+          <pre class="code-font text-[11px] text-emerald-200 overflow-x-auto"><code>@Transactional
+public void placeOrder(Order order) {
+    orderRepository.save(order); // 1. Save business entity
+
+    // 2. Save event payload into outbox table in SAME ACID transaction!
+    OutboxEvent event = new OutboxEvent("ORDER_CREATED", toJson(order));
+    outboxRepository.save(event);
+    // Guaranteed atomic! Both succeed or both rollback.
+}</code></pre>
+        </div>
+
+        <div class="p-3.5 rounded-lg bg-indigo-950/20 border border-indigo-800/40 space-y-1">
+          <div class="font-bold text-indigo-300">How the Message Gets to Kafka:</div>
+          <p class="text-slate-400 leading-relaxed">
+            A separate background process reads from the Outbox table and publishes to Kafka. The best practice is using <strong>Change Data Capture (CDC) via Debezium</strong>, which tails the PostgreSQL Write-Ahead Log (WAL) directly with near-zero latency, guaranteeing <em>at-least-once</em> delivery without polling overhead!
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 3: Sagas (Choreography vs Orchestration) -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+        <span class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-sm font-black">3</span>
+        Distributed Consistency: The Saga Pattern
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+          <div class="font-bold text-amber-400 text-sm">Choreography-based Saga</div>
+          <p class="text-slate-400 leading-relaxed">
+            Each service acts independently and listens to domain events from Kafka.
+            <br><br>
+            Order Service emits <code class="font-mono text-[11px]">OrderCreated</code> $\rightarrow$ Payment Service listens and charges card, emits <code class="font-mono text-[11px]">PaymentSuccess</code> $\rightarrow$ Inventory Service listens and reserves stock.
+            <br><br>
+            <strong>Pros:</strong> Simple, decoupled. <br>
+            <strong>Cons:</strong> Hard to debug when 8+ services are involved; cyclic dependencies.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+          <div class="font-bold text-indigo-400 text-sm">Orchestration-based Saga (Recommended at Scale)</div>
+          <p class="text-slate-400 leading-relaxed">
+            A centralized <strong>Saga Orchestrator</strong> (e.g. Temporal, Camunda, or a custom state machine service) directs all steps:
+            <br><br>
+            "OrderOrchestrator calls Payment ➔ calls Inventory ➔ confirms Order".
+            <br><br>
+            If Inventory fails: Orchestrator explicitly invokes <code class="font-mono text-[11px]">refundPayment()</code> compensating transaction. State is visible in one place.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 4: Resilience4j Circuit Breakers -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+        <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-black">4</span>
+        Resiliency: Circuit Breakers (Resilience4j vs Node Opossum)
+      </h2>
+
+      <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3 text-xs">
+        <p class="text-slate-300 leading-relaxed">
+          If your Recommendation Microservice slows down from 20ms to 8,000ms, your main thread pool will back up and crash the whole application.
+        </p>
+
+        <div class="p-4 rounded-lg bg-slate-950 border border-slate-800">
+          <pre class="code-font text-[11px] text-sky-200 overflow-x-auto"><code>@Service
+public class PaymentGatewayClient {
+
+    @CircuitBreaker(name = "stripeBreaker", fallbackMethod = "fallbackCharge")
+    @Retry(name = "stripeBreaker")
+    @TimeLimiter(name = "stripeBreaker") // 2 second timeout
+    public PaymentResponse process(PaymentRequest req) {
+        return restClient.post().uri("/charges").body(req).retrieve().body(PaymentResponse.class);
+    }
+
+    // Fallback executes when Circuit is OPEN or times out:
+    public PaymentResponse fallbackCharge(PaymentRequest req, Throwable t) {
+        log.warn("Payment service unavailable, queuing for async retry: {}", t.getMessage());
+        return new PaymentResponse("QUEUED_FOR_OFFLINE_PROCESSING");
+    }
+}</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <div class="border-t border-slate-800 pt-6 flex items-center justify-between">
+      <a href="06_transaction_management_traps.html" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 font-semibold">
+        ← Previous: @Transactional
+      </a>
+      <a href="08_production_outage_triage.html" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md shadow-indigo-600/30">
+        Next Guide: Production Outage Triage →
+      </a>
+    </div>
+
+  </main>
+</body>
+</html>

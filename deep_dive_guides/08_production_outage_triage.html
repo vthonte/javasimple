@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Dive: Production Troubleshooting & Live Outage Incident War Room</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .code-font { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="07_microservices_and_resiliency.html" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-semibold">
+        ← Previous: Microservices & Resiliency
+      </a>
+      <span class="text-slate-600">|</span>
+      <span class="text-xs text-slate-400 font-mono">Guide 8 of 8</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="index.html" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors">
+        Back to Index 🏁
+      </a>
+    </div>
+  </header>
+
+  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-12">
+    
+    <!-- Title -->
+    <div class="space-y-3 border-b border-slate-800 pb-8">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 text-xs font-semibold">
+        Deep Dive 08 • Production Incident War Room
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
+        Production Troubleshooting & Live Incident War Room (4-7 Years On-Call Bar)
+      </h1>
+      <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+        Step-by-step diagnostic workflows for the 3 most terrifying production outages: 100% CPU Spikes, Deadlocks / Connection Pool Depletion, and Heap OutOfMemoryErrors.
+      </p>
+    </div>
+
+    <!-- INCIDENT 1: 100% CPU SPIKE -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-rose-400 flex items-center gap-2">
+        <span class="w-7 h-7 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center text-sm font-black">1</span>
+        Outage 1: 100% CPU Spike on Linux / Kubernetes Pods
+      </h2>
+
+      <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-4 text-xs">
+        <div class="text-slate-300">
+          <strong>The Scenario:</strong> You receive a PagerDuty alert at 2 AM. Pod CPU is pinned at 100%, health checks are timing out, and response latency went from 30ms to 15,000ms.
+        </div>
+
+        <div class="space-y-3">
+          <div class="font-bold text-amber-400">The 4-Step Terminal Triage Command Sequence:</div>
+
+          <div class="p-3.5 rounded-lg bg-slate-950 border border-slate-800 space-y-1">
+            <span class="font-bold text-indigo-400">Step 1: Find the exact high-CPU OS Thread ID</span>
+            <code class="font-mono text-emerald-400 block bg-slate-900 p-2 rounded">top -H -p &lt;JVM_PID&gt;</code>
+            <p class="text-slate-400 text-[11px]">Displays individual threads. Suppose thread ID <code class="font-mono text-xs">28419</code> is consuming 98% CPU.</p>
+          </div>
+
+          <div class="p-3.5 rounded-lg bg-slate-950 border border-slate-800 space-y-1">
+            <span class="font-bold text-indigo-400">Step 2: Convert the Thread ID from decimal to hexadecimal</span>
+            <code class="font-mono text-emerald-400 block bg-slate-900 p-2 rounded">printf '%x\n' 28419  # Outputs: 6f03</code>
+            <p class="text-slate-400 text-[11px]">The JVM thread dump records thread native IDs (<code class="font-mono text-xs">nid</code>) in hex format.</p>
+          </div>
+
+          <div class="p-3.5 rounded-lg bg-slate-950 border border-slate-800 space-y-1">
+            <span class="font-bold text-indigo-400">Step 3: Take a thread dump snapshot</span>
+            <code class="font-mono text-emerald-400 block bg-slate-900 p-2 rounded">jstack -l &lt;JVM_PID&gt; > threaddump.txt</code>
+          </div>
+
+          <div class="p-3.5 rounded-lg bg-slate-950 border border-slate-800 space-y-1">
+            <span class="font-bold text-indigo-400">Step 4: Grep for the hex thread ID in the dump</span>
+            <code class="font-mono text-emerald-400 block bg-slate-900 p-2 rounded">grep -A 25 "nid=0x6f03" threaddump.txt</code>
+            <p class="text-slate-400 text-[11px]">Instantly reveals the exact Java class and line number causing the spin (e.g. <code class="font-mono text-xs">at com.example.service.ReportGenerator.parseData(ReportGenerator.java:142)</code> - usually a runaway <code class="font-mono text-xs">while</code> loop or catastrophic regex backtracking!).</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INCIDENT 2: HIKARICP POOL EXHAUSTION -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">
+        <span class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm font-black">2</span>
+        Outage 2: Connection Pool Exhaustion (HikariPool Connection Timeout)
+      </h2>
+
+      <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3 text-xs">
+        <div class="text-slate-300">
+          <strong>The Error in Logs:</strong>
+          <code class="block font-mono text-rose-400 bg-slate-950 p-2 rounded mt-1 border border-slate-800">
+            HikariPool-1 - Connection is not available, request timed out after 30000ms.
+          </code>
+        </div>
+
+        <div class="p-4 rounded-lg bg-slate-950 border border-slate-800 space-y-2">
+          <div class="font-bold text-emerald-400">Root Cause #1: Long Third-Party HTTP Calls inside @Transactional</div>
+          <pre class="code-font text-[11px] text-rose-300 overflow-x-auto"><code>@Transactional // DB connection checked out here!
+public void processCheckout(Order order) {
+    orderRepo.save(order); // takes 2ms
+    
+    // DISASTER: 3rd-party network call holding DB connection open!
+    stripeClient.chargeCard(order.getAmount()); // takes 5,000ms!
+}</code></pre>
+          <p class="text-slate-400 text-[11px] leading-relaxed">
+            If 10 requests hit checkout, all 10 HikariCP database connections are blocked for 5 seconds doing nothing but waiting for Stripe's network. Every other endpoint in your app starves and crashes!
+          </p>
+          <div class="text-emerald-400 font-semibold text-[11px] pt-1">
+            Fix: Never make external API calls inside a database transaction. Execute the Stripe charge first, and open the <code class="font-mono text-xs">@Transactional</code> scope only for the 3ms required to write to PostgreSQL.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INCIDENT 3: DEADLOCK TRIAGE -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-indigo-400 flex items-center gap-2">
+        <span class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-sm font-black">3</span>
+        Outage 3: Thread Deadlocks (The Mutual Lock Freeze)
+      </h2>
+
+      <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3 text-xs">
+        <p class="text-slate-300 leading-relaxed">
+          Thread 1 holds Lock A and waits for Lock B. Thread 2 holds Lock B and waits for Lock A. Both freeze forever.
+        </p>
+
+        <div class="p-4 rounded-lg bg-slate-950 border border-slate-800">
+          <div class="font-bold text-indigo-300 mb-1">How jstack Detects Deadlocks Automatically:</div>
+          <p class="text-slate-400 leading-relaxed">
+            Run <code class="font-mono text-xs text-emerald-400">jstack -l &lt;PID&gt;</code>. Scroll to the very bottom of the output. The JVM automatically runs cycle-detection algorithms and prints:
+          </p>
+          <pre class="code-font text-[11px] text-amber-300 bg-slate-900 p-2.5 rounded mt-2 border border-slate-800 overflow-x-auto"><code>Found 1 deadlock.
+================
+"pool-1-thread-1":
+  waiting to lock monitor 0x00007f (object A),
+  which is held by "pool-1-thread-2"
+"pool-1-thread-2":
+  waiting to lock monitor 0x00008b (object B),
+  which is held by "pool-1-thread-1"</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <div class="border-t border-slate-800 pt-6 flex items-center justify-between">
+      <a href="07_microservices_and_resiliency.html" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 font-semibold">
+        ← Previous: Microservices & Resiliency
+      </a>
+      <a href="index.html" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-md shadow-emerald-600/30">
+        Review Table of Contents 🏁
+      </a>
+    </div>
+
+  </main>
+</body>
+</html>

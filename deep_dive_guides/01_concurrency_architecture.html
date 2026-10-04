@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Dive: Concurrency Architecture (Node.js Event Loop vs Java Threads vs Java 21 Virtual Threads)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .code-font { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+
+  <!-- Navigation Banner -->
+  <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="index.html" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-semibold">
+        ← Back to Table of Contents
+      </a>
+      <span class="text-slate-600">|</span>
+      <span class="text-xs text-slate-400 font-mono">Guide 1 of 8</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="02_memory_and_garbage_collection.html" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors">
+        Next: JVM Memory & GC →
+      </a>
+    </div>
+  </header>
+
+  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-12">
+    
+    <!-- Title & Executive Context -->
+    <div class="space-y-3 border-b border-slate-800 pb-8">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-semibold">
+        Deep Dive 01 • Core Java Concurrency
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
+        Concurrency Architecture: Node.js Event Loop vs. Multi-Threaded JVM vs. Java 21 Virtual Threads
+      </h1>
+      <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+        Understand how Node.js and Java schedule CPU time, handle blocking I/O, allocate memory per task, and resolve the classic trade-off between throughput, latency, and code readability.
+      </p>
+    </div>
+
+    <!-- PART 1: The Node.js Mental Model -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+        <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-black">1</span>
+        How Node.js Concurrency Works Under The Hood
+      </h2>
+      <p class="text-sm text-slate-300 leading-relaxed">
+        In Node.js, your JavaScript code runs on a <strong>single OS thread</strong> governed by the <strong>libuv event loop</strong>.
+      </p>
+      
+      <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3 text-xs">
+        <div class="font-bold text-slate-200">The Anatomy of an Asynchronous I/O Call in Node:</div>
+        <ol class="list-decimal list-inside space-y-2 text-slate-400 leading-relaxed">
+          <li>You make an I/O call: <code class="font-mono text-emerald-400 text-[11px]">const user = await db.query("SELECT * FROM users WHERE id = ?", [1]);</code></li>
+          <li>The JavaScript engine registers a callback / Promise in the libuv event queue and delegates the socket polling to the OS kernel (<code class="font-mono text-xs">epoll</code> on Linux, <code class="font-mono text-xs">kqueue</code> on macOS, <code class="font-mono text-xs">IOCP</code> on Windows).</li>
+          <li><strong>Crucial:</strong> While waiting 30ms for the database to reply, the main JavaScript thread is <em>completely free</em> to handle other incoming HTTP requests.</li>
+          <li>When the OS socket signals that database bytes have arrived, libuv pushes the resume callback to the microtask queue, which runs on the main thread.</li>
+        </ol>
+      </div>
+
+      <div class="p-4 rounded-xl bg-rose-950/30 border border-rose-800/40 text-xs text-rose-300 space-y-1">
+        <div class="font-bold text-rose-200">The Fatal Node.js Limitation: The Event Loop Lag / CPU Blocking Problem</div>
+        <p>Because there is only 1 thread running your code, if any single request executes a CPU-heavy loop (JSON parsing of a 10MB payload, cryptographic encryption, complex array sorting, image resizing), <strong>every other user's requests are completely frozen in queue</strong> until that loop finishes.</p>
+      </div>
+    </section>
+
+    <!-- PART 2: The Traditional Java Thread Model -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+        <span class="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center text-sm font-black">2</span>
+        Traditional Java: Platform Threads & Thread-Per-Request (Tomcat)
+      </h2>
+      <p class="text-sm text-slate-300 leading-relaxed">
+        Historically, Java implemented a <strong>Thread-per-Request</strong> model using operating system (kernel) threads:
+      </p>
+
+      <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3 text-xs">
+        <div class="font-bold text-slate-200">The Anatomy of a Request in Standard Spring Boot (Tomcat):</div>
+        <ol class="list-decimal list-inside space-y-2 text-slate-400 leading-relaxed">
+          <li>An incoming HTTP request arrives at port 8080.</li>
+          <li>Tomcat takes a dedicated <strong>OS Platform Thread</strong> (e.g. <code class="font-mono text-sky-400 text-[11px]">http-nio-8080-exec-1</code>) from its worker thread pool (default size: 200 threads).</li>
+          <li>This thread executes your controller, service, and repository synchronously.</li>
+          <li>When your code queries the database: <code class="font-mono text-sky-400 text-[11px]">User user = userRepository.findById(1L);</code>, the thread makes a blocking socket read.</li>
+          <li><strong>Crucial Difference:</strong> While waiting for the database to reply, <strong>that entire OS thread is blocked (parked)</strong>. It cannot do anything else.</li>
+        </ol>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+          <div class="font-bold text-indigo-400">Memory Cost of an OS Thread</div>
+          <p class="text-slate-400 leading-relaxed">
+            Each OS thread requires roughly <strong>1MB of dedicated RAM</strong> for its call stack (configured by <code class="font-mono text-[11px]">-Xss1m</code>).
+            <br><br>
+            If you have 10,000 concurrent connected sockets, traditional Java would need <strong>10 GB of RAM just for thread stacks alone</strong>, and the OS kernel scheduler would collapse under context switching overhead. That's why Tomcat capped pools at 200 threads.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+          <div class="font-bold text-emerald-400">Why Developers Preferred It Anyway</div>
+          <p class="text-slate-400 leading-relaxed">
+            Simple linear code! No "callback hell", no <code class="font-mono text-[11px]">Promise.all()</code>, no colored functions (<code class="font-mono text-[11px]">async/await</code> contagion). Exceptions produce clear, sequential stack traces with exact line numbers from top to bottom.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 3: The Game Changer - Java 21 Virtual Threads -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+        <span class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-sm font-black">3</span>
+        The Game Changer: Java 21 Virtual Threads (Project Loom)
+      </h2>
+      <p class="text-sm text-slate-300 leading-relaxed">
+        Java 21 solved the 25-year dilemma between "Node.js high concurrency" and "Java clean linear code" through <strong>Virtual Threads</strong>.
+      </p>
+
+      <div class="p-6 rounded-xl bg-gradient-to-br from-indigo-950/40 to-slate-900 border border-indigo-500/30 space-y-4">
+        <h3 class="text-sm font-bold text-indigo-300 uppercase tracking-wide">How Virtual Threads Work Internally:</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div class="space-y-2">
+            <div class="font-bold text-white">1. Decoupled from the OS</div>
+            <p class="text-slate-400 leading-relaxed">
+              A Virtual Thread is NOT a 1:1 wrapper around a Windows/Linux OS thread. It is a lightweight Java object managed entirely by the <strong>Java Virtual Machine in heap memory</strong> (takes only a few hundred bytes).
+            </p>
+          </div>
+          <div class="space-y-2">
+            <div class="font-bold text-white">2. Automatic Mounting & Unmounting</div>
+            <p class="text-slate-400 leading-relaxed">
+              The JVM maintains a tiny pool of carrier OS threads (usually equal to your CPU cores, e.g. 8). When your virtual thread runs code, it is "mounted" to a carrier thread.
+            </p>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-lg bg-slate-950 border border-slate-800 text-xs space-y-2">
+          <div class="font-bold text-emerald-400">The Magic Moment (Blocking I/O):</div>
+          <p class="text-slate-300 leading-relaxed">
+            When your virtual thread makes a blocking call (HTTP request, SQL query, reading a file):
+          </p>
+          <div class="font-mono text-[11px] text-indigo-300 bg-slate-900 p-2.5 rounded border border-indigo-900/50">
+            Virtual Thread blocks on DB ➔ JVM freezes its stack frame in Heap ➔ JVM UNMOUNTS it from the carrier OS thread ➔ Carrier OS thread immediately runs another Virtual Thread!
+          </div>
+          <p class="text-slate-400 text-[11px] mt-1">
+            When the database answers, the JVM simply mounts the stack frame back onto any available carrier OS thread and execution resumes seamlessly at the next line.
+          </p>
+        </div>
+
+        <div class="flex items-center justify-between p-3 rounded-lg bg-indigo-900/30 border border-indigo-700/40 text-xs">
+          <span class="text-indigo-200">How to enable Virtual Threads in your Spring Boot application:</span>
+          <code class="font-mono text-emerald-400 bg-slate-950 px-2.5 py-1 rounded">spring.threads.virtual.enabled=true</code>
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 4: Side-by-Side Comparison -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+        <span class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center text-sm font-black">4</span>
+        The Concurrency Architecture Comparison Matrix
+      </h2>
+
+      <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900">
+        <table class="w-full text-xs text-left">
+          <thead class="bg-slate-950 border-b border-slate-800 text-slate-400 uppercase font-semibold">
+            <tr>
+              <th class="p-3.5">Metric / Feature</th>
+              <th class="p-3.5 text-emerald-400">Node.js (Event Loop)</th>
+              <th class="p-3.5 text-sky-400">Java (Platform Threads)</th>
+              <th class="p-3.5 text-indigo-400">Java 21 (Virtual Threads)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800 text-slate-300">
+            <tr>
+              <td class="p-3.5 font-bold text-white">Memory per task</td>
+              <td class="p-3.5 font-mono">Few KB (closure / promise)</td>
+              <td class="p-3.5 font-mono text-rose-400">~1 MB (OS stack)</td>
+              <td class="p-3.5 font-mono text-emerald-400">~200 - 1000 Bytes (Heap)</td>
+            </tr>
+            <tr>
+              <td class="p-3.5 font-bold text-white">Max Concurrent Tasks</td>
+              <td class="p-3.5 font-mono">100,000+</td>
+              <td class="p-3.5 font-mono text-rose-400">200 - 2,000 (limited by OS)</td>
+              <td class="p-3.5 font-mono text-emerald-400">1,000,000+</td>
+            </tr>
+            <tr>
+              <td class="p-3.5 font-bold text-white">CPU-Bound Performance</td>
+              <td class="p-3.5 text-rose-400">Poor (Blocks whole server)</td>
+              <td class="p-3.5 text-emerald-400">Excellent (Runs on multi-cores)</td>
+              <td class="p-3.5 text-emerald-400">Excellent (Runs on multi-cores)</td>
+            </tr>
+            <tr>
+              <td class="p-3.5 font-bold text-white">Programming Model</td>
+              <td class="p-3.5">async / await (Colored functions)</td>
+              <td class="p-3.5">Synchronous, sequential</td>
+              <td class="p-3.5 text-emerald-400">Synchronous, sequential</td>
+            </tr>
+            <tr>
+              <td class="p-3.5 font-bold text-white">Thread-Safety Needed?</td>
+              <td class="p-3.5">No (Single-threaded JS)</td>
+              <td class="p-3.5 text-amber-400">Yes (Shared mutable memory)</td>
+              <td class="p-3.5 text-amber-400">Yes (Shared mutable memory)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PART 5: Senior Interview Questions -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+        <span class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm font-black">5</span>
+        Senior Technical Interview Q&A for this Concept
+      </h2>
+
+      <div class="space-y-3">
+        <details class="p-4 rounded-xl bg-slate-900 border border-slate-800 group">
+          <summary class="font-bold text-sm text-slate-200 cursor-pointer flex items-center justify-between">
+            <span>Q1: "Can Virtual Threads replace thread pools everywhere in Spring Boot?"</span>
+            <span class="text-xs text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <div class="mt-3 text-xs text-slate-400 space-y-2 border-t border-slate-800 pt-3 leading-relaxed">
+            <p><strong>Answer:</strong> "No, they should NOT be pooled! In traditional Java, we pool threads because creating an OS thread takes milliseconds and megabytes of memory. Virtual Threads are ephemeral and cheap to create (like JavaScript objects). You create them on-the-fly and let them be garbage collected when done."</p>
+            <p><strong>Senior Gotcha (Pinning):</strong> "There is a caveat called <em>Thread Pinning</em>: If a Virtual Thread enters a <code class="font-mono text-amber-400">synchronized</code> block or executes native code (JNI) and blocks on I/O, it cannot unmount from its carrier thread. In Java 21, the best practice is to replace <code class="font-mono text-amber-400">synchronized</code> with <code class="font-mono text-emerald-400">java.util.concurrent.locks.ReentrantLock</code> to prevent pinning."</p>
+          </div>
+        </details>
+
+        <details class="p-4 rounded-xl bg-slate-900 border border-slate-800 group">
+          <summary class="font-bold text-sm text-slate-200 cursor-pointer flex items-center justify-between">
+            <span>Q2: "In Node.js, we don't need locks. Why does Java need locks, and how do you write lock-free code?"</span>
+            <span class="text-xs text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <div class="mt-3 text-xs text-slate-400 space-y-2 border-t border-slate-800 pt-3 leading-relaxed">
+            <p><strong>Answer:</strong> "In Node.js, code runs on a single event loop thread, so memory access is serialized. In Java, multiple threads share the same Heap memory space and execute concurrently across physical CPU cores. If Thread A and Thread B simultaneously execute <code class="font-mono text-rose-400">count++</code>, both read 5, both write 6, and 1 increment is lost (race condition)."</p>
+            <p><strong>Lock-free Solution:</strong> "To avoid heavy OS lock contention, senior engineers use CPU hardware-level <strong>CAS (Compare-And-Swap)</strong> primitives provided by <code class="font-mono text-emerald-400">java.util.concurrent.atomic.AtomicInteger</code>, which increments without blocking any other thread."</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- Bottom Navigation -->
+    <div class="border-t border-slate-800 pt-6 flex items-center justify-between">
+      <a href="index.html" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 font-semibold">
+        ← Table of Contents
+      </a>
+      <a href="02_memory_and_garbage_collection.html" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md shadow-indigo-600/30">
+        Next Guide: JVM Memory & Garbage Collection →
+      </a>
+    </div>
+
+  </main>
+</body>
+</html>

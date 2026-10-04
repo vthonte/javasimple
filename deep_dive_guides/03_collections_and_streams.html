@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Dive: Java Collections Framework, Internals & Streams vs JS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .code-font { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="02_memory_and_garbage_collection.html" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-semibold">
+        ← Previous: Memory & GC
+      </a>
+      <span class="text-slate-600">|</span>
+      <span class="text-xs text-slate-400 font-mono">Guide 3 of 8</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="04_spring_ioc_and_bean_lifecycle.html" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors">
+        Next: Spring IoC & Beans →
+      </a>
+    </div>
+  </header>
+
+  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-12">
+    
+    <!-- Title -->
+    <div class="space-y-3 border-b border-slate-800 pb-8">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 text-xs font-semibold">
+        Deep Dive 03 • Data Structures & Functional Pipelines
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
+        Java Collections Framework Internals, Thread-Safe Concurrency & Streams API
+      </h1>
+      <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+        Why HashMap is not thread-safe, how bucket collisions and treeification work, when to choose ConcurrentHashMap, and how Java 8+ Streams differ from JavaScript array methods.
+      </p>
+    </div>
+
+    <!-- PART 1: Collections Hierarchy -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+        <span class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center text-sm font-black">1</span>
+        The Java Collections Architecture Overview
+      </h2>
+      <p class="text-sm text-slate-300 leading-relaxed">
+        In JavaScript, you almost exclusively use <code class="font-mono text-xs">Array</code>, <code class="font-mono text-xs">Object</code>, and <code class="font-mono text-xs">Set</code>. In Java, the Collections Framework is divided into interfaces with specialized, performance-tuned implementations:
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+          <div class="font-bold text-indigo-400 text-sm">List&lt;E&gt; (Ordered Collection)</div>
+          <p class="text-slate-400 leading-relaxed">Allows duplicates. Preserves insertion order.</p>
+          <ul class="list-disc list-inside text-slate-300 space-y-1 pt-1">
+            <li><strong class="text-white">ArrayList:</strong> Backed by resizable array. $O(1)$ random index access. Best default choice for 99% of lists.</li>
+            <li><strong class="text-white">LinkedList:</strong> Doubly-linked node pointers. $O(1)$ insert/remove at head/tail. $O(N)$ random access. High memory overhead per node pointer.</li>
+          </ul>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+          <div class="font-bold text-emerald-400 text-sm">Set&lt;E&gt; (Unique Collection)</div>
+          <p class="text-slate-400 leading-relaxed">Disallows duplicates. Fast membership checking.</p>
+          <ul class="list-disc list-inside text-slate-300 space-y-1 pt-1">
+            <li><strong class="text-white">HashSet:</strong> Backed by a HashMap where values are dummy objects. $O(1)$ <code class="font-mono">contains()</code>. Unordered.</li>
+            <li><strong class="text-white">TreeSet:</strong> Backed by Red-Black tree. Keeps elements sorted in natural or comparator order. $O(\log N)$ operations.</li>
+          </ul>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+          <div class="font-bold text-amber-400 text-sm">Map&lt;K, V&gt; (Key-Value Dictionary)</div>
+          <p class="text-slate-400 leading-relaxed">Does not extend <code class="font-mono">Collection</code>, but part of framework.</p>
+          <ul class="list-disc list-inside text-slate-300 space-y-1 pt-1">
+            <li><strong class="text-white">HashMap:</strong> Fast, non-thread-safe dictionary.</li>
+            <li><strong class="text-white">ConcurrentHashMap:</strong> Thread-safe, lock-free reads, segment striped locks on write.</li>
+            <li><strong class="text-white">LinkedHashMap:</strong> Preserves insertion order of keys.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 2: HashMap Deep Dive -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+        <span class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm font-black">2</span>
+        HashMap Internals: The #1 Java Core Interview Question
+      </h2>
+
+      <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-4 text-xs">
+        <p class="text-slate-300 leading-relaxed">
+          Interviewers will ask: <em>"Explain how <code class="font-mono text-indigo-400">map.put(key, value)</code> and <code class="font-mono text-indigo-400">map.get(key)</code> work internally."</em>
+        </p>
+
+        <div class="space-y-2 text-slate-400">
+          <div class="p-3 rounded-lg bg-slate-950 border border-slate-800">
+            <span class="font-bold text-indigo-400">Step 1: Hash Calculation</span>
+            <p class="mt-1">Java calls <code class="font-mono text-xs">key.hashCode()</code> and applies bitwise XOR spreading to reduce collision clustering. The array bucket index is calculated via: <code class="font-mono text-xs">index = (n - 1) & hash</code> (where $n$ is table capacity, always a power of 2).</p>
+          </div>
+
+          <div class="p-3 rounded-lg bg-slate-950 border border-slate-800">
+            <span class="font-bold text-amber-400">Step 2: Collision Handling (Chaining)</span>
+            <p class="mt-1">If the bucket is empty, a new <code class="font-mono text-xs">Node(hash, key, value, null)</code> is stored. If a node already exists (hash collision), Java traverses the linked list, checking <code class="font-mono text-xs">key.equals(existingKey)</code>. If found, it updates value; otherwise it appends to the list.</p>
+          </div>
+
+          <div class="p-3 rounded-lg bg-slate-950 border border-slate-800">
+            <span class="font-bold text-rose-400">Step 3: Treeification (Java 8+ Optimization)</span>
+            <p class="mt-1">If collisions cause a bucket list length to exceed <strong>8 elements</strong> (and total table size $\ge 64$), Java automatically converts the linked list into a <strong>Red-Black Balanced Binary Search Tree</strong>! This turns worst-case lookup from degraded $O(N)$ into guaranteed $O(\log N)$.</p>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-lg bg-rose-950/20 border border-rose-800/40 text-rose-300 space-y-1">
+          <div class="font-bold text-rose-200">Why HashMap fails catastrophically under multi-threading:</div>
+          <p>HashMap is not synchronized. If two threads call <code class="font-mono text-xs">put()</code> simultaneously during resizing (rehash), it causes race conditions, corrupted pointer links, or an infinite loop that pins CPU at 100%. In multi-threaded Spring services, always use <strong class="text-white">ConcurrentHashMap</strong>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 3: Streams vs JS Array methods -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+        <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-black">3</span>
+        Java Streams API vs JavaScript Functional Array Methods
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+          <div class="font-bold text-amber-400">JavaScript Array Pipelines (Eager)</div>
+          <pre class="code-font text-[11px] text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>const results = items
+  .filter(x => x.price > 100)  // creates array #1 in RAM
+  .map(x => x.name)            // creates array #2 in RAM
+  .slice(0, 5);                // creates array #3 in RAM</code></pre>
+          <p class="text-slate-400 leading-relaxed">
+            In Node.js, each chained function executes immediately on the entire collection and allocates an intermediate array in memory.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+          <div class="font-bold text-indigo-400">Java Streams (Lazy & Single Pass)</div>
+          <pre class="code-font text-[11px] text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>List&lt;String&gt; results = items.stream()
+  .filter(x -> x.getPrice() > 100) // intermediate (lazy)
+  .map(Item::getName)             // intermediate (lazy)
+  .limit(5)                       // intermediate (short-circuit)
+  .toList();                      // terminal (triggers work)</code></pre>
+          <p class="text-slate-400 leading-relaxed">
+            Java Streams do zero work until the terminal operator (<code class="font-mono text-[11px]">.toList()</code>, <code class="font-mono text-[11px]">.collect()</code>, <code class="font-mono text-[11px]">.count()</code>) is invoked. Elements flow through filter $\rightarrow$ map one at a time, stopping as soon as 5 matches are found! Zero intermediate arrays.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <div class="border-t border-slate-800 pt-6 flex items-center justify-between">
+      <a href="02_memory_and_garbage_collection.html" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 font-semibold">
+        ← Previous: Memory & GC
+      </a>
+      <a href="04_spring_ioc_and_bean_lifecycle.html" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md shadow-indigo-600/30">
+        Next Guide: Spring IoC & Bean Lifecycle →
+      </a>
+    </div>
+
+  </main>
+</body>
+</html>
