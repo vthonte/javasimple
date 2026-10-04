@@ -9,40 +9,43 @@
     .code-font { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
   </style>
   <!-- Prism.js One Dark IDE Syntax Highlighting -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-  <style>
+    <style>
     pre[class*="language-"] {
-      background: #0d1117 !important;
-      border: 1px solid #30363d !important;
+      background: #f6f8fa !important;
+      border: 1px solid #d0d7de !important;
       border-radius: 0.75rem !important;
       padding: 1.1rem !important;
-      font-size: 0.95rem !important;
+      font-size: 0.92rem !important;
       line-height: 1.6 !important;
+      color: #24292f !important;
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
       font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
     }
     code[class*="language-"] {
       font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
-      font-size: 0.95rem !important;
+      font-size: 0.92rem !important;
+      color: #24292f !important;
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
 
-  <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-6 py-3.5 flex items-center justify-between">
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
     <div class="flex items-center gap-3">
-      <a href="index.html" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-semibold">
+      <a href="index.html" class="text-xs text-indigo-400 hover:text-indigo-800 flex items-center gap-1 font-semibold">
         â† Back to Table of Contents
       </a>
       <span class="text-slate-600">|</span>
-      <span class="text-xs text-slate-400 font-mono">Guide 1 of 8</span>
+      <span class="text-xs text-slate-600 font-mono">Guide 1 of 8</span>
     </div>
     <div class="flex items-center gap-2">
-      <a href="02_memory_and_garbage_collection.html" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors">
+      <a href="02_memory_and_garbage_collection.html" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-slate-900 text-xs font-medium transition-colors">
         Next: JVM Memory & GC â†’
       </a>
     </div>
@@ -50,37 +53,37 @@
 
   <main class="max-w-5xl w-full mx-auto px-6 py-10 space-y-12">
     
-    <div class="space-y-3 border-b border-slate-800 pb-8">
+    <div class="space-y-3 border-b border-slate-200 pb-8">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-semibold">
         Deep Dive 01 â€¢ Concurrency Architecture & Code Evolution
       </div>
-      <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
         Concurrency in Code: Node.js vs. Java 8 (CompletableFuture) vs. Java 21 (Virtual Threads)
       </h1>
-      <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+      <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
         Let's inspect the bare-metal code for running 10,000 concurrent HTTP requests, handling race conditions on shared memory, and comparing asynchronous promises with virtual threads.
       </p>
     </div>
 
     <!-- CODE LAB 1: Fetching multiple services in parallel -->
     <section class="space-y-4">
-      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+      <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
         <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-black">1</span>
         Code Lab 1: Fetching User Profile + Order History in Parallel
       </h2>
-      <p class="text-sm text-slate-300">
+      <p class="text-sm text-slate-700">
         Scenario: To serve a dashboard, we must fetch a User profile from Service A (takes 50ms) and Order History from Service B (takes 80ms) concurrently.
       </p>
 
       <div class="space-y-4 text-sm">
         
         <!-- Node.js Version -->
-        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+        <div class="p-4 rounded-xl bg-white shadow-sm border border-slate-200 space-y-2">
           <div class="flex items-center justify-between">
             <span class="font-bold text-emerald-400">Node.js (ES6+ async/await & Promise.all)</span>
             <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-xs">Single-Threaded Event Loop</span>
           </div>
-          <pre class="language-javascript code-font text-sm text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-javascript">// Node.js: Non-blocking I/O via libuv
+          <pre class="language-javascript code-font text-sm text-slate-700 bg-slate-100 p-3 rounded-lg border border-slate-200 overflow-x-auto"><code class="language-javascript">// Node.js: Non-blocking I/O via libuv
 async function getDashboard(userId) {
   try {
     // Both requests fire concurrently over network sockets
@@ -95,18 +98,18 @@ async function getDashboard(userId) {
     throw error;
   }
 }</code></pre>
-          <p class="text-slate-400 text-sm">
+          <p class="text-slate-600 text-sm">
             <strong>What happens:</strong> The main thread starts both HTTP sockets and yields control back to the event loop. When responses arrive, callbacks resume. Total time = $\approx 80\text{ms}$ (longest of the two).
           </p>
         </div>
 
         <!-- Java 8 Version -->
-        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+        <div class="p-4 rounded-xl bg-white shadow-sm border border-slate-200 space-y-2">
           <div class="flex items-center justify-between">
             <span class="font-bold text-sky-400">Java 8 (CompletableFuture & ForkJoinPool)</span>
             <span class="px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 text-xs">Callback-Based Asynchronous Pipeline</span>
           </div>
-          <pre class="language-java code-font text-sm text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">// Java 8: Introduced CompletableFuture (Java's Promise equivalent)
+          <pre class="language-java code-font text-sm text-slate-700 bg-slate-100 p-3 rounded-lg border border-slate-200 overflow-x-auto"><code class="language-java">// Java 8: Introduced CompletableFuture (Java's Promise equivalent)
 public CompletableFuture&lt;DashboardDTO&gt; getDashboard(Long userId) {
     // Dispatches task to background thread pool (ForkJoinPool.commonPool)
     CompletableFuture&lt;UserDTO&gt; userFuture = CompletableFuture.supplyAsync(() -> 
@@ -125,18 +128,18 @@ public CompletableFuture&lt;DashboardDTO&gt; getDashboard(Long userId) {
         throw new DashboardException(ex);
     });
 }</code></pre>
-          <p class="text-slate-400 text-sm">
+          <p class="text-slate-600 text-sm">
             <strong>Drawback in Java 8:</strong> Notice the callback syntax! Stack traces become fragmented across different worker threads, making debugging painful.
           </p>
         </div>
 
         <!-- Java 21 Version -->
-        <div class="p-4 rounded-xl bg-slate-900 border border-indigo-500/40 bg-indigo-950/20 space-y-2">
+        <div class="p-4 rounded-xl bg-white shadow-sm border border-indigo-500/40 bg-indigo-50 space-y-2">
           <div class="flex items-center justify-between">
-            <span class="font-bold text-indigo-300">Java 21 (Structured Concurrency & Virtual Threads)</span>
-            <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-xs">Pure Sequential Code</span>
+            <span class="font-bold text-indigo-800">Java 21 (Structured Concurrency & Virtual Threads)</span>
+            <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-800 text-xs">Pure Sequential Code</span>
           </div>
-          <pre class="language-java code-font text-sm text-indigo-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">// Java 21: StructuredTaskScope (Preview in 21, standard in modern Java)
+          <pre class="language-java code-font text-sm text-indigo-900 bg-slate-100 p-3 rounded-lg border border-slate-200 overflow-x-auto"><code class="language-java">// Java 21: StructuredTaskScope (Preview in 21, standard in modern Java)
 public DashboardDTO getDashboard(Long userId) throws InterruptedException, ExecutionException {
     // Spawns virtual threads that run concurrently, but code reads 100% synchronously!
     try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
@@ -154,7 +157,7 @@ public DashboardDTO getDashboard(Long userId) throws InterruptedException, Execu
         return new DashboardDTO(userSubtask.get(), ordersSubtask.get());
     }
 }</code></pre>
-          <p class="text-slate-400 text-sm">
+          <p class="text-slate-600 text-sm">
             <strong>The Breakthrough:</strong> Zero callbacks. If one fails, the scope automatically cancels the other task. Total time = $80\text{ms}$. Uses virtually zero OS thread memory.
           </p>
         </div>
@@ -164,19 +167,19 @@ public DashboardDTO getDashboard(Long userId) throws InterruptedException, Execu
 
     <!-- CODE LAB 2: Shared State & Race Conditions -->
     <section class="space-y-4">
-      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+      <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
         <span class="w-7 h-7 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center text-sm font-black">2</span>
         Code Lab 2: Race Conditions on Shared Memory (Counter Example)
       </h2>
-      <p class="text-sm text-slate-300">
+      <p class="text-sm text-slate-700">
         Scenario: 1,000 concurrent requests each increment a hit counter in memory.
       </p>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
         
-        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+        <div class="p-4 rounded-xl bg-white shadow-sm border border-slate-200 space-y-2">
           <div class="font-bold text-emerald-400">Node.js (Safe by Default)</div>
-          <pre class="language-javascript code-font text-sm text-slate-300 bg-slate-950 p-2.5 rounded border border-slate-800 overflow-x-auto"><code class="language-javascript">// Node.js: In-memory counter
+          <pre class="language-javascript code-font text-sm text-slate-700 bg-slate-100 p-2.5 rounded border border-slate-200 overflow-x-auto"><code class="language-javascript">// Node.js: In-memory counter
 let count = 0;
 
 app.get('/hit', (req, res) => {
@@ -186,12 +189,12 @@ app.get('/hit', (req, res) => {
   // during this increment!
   res.send({ count });
 });</code></pre>
-          <p class="text-slate-400 text-sm">Final value after 1,000 hits = <strong>Exactly 1,000</strong>.</p>
+          <p class="text-slate-600 text-sm">Final value after 1,000 hits = <strong>Exactly 1,000</strong>.</p>
         </div>
 
-        <div class="p-4 rounded-xl bg-slate-900 border border-rose-800/40 bg-rose-950/20 space-y-2">
+        <div class="p-4 rounded-xl bg-white shadow-sm border border-rose-200 bg-rose-50 space-y-2">
           <div class="font-bold text-rose-400">Java (Naive: Silent Data Loss!)</div>
-          <pre class="language-java code-font text-sm text-rose-200 bg-slate-950 p-2.5 rounded border border-slate-800 overflow-x-auto"><code class="language-java">@RestController
+          <pre class="language-java code-font text-sm text-rose-900 bg-slate-100 p-2.5 rounded border border-slate-200 overflow-x-auto"><code class="language-java">@RestController
 public class HitController {
     private int count = 0; // Shared state!
 
@@ -204,12 +207,12 @@ public class HitController {
         return count;
     }
 }</code></pre>
-          <p class="text-rose-300 text-sm">Final value after 1,000 hits = <strong>~842 (Corrupted!)</strong>.</p>
+          <p class="text-rose-800 text-sm">Final value after 1,000 hits = <strong>~842 (Corrupted!)</strong>.</p>
         </div>
 
-        <div class="p-4 rounded-xl bg-slate-900 border border-emerald-800/40 bg-emerald-950/20 space-y-2">
+        <div class="p-4 rounded-xl bg-white shadow-sm border border-emerald-200 bg-emerald-50 space-y-2">
           <div class="font-bold text-emerald-400">Java (Thread-Safe with Atomic / CAS)</div>
-          <pre class="language-java code-font text-sm text-emerald-200 bg-slate-950 p-2.5 rounded border border-slate-800 overflow-x-auto"><code class="language-java">@RestController
+          <pre class="language-java code-font text-sm text-emerald-900 bg-slate-100 p-2.5 rounded border border-slate-200 overflow-x-auto"><code class="language-java">@RestController
 public class HitController {
     // Hardware-level atomic instruction
     private final AtomicInteger count = 
@@ -221,7 +224,7 @@ public class HitController {
         return count.incrementAndGet();
     }
 }</code></pre>
-          <p class="text-emerald-300 text-sm">Final value after 1,000 hits = <strong>Exactly 1,000 (Thread-Safe!)</strong>.</p>
+          <p class="text-emerald-800 text-sm">Final value after 1,000 hits = <strong>Exactly 1,000 (Thread-Safe!)</strong>.</p>
         </div>
 
       </div>
@@ -229,15 +232,15 @@ public class HitController {
 
     <!-- CODE LAB 3: Spawning 10,000 Concurrent Tasks -->
     <section class="space-y-4">
-      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+      <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
         <span class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-sm font-black">3</span>
         Code Lab 3: Spawning 10,000 Concurrent Background Tasks
       </h2>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+        <div class="p-4 rounded-xl bg-white shadow-sm border border-slate-200 space-y-2">
           <div class="font-bold text-rose-400">Traditional Java Platform Threads (Crashes the JVM!)</div>
-          <pre class="language-java code-font text-sm text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">// Trying to create 10,000 OS Threads:
+          <pre class="language-java code-font text-sm text-rose-900 bg-slate-100 p-3 rounded-lg border border-slate-200 overflow-x-auto"><code class="language-java">// Trying to create 10,000 OS Threads:
 for (int i = 0; i < 10_000; i++) {
     new Thread(() -> {
         try { Thread.sleep(1000); } catch (Exception e) {}
@@ -248,9 +251,9 @@ for (int i = 0; i < 10_000; i++) {
 // 10,000 * 1MB stack = 10GB of RAM needed!</code></pre>
         </div>
 
-        <div class="p-4 rounded-xl bg-slate-900 border border-emerald-800/40 bg-emerald-950/20 space-y-2">
+        <div class="p-4 rounded-xl bg-white shadow-sm border border-emerald-200 bg-emerald-50 space-y-2">
           <div class="font-bold text-emerald-400">Java 21 Virtual Threads (Runs in 20 Milliseconds!)</div>
-          <pre class="language-java code-font text-sm text-emerald-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">// Spawning 10,000 Virtual Threads in Java 21:
+          <pre class="language-java code-font text-sm text-emerald-900 bg-slate-100 p-3 rounded-lg border border-slate-200 overflow-x-auto"><code class="language-java">// Spawning 10,000 Virtual Threads in Java 21:
 try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
     for (int i = 0; i < 10_000; i++) {
         executor.submit(() -> {
@@ -265,11 +268,11 @@ try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
     </section>
 
     <!-- Navigation -->
-    <div class="border-t border-slate-800 pt-6 flex items-center justify-between">
-      <a href="index.html" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 font-semibold">
+    <div class="border-t border-slate-200 pt-6 flex items-center justify-between">
+      <a href="index.html" class="text-xs text-slate-600 hover:text-slate-900 flex items-center gap-1 font-semibold">
         â† Table of Contents
       </a>
-      <a href="02_memory_and_garbage_collection.html" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md shadow-indigo-600/30">
+      <a href="02_memory_and_garbage_collection.html" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-slate-900 text-xs font-semibold shadow-md shadow-indigo-600/30">
         Next Guide: JVM Memory Management & GC â†’
       </a>
     </div>
@@ -279,6 +282,7 @@ try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
   <script src="gemini_assistant.js"></script>
 </body>
 </html>
+
 
 
 

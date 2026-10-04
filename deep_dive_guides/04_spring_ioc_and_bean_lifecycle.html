@@ -9,40 +9,43 @@
     .code-font { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
   </style>
   <!-- Prism.js One Dark IDE Syntax Highlighting -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-  <style>
+    <style>
     pre[class*="language-"] {
-      background: #0d1117 !important;
-      border: 1px solid #30363d !important;
+      background: #f6f8fa !important;
+      border: 1px solid #d0d7de !important;
       border-radius: 0.75rem !important;
       padding: 1.1rem !important;
-      font-size: 0.95rem !important;
+      font-size: 0.92rem !important;
       line-height: 1.6 !important;
+      color: #24292f !important;
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
       font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
     }
     code[class*="language-"] {
       font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
-      font-size: 0.95rem !important;
+      font-size: 0.92rem !important;
+      color: #24292f !important;
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
 
-  <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-6 py-3.5 flex items-center justify-between">
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
     <div class="flex items-center gap-3">
-      <a href="03_collections_and_streams.html" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-semibold">
+      <a href="03_collections_and_streams.html" class="text-xs text-indigo-400 hover:text-indigo-800 flex items-center gap-1 font-semibold">
         â† Previous: Collections & Streams
       </a>
       <span class="text-slate-600">|</span>
-      <span class="text-xs text-slate-400 font-mono">Guide 4 of 8</span>
+      <span class="text-xs text-slate-600 font-mono">Guide 4 of 8</span>
     </div>
     <div class="flex items-center gap-2">
-      <a href="05_jpa_hibernate_n_plus_one.html" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors">
+      <a href="05_jpa_hibernate_n_plus_one.html" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-slate-900 text-xs font-medium transition-colors">
         Next: JPA & N+1 Problem â†’
       </a>
     </div>
@@ -50,21 +53,21 @@
 
   <main class="max-w-5xl w-full mx-auto px-6 py-10 space-y-12">
     
-    <div class="space-y-3 border-b border-slate-800 pb-8">
+    <div class="space-y-3 border-b border-slate-200 pb-8">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold">
         Deep Dive 04 â€¢ Enterprise Architecture & DI Patterns
       </div>
-      <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
         Dependency Injection in Code: Express.js vs. NestJS vs. Spring Boot
       </h1>
-      <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+      <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
         Let's inspect how dependencies are created and injected across Node.js (manual/Express), TypeScript (NestJS), and modern Spring Boot with constructor injection.
       </p>
     </div>
 
     <!-- CODE LAB 1: Building a Service Layer with Dependencies -->
     <section class="space-y-4">
-      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+      <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
         <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-black">1</span>
         Code Lab 1: Wiring Controller $\rightarrow$ Service $\rightarrow$ Repository
       </h2>
@@ -72,12 +75,12 @@
       <div class="space-y-4 text-sm">
         
         <!-- Express / Node.js -->
-        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+        <div class="p-4 rounded-xl bg-white shadow-sm border border-slate-200 space-y-2">
           <div class="flex items-center justify-between">
             <span class="font-bold text-emerald-400">1. Node.js (Express - Manual Factory / Imports)</span>
             <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-xs">No Built-in Container</span>
           </div>
-          <pre class="language-java code-font text-sm text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">// user.service.js
+          <pre class="language-java code-font text-sm text-slate-700 bg-slate-100 p-3 rounded-lg border border-slate-200 overflow-x-auto"><code class="language-java">// user.service.js
 import db from '../db.js';
 import emailClient from '../mailer.js';
 
@@ -100,12 +103,12 @@ router.post('/register', (req, res) => userService.registerUser(req.body.email))
         </div>
 
         <!-- NestJS (TypeScript Node) -->
-        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+        <div class="p-4 rounded-xl bg-white shadow-sm border border-slate-200 space-y-2">
           <div class="flex items-center justify-between">
             <span class="font-bold text-sky-400">2. Node.js (NestJS - TypeScript IoC Container)</span>
             <span class="px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 text-xs">Reflection-based DI (Inspired by Spring!)</span>
           </div>
-          <pre class="language-java code-font text-sm text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">// user.service.ts
+          <pre class="language-java code-font text-sm text-slate-700 bg-slate-100 p-3 rounded-lg border border-slate-200 overflow-x-auto"><code class="language-java">// user.service.ts
 @Injectable()
 export class UserService {
   constructor(
@@ -133,12 +136,12 @@ export class UserController {
         </div>
 
         <!-- Spring Boot Java 21 -->
-        <div class="p-4 rounded-xl bg-slate-900 border border-indigo-500/40 bg-indigo-950/20 space-y-2">
+        <div class="p-4 rounded-xl bg-white shadow-sm border border-indigo-500/40 bg-indigo-50 space-y-2">
           <div class="flex items-center justify-between">
-            <span class="font-bold text-indigo-300">3. Spring Boot (Modern Java 21 - Constructor Injection)</span>
-            <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-xs">Enterprise Production Standard</span>
+            <span class="font-bold text-indigo-800">3. Spring Boot (Modern Java 21 - Constructor Injection)</span>
+            <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-800 text-xs">Enterprise Production Standard</span>
           </div>
-          <pre class="language-java code-font text-sm text-indigo-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">// 1. Service Layer
+          <pre class="language-java code-font text-sm text-indigo-900 bg-slate-100 p-3 rounded-lg border border-slate-200 overflow-x-auto"><code class="language-java">// 1. Service Layer
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -182,16 +185,16 @@ public class UserController {
 
     <!-- CODE LAB 2: Bean Lifecycle Hook in Action -->
     <section class="space-y-4">
-      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+      <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
         <span class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm font-black">2</span>
         Code Lab 2: Lifecycle Callbacks (@PostConstruct & @PreDestroy)
       </h2>
-      <p class="text-sm text-slate-300">
+      <p class="text-sm text-slate-700">
         In Node.js, you initialize resources right at startup in <code class="font-mono text-xs">index.js</code>. In Spring, beans manage their own startup and shutdown cleanly:
       </p>
 
-      <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 text-xs">
-        <pre class="language-java code-font text-sm text-emerald-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">@Component
+      <div class="p-4 rounded-xl bg-white shadow-sm border border-slate-200 text-xs">
+        <pre class="language-java code-font text-sm text-emerald-900 bg-slate-100 p-3 rounded-lg border border-slate-200 overflow-x-auto"><code class="language-java">@Component
 public class CacheWarmerManager {
 
     private final RedisTemplate&lt;String, String&gt; redisTemplate;
@@ -223,11 +226,11 @@ public class CacheWarmerManager {
     </section>
 
     <!-- Navigation -->
-    <div class="border-t border-slate-800 pt-6 flex items-center justify-between">
-      <a href="03_collections_and_streams.html" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 font-semibold">
+    <div class="border-t border-slate-200 pt-6 flex items-center justify-between">
+      <a href="03_collections_and_streams.html" class="text-xs text-slate-600 hover:text-slate-900 flex items-center gap-1 font-semibold">
         â† Previous: Collections & Streams
       </a>
-      <a href="05_jpa_hibernate_n_plus_one.html" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md shadow-indigo-600/30">
+      <a href="05_jpa_hibernate_n_plus_one.html" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-slate-900 text-xs font-semibold shadow-md shadow-indigo-600/30">
         Next Guide: JPA, Hibernate & N+1 Traps â†’
       </a>
     </div>
@@ -237,6 +240,7 @@ public class CacheWarmerManager {
   <script src="gemini_assistant.js"></script>
 </body>
 </html>
+
 
 
 

@@ -9,41 +9,44 @@
     .code-font { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
   </style>
   <!-- Prism.js One Dark IDE Syntax Highlighting -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-  <style>
+    <style>
     pre[class*="language-"] {
-      background: #0d1117 !important;
-      border: 1px solid #30363d !important;
+      background: #f6f8fa !important;
+      border: 1px solid #d0d7de !important;
       border-radius: 0.75rem !important;
       padding: 1.1rem !important;
-      font-size: 0.95rem !important;
+      font-size: 0.92rem !important;
       line-height: 1.6 !important;
+      color: #24292f !important;
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
       font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
     }
     code[class*="language-"] {
       font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
-      font-size: 0.95rem !important;
+      font-size: 0.92rem !important;
+      color: #24292f !important;
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
 
   <!-- Header -->
-  <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-6 py-3.5 flex items-center justify-between">
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
     <div class="flex items-center gap-3">
-      <a href="01_concurrency_architecture.html" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-semibold">
+      <a href="01_concurrency_architecture.html" class="text-xs text-indigo-400 hover:text-indigo-800 flex items-center gap-1 font-semibold">
         â† Previous: Concurrency
       </a>
       <span class="text-slate-600">|</span>
-      <span class="text-xs text-slate-400 font-mono">Guide 2 of 8</span>
+      <span class="text-xs text-slate-600 font-mono">Guide 2 of 8</span>
     </div>
     <div class="flex items-center gap-2">
-      <a href="03_collections_and_streams.html" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors">
+      <a href="03_collections_and_streams.html" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-slate-900 text-xs font-medium transition-colors">
         Next: Collections & Streams â†’
       </a>
     </div>
@@ -52,38 +55,38 @@
   <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-12">
     
     <!-- Title -->
-    <div class="space-y-3 border-b border-slate-800 pb-8">
+    <div class="space-y-3 border-b border-slate-200 pb-8">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold">
         Deep Dive 02 â€¢ JVM Runtime Internals
       </div>
-      <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
         JVM Memory Management, Garbage Collection Algorithms & Production Memory Leaks
       </h1>
-      <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+      <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
         How the JVM allocates RAM, differences between Stack and Heap, how modern GCs (G1, ZGC) collect unreachable objects without freezing your servers, and how to debug <code class="font-mono text-rose-400 text-xs">OutOfMemoryError</code>.
       </p>
     </div>
 
     <!-- PART 1: The JVM Memory Regions -->
     <section class="space-y-4">
-      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+      <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
         <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-black">1</span>
         The 3 Major JVM Memory Regions
       </h2>
-      <p class="text-sm text-slate-300 leading-relaxed">
+      <p class="text-sm text-slate-700 leading-relaxed">
         In Node.js, V8 manages memory with an old-space and new-space heap (usually capped around 1.4GBâ€“2GB by <code class="font-mono text-xs">--max-old-space-size</code>). The JVM divides process memory into three distinct architectural zones:
       </p>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-        <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
+        <div class="p-5 rounded-xl bg-white shadow-sm border border-slate-200 space-y-3">
           <div class="flex items-center justify-between">
             <span class="font-bold text-indigo-400 text-sm">Thread Stack</span>
             <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs">Per-Thread</span>
           </div>
-          <p class="text-slate-400 leading-relaxed">
+          <p class="text-slate-600 leading-relaxed">
             Allocated private for every active thread. Holds primitive values (e.g. <code class="font-mono text-sm">int x = 5</code>) and reference pointers to heap objects.
           </p>
-          <div class="p-2.5 rounded bg-slate-950 border border-slate-800 text-sm text-slate-300">
+          <div class="p-2.5 rounded bg-slate-100 border border-slate-200 text-sm text-slate-700">
             <strong>Lifecycle:</strong> Ultra-fast LIFO. Freed automatically when a method exits. Never touched by Garbage Collector!
           </div>
           <div class="text-sm text-rose-400">
@@ -91,15 +94,15 @@
           </div>
         </div>
 
-        <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
+        <div class="p-5 rounded-xl bg-white shadow-sm border border-slate-200 space-y-3">
           <div class="flex items-center justify-between">
             <span class="font-bold text-emerald-400 text-sm">Heap Memory</span>
             <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs">Shared</span>
           </div>
-          <p class="text-slate-400 leading-relaxed">
+          <p class="text-slate-600 leading-relaxed">
             The largest region, shared across all threads. Every instance created with <code class="font-mono text-sm">new User()</code> or Spring Singleton lives here.
           </p>
-          <div class="p-2.5 rounded bg-slate-950 border border-slate-800 text-sm text-slate-300">
+          <div class="p-2.5 rounded bg-slate-100 border border-slate-200 text-sm text-slate-700">
             <strong>Lifecycle:</strong> Managed completely by the Garbage Collector (Young and Old Generations).
           </div>
           <div class="text-sm text-rose-400">
@@ -107,15 +110,15 @@
           </div>
         </div>
 
-        <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
+        <div class="p-5 rounded-xl bg-white shadow-sm border border-slate-200 space-y-3">
           <div class="flex items-center justify-between">
             <span class="font-bold text-amber-400 text-sm">Metaspace</span>
             <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs">Native RAM</span>
           </div>
-          <p class="text-slate-400 leading-relaxed">
+          <p class="text-slate-600 leading-relaxed">
             Stores class bytecodes, method metadata, static variables, and reflection references.
           </p>
-          <div class="p-2.5 rounded bg-slate-950 border border-slate-800 text-sm text-slate-300">
+          <div class="p-2.5 rounded bg-slate-100 border border-slate-200 text-sm text-slate-700">
             <strong>Lifecycle:</strong> Lives in native OS memory (outside Heap). Introduced in Java 8 to replace PermGen.
           </div>
           <div class="text-sm text-rose-400">
@@ -127,45 +130,45 @@
 
     <!-- PART 2: How Garbage Collection Works -->
     <section class="space-y-4">
-      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+      <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
         <span class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-sm font-black">2</span>
         How JVM Garbage Collection (GC) Works: Generational Hypothesis
       </h2>
-      <p class="text-sm text-slate-300 leading-relaxed">
+      <p class="text-sm text-slate-700 leading-relaxed">
         The JVM's GC relies on the <strong>Weak Generational Hypothesis</strong>: *"Most objects die shortly after creation (e.g. temporary DTOs, HTTP request strings, loop variables)."*
       </p>
 
-      <div class="p-6 rounded-xl bg-slate-900 border border-slate-800 space-y-4 text-sm">
-        <div class="font-bold text-slate-200">The Journey of a Java Object through the Heap Generations:</div>
+      <div class="p-6 rounded-xl bg-white shadow-sm border border-slate-200 space-y-4 text-sm">
+        <div class="font-bold text-slate-800">The Journey of a Java Object through the Heap Generations:</div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div class="p-3.5 rounded-lg bg-slate-950 border border-slate-800 space-y-1.5">
+          <div class="p-3.5 rounded-lg bg-slate-100 border border-slate-200 space-y-1.5">
             <div class="font-bold text-emerald-400">1. Eden Space (Young Gen)</div>
-            <p class="text-slate-400 leading-relaxed">
+            <p class="text-slate-600 leading-relaxed">
               Every newly allocated object begins in Eden. When Eden fills up, a fast <strong>Minor GC</strong> fires. 98% of objects are immediately destroyed.
             </p>
           </div>
 
-          <div class="p-3.5 rounded-lg bg-slate-950 border border-slate-800 space-y-1.5">
+          <div class="p-3.5 rounded-lg bg-slate-100 border border-slate-200 space-y-1.5">
             <div class="font-bold text-amber-400">2. Survivor Spaces (S0 / S1)</div>
-            <p class="text-slate-400 leading-relaxed">
+            <p class="text-slate-600 leading-relaxed">
               Objects that survive Eden are copied to Survivor space. An "age" counter increments every time they survive a Minor GC cycle.
             </p>
           </div>
 
-          <div class="p-3.5 rounded-lg bg-slate-950 border border-slate-800 space-y-1.5">
+          <div class="p-3.5 rounded-lg bg-slate-100 border border-slate-200 space-y-1.5">
             <div class="font-bold text-rose-400">3. Old / Tenured Generation</div>
-            <p class="text-slate-400 leading-relaxed">
+            <p class="text-slate-600 leading-relaxed">
               When an object's age reaches the threshold (default: 15 cycles), it is promoted to the Old Gen. Spring Singletons and DB pools live here permanently.
             </p>
           </div>
         </div>
 
-        <div class="p-4 rounded-lg bg-slate-950 border border-indigo-500/30 text-xs space-y-2">
-          <div class="font-bold text-indigo-300">Modern GC Collectors You Must Know in Senior Interviews:</div>
-          <ul class="list-disc list-inside space-y-1 text-slate-400">
-            <li><strong class="text-slate-200">G1GC (Garbage-First GC):</strong> The default since Java 9. Divides heap into thousands of equal regions. Prioritizes collecting regions containing the most garbage to meet target pause-time goals (e.g. <code class="font-mono text-xs">-XX:MaxGCPauseMillis=200</code>).</li>
-            <li><strong class="text-slate-200">ZGC (Z Garbage Collector):</strong> Ultra-low-latency collector in modern Java 21. Performs all heavy GC work concurrently without stopping application threads. Guarantees <strong>pause times below 1 millisecond</strong> even on terabyte-sized heaps!</li>
+        <div class="p-4 rounded-lg bg-slate-100 border border-indigo-500/30 text-xs space-y-2">
+          <div class="font-bold text-indigo-800">Modern GC Collectors You Must Know in Senior Interviews:</div>
+          <ul class="list-disc list-inside space-y-1 text-slate-600">
+            <li><strong class="text-slate-800">G1GC (Garbage-First GC):</strong> The default since Java 9. Divides heap into thousands of equal regions. Prioritizes collecting regions containing the most garbage to meet target pause-time goals (e.g. <code class="font-mono text-xs">-XX:MaxGCPauseMillis=200</code>).</li>
+            <li><strong class="text-slate-800">ZGC (Z Garbage Collector):</strong> Ultra-low-latency collector in modern Java 21. Performs all heavy GC work concurrently without stopping application threads. Guarantees <strong>pause times below 1 millisecond</strong> even on terabyte-sized heaps!</li>
           </ul>
         </div>
       </div>
@@ -173,11 +176,11 @@
 
     <!-- PART 3: The 3 Real-World Memory Leaks in Java -->
     <section class="space-y-4">
-      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+      <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
         <span class="w-7 h-7 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center text-sm font-black">3</span>
         How Memory Leaks Actually Happen in Java (and How to Triage Them)
       </h2>
-      <p class="text-sm text-slate-300 leading-relaxed">
+      <p class="text-sm text-slate-700 leading-relaxed">
         *"Wait, Java has garbage collection! How can it leak memory?"*<br>
         A memory leak in Java occurs when an object is <strong>no longer needed by your business logic, but an active reference path from a GC Root still exists</strong>, preventing the GC from ever freeing it.
       </p>
@@ -185,9 +188,9 @@
       <div class="space-y-4 text-sm">
         
         <!-- Leak 1: Static Collections -->
-        <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+        <div class="p-5 rounded-xl bg-white shadow-sm border border-slate-200 space-y-2">
           <div class="font-bold text-rose-400 text-sm">Leak 1: Unbounded Static Collections (The In-Memory Cache Trap)</div>
-          <pre class="language-java code-font text-sm text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">@Service
+          <pre class="language-java code-font text-sm text-rose-900 bg-slate-100 p-3 rounded-lg border border-slate-200 overflow-x-auto"><code class="language-java">@Service
 public class UserService {
     // STATIC collection stays alive for the ENTIRE lifetime of the JVM process!
     private static final Map&lt;String, UserDTO&gt; userCache = new HashMap&lt;&gt;();
@@ -203,9 +206,9 @@ public class UserService {
         </div>
 
         <!-- Leak 2: ThreadLocal -->
-        <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+        <div class="p-5 rounded-xl bg-white shadow-sm border border-slate-200 space-y-2">
           <div class="font-bold text-rose-400 text-sm">Leak 2: Forgotten ThreadLocal Variables in Servlet Filters</div>
-          <pre class="language-java code-font text-sm text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">public class TenantFilter extends OncePerRequestFilter {
+          <pre class="language-java code-font text-sm text-rose-900 bg-slate-100 p-3 rounded-lg border border-slate-200 overflow-x-auto"><code class="language-java">public class TenantFilter extends OncePerRequestFilter {
     public static final ThreadLocal&lt;SecurityContext&gt; contextHolder = new ThreadLocal&lt;&gt;();
 
     @Override
@@ -226,16 +229,16 @@ public class UserService {
 
     <!-- PART 4: Senior Interview Triage Protocol -->
     <section class="space-y-4">
-      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+      <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
         <span class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm font-black">4</span>
         The Senior Interview Outage Script: Triage an OutOfMemoryError in Prod
       </h2>
-      <p class="text-sm text-slate-300 leading-relaxed">
+      <p class="text-sm text-slate-700 leading-relaxed">
         When an interviewer asks: <em>"Your Spring Boot pods in AWS are restarting every 4 hours with OutOfMemoryError. Walk me through your triage process step-by-step."</em>
       </p>
 
-      <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3 text-xs">
-        <div class="space-y-2 text-slate-300 leading-relaxed">
+      <div class="p-5 rounded-xl bg-white shadow-sm border border-slate-200 space-y-3 text-xs">
+        <div class="space-y-2 text-slate-700 leading-relaxed">
           <div class="flex items-start gap-2">
             <span class="font-bold text-indigo-400 shrink-0">Step 1:</span>
             <span>Check if <code class="font-mono text-emerald-400">-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/dumps/heap.hprof</code> is enabled. This instructs the JVM to automatically write the entire RAM state to disk at the exact moment of failure.</span>
@@ -257,11 +260,11 @@ public class UserService {
     </section>
 
     <!-- Navigation -->
-    <div class="border-t border-slate-800 pt-6 flex items-center justify-between">
-      <a href="01_concurrency_architecture.html" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 font-semibold">
+    <div class="border-t border-slate-200 pt-6 flex items-center justify-between">
+      <a href="01_concurrency_architecture.html" class="text-xs text-slate-600 hover:text-slate-900 flex items-center gap-1 font-semibold">
         â† Previous: Concurrency
       </a>
-      <a href="03_collections_and_streams.html" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md shadow-indigo-600/30">
+      <a href="03_collections_and_streams.html" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-slate-900 text-xs font-semibold shadow-md shadow-indigo-600/30">
         Next Guide: Collections & Streams Mastery â†’
       </a>
     </div>
@@ -271,6 +274,7 @@ public class UserService {
   <script src="gemini_assistant.js"></script>
 </body>
 </html>
+
 
 
 

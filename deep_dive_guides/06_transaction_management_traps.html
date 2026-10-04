@@ -9,40 +9,43 @@
     .code-font { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
   </style>
   <!-- Prism.js One Dark IDE Syntax Highlighting -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-  <style>
+    <style>
     pre[class*="language-"] {
-      background: #0d1117 !important;
-      border: 1px solid #30363d !important;
+      background: #f6f8fa !important;
+      border: 1px solid #d0d7de !important;
       border-radius: 0.75rem !important;
       padding: 1.1rem !important;
-      font-size: 0.95rem !important;
+      font-size: 0.92rem !important;
       line-height: 1.6 !important;
+      color: #24292f !important;
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
       font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
     }
     code[class*="language-"] {
       font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
-      font-size: 0.95rem !important;
+      font-size: 0.92rem !important;
+      color: #24292f !important;
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
 
-  <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-6 py-3.5 flex items-center justify-between">
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
     <div class="flex items-center gap-3">
-      <a href="05_jpa_hibernate_n_plus_one.html" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-semibold">
+      <a href="05_jpa_hibernate_n_plus_one.html" class="text-xs text-indigo-400 hover:text-indigo-800 flex items-center gap-1 font-semibold">
         â† Previous: JPA & N+1 Problem
       </a>
       <span class="text-slate-600">|</span>
-      <span class="text-xs text-slate-400 font-mono">Guide 6 of 8</span>
+      <span class="text-xs text-slate-600 font-mono">Guide 6 of 8</span>
     </div>
     <div class="flex items-center gap-2">
-      <a href="07_microservices_and_resiliency.html" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors">
+      <a href="07_microservices_and_resiliency.html" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-slate-900 text-xs font-medium transition-colors">
         Next: Microservices & Resiliency â†’
       </a>
     </div>
@@ -50,21 +53,21 @@
 
   <main class="max-w-5xl w-full mx-auto px-6 py-10 space-y-12">
     
-    <div class="space-y-3 border-b border-slate-800 pb-8">
+    <div class="space-y-3 border-b border-slate-200 pb-8">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-semibold">
         Deep Dive 06 â€¢ Code Mechanics: Transactions & Proxies
       </div>
-      <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
         Transaction Management in Code: Node.js Transactions vs. Spring @Transactional
       </h1>
-      <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+      <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
         Let's compare how manual ACID transactions are written in Node.js (Prisma/Knex) versus Spring's declarative <code class="font-mono text-amber-400 text-xs">@Transactional</code>, and see the exact CGLIB proxy bypass bug in code.
       </p>
     </div>
 
     <!-- CODE LAB 1: Transfer Money between 2 Accounts -->
     <section class="space-y-4">
-      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+      <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
         <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-black">1</span>
         Code Lab 1: Bank Transfer (Deduct from A, Credit to B)
       </h2>
@@ -72,9 +75,9 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
         
         <!-- Node.js / Prisma Interactive Transaction -->
-        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+        <div class="p-4 rounded-xl bg-white shadow-sm border border-slate-200 space-y-2">
           <div class="font-bold text-emerald-400">Node.js (Prisma $transaction closure)</div>
-          <pre class="language-java code-font text-sm text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">async function transferMoney(fromId, toId, amount) {
+          <pre class="language-java code-font text-sm text-slate-700 bg-slate-100 p-3 rounded-lg border border-slate-200 overflow-x-auto"><code class="language-java">async function transferMoney(fromId, toId, amount) {
   // Prisma $transaction: Executes all steps inside 1 DB transaction
   return await prisma.$transaction(async (tx) => {
     // 1. Deduct from sender
@@ -100,9 +103,9 @@
         </div>
 
         <!-- Spring Boot Declarative Transaction -->
-        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+        <div class="p-4 rounded-xl bg-white shadow-sm border border-slate-200 space-y-2">
           <div class="font-bold text-indigo-400">Java Spring Boot (@Transactional)</div>
-          <pre class="language-java code-font text-sm text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">@Service
+          <pre class="language-java code-font text-sm text-slate-700 bg-slate-100 p-3 rounded-lg border border-slate-200 overflow-x-auto"><code class="language-java">@Service
 public class BankTransferService {
 
     private final AccountRepository accountRepo;
@@ -131,16 +134,16 @@ public class BankTransferService {
 
     <!-- CODE LAB 2: The Self-Invocation Trap in Code -->
     <section class="space-y-4">
-      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+      <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
         <span class="w-7 h-7 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center text-sm font-black">2</span>
         Code Lab 2: The Self-Invocation Bug & The 2 Senior Refactoring Solutions
       </h2>
 
       <div class="space-y-4 text-sm">
         
-        <div class="p-5 rounded-xl bg-slate-900 border border-rose-800/40 bg-rose-950/20 space-y-2">
+        <div class="p-5 rounded-xl bg-white shadow-sm border border-rose-200 bg-rose-50 space-y-2">
           <div class="font-bold text-rose-400 text-sm">âŒ The Broken Code (Self-Invocation):</div>
-          <pre class="language-java code-font text-sm text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">@Service
+          <pre class="language-java code-font text-sm text-rose-900 bg-slate-100 p-3 rounded-lg border border-slate-200 overflow-x-auto"><code class="language-java">@Service
 public class OrderService {
 
     public void processOrder(Order order) {
@@ -155,15 +158,15 @@ public class OrderService {
         auditRepo.save(new AuditLog("ORDER_CREATED"));
     }
 }</code></pre>
-          <p class="text-slate-400 text-sm">
-            <strong>Why:</strong> Spring creates a proxy <em>around</em> the bean. When <code class="font-mono text-rose-300">processOrder</code> is called, execution enters the real object. Inside the real object, <code class="font-mono text-rose-300">this</code> points to the plain Java instance, not the proxy wrapper!
+          <p class="text-slate-600 text-sm">
+            <strong>Why:</strong> Spring creates a proxy <em>around</em> the bean. When <code class="font-mono text-rose-800">processOrder</code> is called, execution enters the real object. Inside the real object, <code class="font-mono text-rose-800">this</code> points to the plain Java instance, not the proxy wrapper!
           </p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="p-4 rounded-xl bg-slate-900 border border-emerald-800/40 bg-emerald-950/20 space-y-2">
+          <div class="p-4 rounded-xl bg-white shadow-sm border border-emerald-200 bg-emerald-50 space-y-2">
             <div class="font-bold text-emerald-400">âœ… Senior Solution 1: Clean Architectural Separation</div>
-            <pre class="language-java code-font text-sm text-emerald-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">@Service
+            <pre class="language-java code-font text-sm text-emerald-900 bg-slate-100 p-3 rounded-lg border border-slate-200 overflow-x-auto"><code class="language-java">@Service
 public class OrderService {
     // Inject the dedicated transactional collaborator:
     private final OrderWriterService orderWriter;
@@ -180,9 +183,9 @@ public class OrderService {
 }</code></pre>
           </div>
 
-          <div class="p-4 rounded-xl bg-slate-900 border border-emerald-800/40 bg-emerald-950/20 space-y-2">
+          <div class="p-4 rounded-xl bg-white shadow-sm border border-emerald-200 bg-emerald-50 space-y-2">
             <div class="font-bold text-emerald-400">âœ… Senior Solution 2: Programmatic TransactionTemplate</div>
-            <pre class="language-java code-font text-sm text-emerald-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">@Service
+            <pre class="language-java code-font text-sm text-emerald-900 bg-slate-100 p-3 rounded-lg border border-slate-200 overflow-x-auto"><code class="language-java">@Service
 public class OrderService {
     private final TransactionTemplate txTemplate;
 
@@ -206,11 +209,11 @@ public class OrderService {
     </section>
 
     <!-- Navigation -->
-    <div class="border-t border-slate-800 pt-6 flex items-center justify-between">
-      <a href="05_jpa_hibernate_n_plus_one.html" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 font-semibold">
+    <div class="border-t border-slate-200 pt-6 flex items-center justify-between">
+      <a href="05_jpa_hibernate_n_plus_one.html" class="text-xs text-slate-600 hover:text-slate-900 flex items-center gap-1 font-semibold">
         â† Previous: JPA & N+1 Problem
       </a>
-      <a href="07_microservices_and_resiliency.html" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md shadow-indigo-600/30">
+      <a href="07_microservices_and_resiliency.html" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-slate-900 text-xs font-semibold shadow-md shadow-indigo-600/30">
         Next Guide: Microservices & Resiliency â†’
       </a>
     </div>
@@ -220,6 +223,7 @@ public class OrderService {
   <script src="gemini_assistant.js"></script>
 </body>
 </html>
+
 
 
 

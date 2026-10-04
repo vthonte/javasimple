@@ -9,41 +9,44 @@
     .code-font { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
   </style>
   <!-- Prism.js One Dark IDE Syntax Highlighting -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-  <style>
+    <style>
     pre[class*="language-"] {
-      background: #0d1117 !important;
-      border: 1px solid #30363d !important;
+      background: #f6f8fa !important;
+      border: 1px solid #d0d7de !important;
       border-radius: 0.75rem !important;
       padding: 1.1rem !important;
-      font-size: 0.95rem !important;
+      font-size: 0.92rem !important;
       line-height: 1.6 !important;
+      color: #24292f !important;
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
       font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
     }
     code[class*="language-"] {
       font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
-      font-size: 0.95rem !important;
+      font-size: 0.92rem !important;
+      color: #24292f !important;
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
 
   <!-- Header -->
-  <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-6 py-3.5 flex items-center justify-between">
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
     <div class="flex items-center gap-3">
-      <a href="06_transaction_management_traps.html" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-semibold">
+      <a href="06_transaction_management_traps.html" class="text-xs text-indigo-400 hover:text-indigo-800 flex items-center gap-1 font-semibold">
         â† Previous: @Transactional
       </a>
       <span class="text-slate-600">|</span>
-      <span class="text-xs text-slate-400 font-mono">Guide 7 of 8</span>
+      <span class="text-xs text-slate-600 font-mono">Guide 7 of 8</span>
     </div>
     <div class="flex items-center gap-2">
-      <a href="08_production_outage_triage.html" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors">
+      <a href="08_production_outage_triage.html" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-slate-900 text-xs font-medium transition-colors">
         Next: Outage Triage â†’
       </a>
     </div>
@@ -52,28 +55,28 @@
   <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-12">
     
     <!-- Title -->
-    <div class="space-y-3 border-b border-slate-800 pb-8">
+    <div class="space-y-3 border-b border-slate-200 pb-8">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20 text-xs font-semibold">
         Deep Dive 07 â€¢ Distributed Systems (4-7 Yrs Bar)
       </div>
-      <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
         Microservices Boundaries, Distributed Data Consistency (Saga/Outbox) & Resiliency
       </h1>
-      <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+      <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
         Why Two-Phase Commit (2PC) fails at scale, the Choreography vs Orchestration Saga pattern, solving the Dual-Write problem with the Transactional Outbox Pattern, and circuit breakers with Resilience4j.
       </p>
     </div>
 
     <!-- PART 1: The Dual-Write Problem -->
     <section class="space-y-4">
-      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+      <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
         <span class="w-7 h-7 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center text-sm font-black">1</span>
         The Dual-Write Problem: Why You Cannot Just Call Kafka in a Transaction
       </h2>
 
-      <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3 text-xs">
+      <div class="p-5 rounded-xl bg-white shadow-sm border border-slate-200 space-y-3 text-xs">
         <div class="font-bold text-rose-400 text-sm">The Naive Code Pattern Found in Inexperienced Codebases:</div>
-        <pre class="language-java code-font text-sm text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code class="language-java">@Transactional
+        <pre class="language-java code-font text-sm text-rose-900 bg-slate-100 p-3 rounded-lg border border-slate-200 overflow-x-auto"><code class="language-java">@Transactional
 public void placeOrder(Order order) {
     orderRepository.save(order); // Step 1: Write to PostgreSQL
     kafkaTemplate.send("order-created", order); // Step 2: Publish to Kafka
@@ -82,7 +85,7 @@ public void placeOrder(Order order) {
     // What if DB commit fails after Kafka sends? Ghost event sent to consumers!
 }</code></pre>
 
-        <p class="text-slate-300 leading-relaxed">
+        <p class="text-slate-700 leading-relaxed">
           PostgreSQL and Kafka are two separate distributed systems without a shared distributed transaction coordinator (2PC is too slow and creates lock deadlocks).
         </p>
       </div>
@@ -90,18 +93,18 @@ public void placeOrder(Order order) {
 
     <!-- PART 2: The Transactional Outbox Pattern -->
     <section class="space-y-4">
-      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+      <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
         <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-black">2</span>
         The Industry Standard Solution: Transactional Outbox Pattern
       </h2>
 
-      <div class="p-6 rounded-xl bg-slate-900 border border-slate-800 space-y-4 text-sm">
-        <p class="text-slate-300 leading-relaxed">
+      <div class="p-6 rounded-xl bg-white shadow-sm border border-slate-200 space-y-4 text-sm">
+        <p class="text-slate-700 leading-relaxed">
           Instead of publishing to Kafka directly inside the HTTP request, write the event into an <code class="font-mono text-emerald-400 text-xs">OUTBOX</code> table in the <strong>exact same relational database transaction</strong>!
         </p>
 
-        <div class="p-4 rounded-lg bg-slate-950 border border-slate-800">
-          <pre class="language-java code-font text-sm text-emerald-200 overflow-x-auto"><code class="language-java">@Transactional
+        <div class="p-4 rounded-lg bg-slate-100 border border-slate-200">
+          <pre class="language-java code-font text-sm text-emerald-900 overflow-x-auto"><code class="language-java">@Transactional
 public void placeOrder(Order order) {
     orderRepository.save(order); // 1. Save business entity
 
@@ -112,9 +115,9 @@ public void placeOrder(Order order) {
 }</code></pre>
         </div>
 
-        <div class="p-3.5 rounded-lg bg-indigo-950/20 border border-indigo-800/40 space-y-1">
-          <div class="font-bold text-indigo-300">How the Message Gets to Kafka:</div>
-          <p class="text-slate-400 leading-relaxed">
+        <div class="p-3.5 rounded-lg bg-indigo-50 border border-indigo-200 space-y-1">
+          <div class="font-bold text-indigo-800">How the Message Gets to Kafka:</div>
+          <p class="text-slate-600 leading-relaxed">
             A separate background process reads from the Outbox table and publishes to Kafka. The best practice is using <strong>Change Data Capture (CDC) via Debezium</strong>, which tails the PostgreSQL Write-Ahead Log (WAL) directly with near-zero latency, guaranteeing <em>at-least-once</em> delivery without polling overhead!
           </p>
         </div>
@@ -123,15 +126,15 @@ public void placeOrder(Order order) {
 
     <!-- PART 3: Sagas (Choreography vs Orchestration) -->
     <section class="space-y-4">
-      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+      <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
         <span class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-sm font-black">3</span>
         Distributed Consistency: The Saga Pattern
       </h2>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+        <div class="p-4 rounded-xl bg-white shadow-sm border border-slate-200 space-y-2">
           <div class="font-bold text-amber-400 text-sm">Choreography-based Saga</div>
-          <p class="text-slate-400 leading-relaxed">
+          <p class="text-slate-600 leading-relaxed">
             Each service acts independently and listens to domain events from Kafka.
             <br><br>
             Order Service emits <code class="font-mono text-sm">OrderCreated</code> $\rightarrow$ Payment Service listens and charges card, emits <code class="font-mono text-sm">PaymentSuccess</code> $\rightarrow$ Inventory Service listens and reserves stock.
@@ -141,9 +144,9 @@ public void placeOrder(Order order) {
           </p>
         </div>
 
-        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+        <div class="p-4 rounded-xl bg-white shadow-sm border border-slate-200 space-y-2">
           <div class="font-bold text-indigo-400 text-sm">Orchestration-based Saga (Recommended at Scale)</div>
-          <p class="text-slate-400 leading-relaxed">
+          <p class="text-slate-600 leading-relaxed">
             A centralized <strong>Saga Orchestrator</strong> (e.g. Temporal, Camunda, or a custom state machine service) directs all steps:
             <br><br>
             "OrderOrchestrator calls Payment âž” calls Inventory âž” confirms Order".
@@ -156,17 +159,17 @@ public void placeOrder(Order order) {
 
     <!-- PART 4: Resilience4j Circuit Breakers -->
     <section class="space-y-4">
-      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+      <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
         <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-black">4</span>
         Resiliency: Circuit Breakers (Resilience4j vs Node Opossum)
       </h2>
 
-      <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3 text-xs">
-        <p class="text-slate-300 leading-relaxed">
+      <div class="p-5 rounded-xl bg-white shadow-sm border border-slate-200 space-y-3 text-xs">
+        <p class="text-slate-700 leading-relaxed">
           If your Recommendation Microservice slows down from 20ms to 8,000ms, your main thread pool will back up and crash the whole application.
         </p>
 
-        <div class="p-4 rounded-lg bg-slate-950 border border-slate-800">
+        <div class="p-4 rounded-lg bg-slate-100 border border-slate-200">
           <pre class="language-java code-font text-sm text-sky-200 overflow-x-auto"><code class="language-java">@Service
 public class PaymentGatewayClient {
 
@@ -188,11 +191,11 @@ public class PaymentGatewayClient {
     </section>
 
     <!-- Navigation -->
-    <div class="border-t border-slate-800 pt-6 flex items-center justify-between">
-      <a href="06_transaction_management_traps.html" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 font-semibold">
+    <div class="border-t border-slate-200 pt-6 flex items-center justify-between">
+      <a href="06_transaction_management_traps.html" class="text-xs text-slate-600 hover:text-slate-900 flex items-center gap-1 font-semibold">
         â† Previous: @Transactional
       </a>
-      <a href="08_production_outage_triage.html" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md shadow-indigo-600/30">
+      <a href="08_production_outage_triage.html" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-slate-900 text-xs font-semibold shadow-md shadow-indigo-600/30">
         Next Guide: Production Outage Triage â†’
       </a>
     </div>
@@ -202,6 +205,7 @@ public class PaymentGatewayClient {
   <script src="gemini_assistant.js"></script>
 </body>
 </html>
+
 
 
 

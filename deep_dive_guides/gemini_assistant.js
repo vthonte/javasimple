@@ -38,61 +38,61 @@ class GeminiAIAssistant {
 
     widget.innerHTML = `
       <!-- Collapsible Chat Drawer -->
-      <div id="geminiChatDrawer" class="hidden mb-3 w-[380px] sm:w-[440px] max-h-[580px] h-[520px] bg-slate-900/95 backdrop-blur-xl border border-indigo-500/40 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-200">
+      <div id="geminiChatDrawer" class="hidden mb-3 w-[380px] sm:w-[440px] max-h-[580px] h-[520px] bg-white/95 backdrop-blur-xl border border-indigo-200 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-800">
         
         <!-- Drawer Header -->
-        <div class="px-4 py-3 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between">
+        <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <span class="w-6 h-6 rounded-lg bg-gradient-to-tr from-indigo-500 to-amber-500 flex items-center justify-center text-white font-bold text-xs">✨</span>
+            <span class="w-6 h-6 rounded-lg bg-gradient-to-tr from-indigo-600 to-amber-500 flex items-center justify-center text-white font-bold text-xs">✨</span>
             <div>
-              <div class="font-bold text-white text-xs flex items-center gap-1.5">
+              <div class="font-bold text-slate-900 text-xs flex items-center gap-1.5">
                 Gemini AI Java Tutor
-                <span class="px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-400 text-[10px] font-mono font-normal">Context-Aware</span>
+                <span class="px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-600 border border-indigo-200 text-[10px] font-mono font-normal">Context-Aware</span>
               </div>
-              <div class="text-[10px] text-slate-400 truncate max-w-[240px]" id="geminiPageTopic">Loading topic...</div>
+              <div class="text-[10px] text-slate-500 truncate max-w-[240px]" id="geminiPageTopic">Loading topic...</div>
             </div>
           </div>
           <div class="flex items-center gap-1">
-            <button onclick="window.geminiAssistant.promptApiKey()" title="Configure API Key" class="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors">
+            <button onclick="window.geminiAssistant.promptApiKey()" title="Configure API Key" class="p-1.5 rounded-lg hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-colors">
               ⚙️
             </button>
-            <button onclick="window.geminiAssistant.toggle()" class="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors">
+            <button onclick="window.geminiAssistant.toggle()" class="p-1.5 rounded-lg hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-colors">
               ✕
             </button>
           </div>
         </div>
 
         <!-- API Key Missing Alert Banner -->
-        <div id="geminiKeyBanner" class="hidden px-3.5 py-2 bg-amber-950/40 border-b border-amber-800/40 text-[11px] text-amber-200 flex items-center justify-between">
+        <div id="geminiKeyBanner" class="hidden px-3.5 py-2 bg-amber-50 border-b border-amber-200 text-[11px] text-amber-800 flex items-center justify-between">
           <span>Enter your free Gemini API key to ask questions.</span>
-          <button onclick="window.geminiAssistant.promptApiKey()" class="underline font-bold text-amber-300 hover:text-white ml-2">Set Key</button>
+          <button onclick="window.geminiAssistant.promptApiKey()" class="underline font-bold text-amber-900 hover:text-indigo-600 ml-2">Set Key</button>
         </div>
 
         <!-- Chat Message Log -->
-        <div id="geminiMessages" class="flex-1 p-4 overflow-y-auto space-y-3 text-xs">
+        <div id="geminiMessages" class="flex-1 p-4 overflow-y-auto space-y-3 text-xs bg-slate-50/50">
           <!-- Populated dynamically -->
         </div>
 
         <!-- Suggested Prompt Chips -->
-        <div class="px-3 py-1.5 bg-slate-950/50 border-t border-slate-800/80 flex items-center gap-1.5 overflow-x-auto text-[11px] no-scrollbar">
-          <button onclick="window.geminiAssistant.sendQuickPrompt('Explain this concept specifically using a Node.js analogy')" class="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-800/80 hover:bg-indigo-600/30 hover:text-indigo-300 text-slate-300 border border-slate-700 transition-all">
+        <div class="px-3 py-1.5 bg-white border-t border-slate-200 flex items-center gap-1.5 overflow-x-auto text-[11px] no-scrollbar">
+          <button onclick="window.geminiAssistant.sendQuickPrompt('Explain this concept specifically using a Node.js analogy')" class="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 border border-slate-200 transition-all">
             💡 Node.js Analogy
           </button>
-          <button onclick="window.geminiAssistant.sendQuickPrompt('What is the hardest question an interviewer will ask about this?')" class="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-800/80 hover:bg-indigo-600/30 hover:text-indigo-300 text-slate-300 border border-slate-700 transition-all">
+          <button onclick="window.geminiAssistant.sendQuickPrompt('What is the hardest question an interviewer will ask about this?')" class="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 border border-slate-200 transition-all">
             🎯 Interview Question
           </button>
-          <button onclick="window.geminiAssistant.sendQuickPrompt('Show me a code snippet where this creates a production bug')" class="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-800/80 hover:bg-indigo-600/30 hover:text-indigo-300 text-slate-300 border border-slate-700 transition-all">
+          <button onclick="window.geminiAssistant.sendQuickPrompt('Show me a code snippet where this creates a production bug')" class="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 border border-slate-200 transition-all">
             🐛 Production Bug
           </button>
         </div>
 
         <!-- Input Box -->
-        <form onsubmit="window.geminiAssistant.handleSubmit(event)" class="p-3 bg-slate-950 border-t border-slate-800 flex items-center gap-2">
+        <form onsubmit="window.geminiAssistant.handleSubmit(event)" class="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
           <input 
             type="text" 
             id="geminiInput" 
             placeholder="Ask anything about this Java concept..." 
-            class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+            class="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500"
           />
           <button 
             type="submit" 
@@ -197,8 +197,8 @@ class GeminiAIAssistant {
       const isUser = msg.role === 'user';
       return `
         <div class="flex flex-col ${isUser ? 'items-end' : 'items-start'}">
-          <div class="max-w-[88%] p-3 rounded-2xl ${isUser ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-slate-950 border border-slate-800 text-slate-200 rounded-bl-none'} space-y-1">
-            <div class="text-[10px] font-bold ${isUser ? 'text-indigo-200' : 'text-amber-400'}">
+          <div class="max-w-[88%] p-3 rounded-2xl ${isUser ? 'bg-indigo-600 text-white rounded-br-none shadow-sm' : 'bg-white border border-slate-200 text-slate-800 rounded-bl-none shadow-sm'} space-y-1">
+            <div class="text-[10px] font-bold ${isUser ? 'text-indigo-200' : 'text-indigo-600'}">
               ${isUser ? 'You' : 'Gemini AI'}
             </div>
             <div class="leading-relaxed whitespace-pre-wrap text-[11px]">${this.formatMarkdown(msg.text)}</div>

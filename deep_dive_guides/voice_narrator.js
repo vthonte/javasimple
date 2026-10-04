@@ -188,35 +188,35 @@ class VoiceNarrator {
 
     const bar = document.createElement('div');
     bar.id = 'voicePlayerWidget';
-    bar.className = 'fixed bottom-5 right-5 z-50 bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-2xl p-3.5 shadow-2xl flex flex-col gap-2 max-w-sm w-full text-xs text-slate-200 transition-all';
+    bar.className = 'fixed bottom-5 right-5 z-50 bg-white/95 backdrop-blur-md border border-slate-200 rounded-2xl p-3.5 shadow-xl flex flex-col gap-2 max-w-sm w-full text-xs text-slate-700 transition-all';
     
     bar.innerHTML = `
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span class="font-bold text-white tracking-tight">Audio Explanation</span>
-          <span id="audioProgressLabel" class="text-[10px] text-slate-400 font-mono">0%</span>
+          <span class="font-bold text-slate-900 tracking-tight">Audio Explanation</span>
+          <span id="audioProgressLabel" class="text-[10px] text-slate-500 font-mono">0%</span>
         </div>
-        <span id="audioStatusText" class="text-[11px] text-slate-400">Ready to narrate</span>
+        <span id="audioStatusText" class="text-[11px] text-slate-500">Ready to narrate</span>
       </div>
 
       <!-- Progress bar -->
-      <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-        <div id="audioProgressBar" class="bg-indigo-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+      <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+        <div id="audioProgressBar" class="bg-indigo-600 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
       </div>
 
       <!-- Controls -->
       <div class="flex items-center justify-between pt-1">
         <div class="flex items-center gap-2">
-          <button id="audioPlayBtn" onclick="window.voiceNarrator.isPlaying ? window.voiceNarrator.pause() : window.voiceNarrator.play()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition-all flex items-center gap-1.5 shadow-md shadow-indigo-600/30">
+          <button id="audioPlayBtn" onclick="window.voiceNarrator.isPlaying ? window.voiceNarrator.pause() : window.voiceNarrator.play()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition-all flex items-center gap-1.5 shadow-md shadow-indigo-600/20">
             🔊 Listen (Voice)
           </button>
-          <button id="audioStopBtn" onclick="window.voiceNarrator.stop()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium transition-all">
+          <button id="audioStopBtn" onclick="window.voiceNarrator.stop()" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition-all">
             ⏹️ Stop
           </button>
         </div>
 
-        <button id="audioSpeedBtn" onclick="window.voiceNarrator.cycleSpeed()" title="Change Playback Speed" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono font-bold transition-all">
+        <button id="audioSpeedBtn" onclick="window.voiceNarrator.cycleSpeed()" title="Change Playback Speed" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-mono font-bold transition-all">
           1x
         </button>
       </div>
