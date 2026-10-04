@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Deep Dive: Spring @Transactional Pitfalls, AOP Proxies & Propagation</title>
+  <title>Deep Dive: @Transactional Mechanics & Rollbacks in Code</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .code-font { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
@@ -11,7 +11,6 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
 
-  <!-- Header -->
   <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-6 py-3.5 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <a href="05_jpa_hibernate_n_plus_one.html" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-semibold">
@@ -27,167 +26,160 @@
     </div>
   </header>
 
-  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-12">
+  <main class="max-w-5xl w-full mx-auto px-6 py-10 space-y-12">
     
-    <!-- Title -->
     <div class="space-y-3 border-b border-slate-800 pb-8">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-semibold">
-        Deep Dive 06 • ACID Data Integrity & AOP
+        Deep Dive 06 • Code Mechanics: Transactions & Proxies
       </div>
       <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
-        Spring @Transactional Pitfalls, Dynamic Proxies & Propagation Mechanics
+        Transaction Management in Code: Node.js Transactions vs. Spring @Transactional
       </h1>
       <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
-        Why <code class="font-mono text-xs">@Transactional</code> silently fails when methods are called internally within the same class (Self-Invocation), why Spring ignores Checked Exceptions by default, and how propagation levels (<code class="font-mono text-xs">REQUIRES_NEW</code>) work under the hood.
+        Let's compare how manual ACID transactions are written in Node.js (Prisma/Knex) versus Spring's declarative <code class="font-mono text-amber-400 text-xs">@Transactional</code>, and see the exact CGLIB proxy bypass bug in code.
       </p>
     </div>
 
-    <!-- PART 1: The Spring AOP Proxy Mechanics -->
+    <!-- CODE LAB 1: Transfer Money between 2 Accounts -->
     <section class="space-y-4">
       <h2 class="text-xl font-bold text-white flex items-center gap-2">
-        <span class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm font-black">1</span>
-        How @Transactional Actually Works: Dynamic CGLIB Proxies
+        <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-black">1</span>
+        Code Lab 1: Bank Transfer (Deduct from A, Credit to B)
       </h2>
-      <p class="text-sm text-slate-300 leading-relaxed">
-        Java does not natively have an <code class="font-mono text-xs">@Transactional</code> keyword in the language. Spring provides it using <strong>Aspect-Oriented Programming (AOP)</strong> via dynamic bytecode generation.
-      </p>
 
-      <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3 text-xs">
-        <div class="font-bold text-slate-200">What Spring Actually Does When You Annotate a Class with @Transactional:</div>
-        <p class="text-slate-400 leading-relaxed">
-          Spring does not inject your actual class instance into other beans. Instead, Spring generates a <strong>CGLIB Proxy subclass</strong> that wraps your real bean:
-        </p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        
+        <!-- Node.js / Prisma Interactive Transaction -->
+        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+          <div class="font-bold text-emerald-400">Node.js (Prisma $transaction closure)</div>
+          <pre class="code-font text-[11px] text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>async function transferMoney(fromId, toId, amount) {
+  // Prisma $transaction: Executes all steps inside 1 DB transaction
+  return await prisma.$transaction(async (tx) => {
+    // 1. Deduct from sender
+    const sender = await tx.account.update({
+      where: { id: fromId },
+      data: { balance: { decrement: amount } }
+    });
 
-        <pre class="code-font text-[11px] text-indigo-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>// Conceptual code generated dynamically by Spring:
-public class OrderService$$SpringCGLIBProxy extends OrderService {
-    @Override
-    public void createOrder(Order order) {
-        TransactionStatus status = transactionManager.getTransaction(...);
-        try {
-            super.createOrder(order); // Calls your actual business code
-            transactionManager.commit(status); // Commits if no error
-        } catch (RuntimeException | Error ex) {
-            transactionManager.rollback(status); // Rolls back
-            throw ex;
-        }
+    if (sender.balance < 0) {
+      // Throwing error inside closure triggers automatic ROLLBACK
+      throw new Error('Insufficient funds!');
+    }
+
+    // 2. Credit to receiver
+    const receiver = await tx.account.update({
+      where: { id: toId },
+      data: { balance: { increment: amount } }
+    });
+
+    return { sender, receiver };
+  });
+}</code></pre>
+        </div>
+
+        <!-- Spring Boot Declarative Transaction -->
+        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+          <div class="font-bold text-indigo-400">Java Spring Boot (@Transactional)</div>
+          <pre class="code-font text-[11px] text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>@Service
+public class BankTransferService {
+
+    private final AccountRepository accountRepo;
+
+    public BankTransferService(AccountRepository repo) {
+        this.accountRepo = repo;
+    }
+
+    // Declarative transaction wrapping the whole method:
+    @Transactional(rollbackFor = Exception.class)
+    public void transferMoney(Long fromId, Long toId, BigDecimal amount) {
+        Account sender = accountRepo.findById(fromId).orElseThrow();
+        Account receiver = accountRepo.findById(toId).orElseThrow();
+
+        sender.deduct(amount);
+        receiver.credit(amount);
+
+        // If an exception is thrown anywhere here, 
+        // the Spring CGLIB proxy intercepts it and rolls back both updates!
     }
 }</code></pre>
+        </div>
+
       </div>
     </section>
 
-    <!-- PART 2: The Self-Invocation Trap -->
+    <!-- CODE LAB 2: The Self-Invocation Trap in Code -->
     <section class="space-y-4">
       <h2 class="text-xl font-bold text-white flex items-center gap-2">
         <span class="w-7 h-7 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center text-sm font-black">2</span>
-        Trap 1: The Self-Invocation Trap (Proxy Bypass)
+        Code Lab 2: The Self-Invocation Bug & The 2 Senior Refactoring Solutions
       </h2>
 
-      <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3 text-xs">
-        <div class="text-rose-400 font-bold text-sm">The Bug Code:</div>
-        <pre class="code-font text-[11px] text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>@Service
+      <div class="space-y-4 text-xs">
+        
+        <div class="p-5 rounded-xl bg-slate-900 border border-rose-800/40 bg-rose-950/20 space-y-2">
+          <div class="font-bold text-rose-400 text-sm">❌ The Broken Code (Self-Invocation):</div>
+          <pre class="code-font text-[11px] text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>@Service
 public class OrderService {
 
-    // Method A has NO @Transactional
-    public void checkout() {
-        // ... validating cart ...
-        this.saveOrder(); // INTERNAL METHOD CALL!
+    public void processOrder(Order order) {
+        validateCart(order);
+        // Direct call to another method in the same class!
+        this.saveOrderWithAudit(order); // <-- PROXY BYPASSED! @Transactional IGNORED!
     }
 
-    // Method B HAS @Transactional
     @Transactional
-    public void saveOrder() {
-        orderRepo.save(...);
+    public void saveOrderWithAudit(Order order) {
+        orderRepo.save(order);
+        auditRepo.save(new AuditLog("ORDER_CREATED"));
     }
 }</code></pre>
-
-        <div class="p-3.5 rounded-lg bg-rose-950/20 border border-rose-800/40 text-slate-300 leading-relaxed">
-          <strong>Why this fails silently in production:</strong><br>
-          When another controller calls <code class="font-mono text-rose-300">orderService.checkout()</code>, it calls the Proxy. The Proxy sees that <code class="font-mono text-rose-300">checkout()</code> has no transaction annotation, so it does nothing and calls the real instance. Inside the real instance, <code class="font-mono text-rose-300">this.saveOrder()</code> calls the method directly on <code class="font-mono text-rose-300">this</code> (the raw object), <strong>bypassing the Proxy completely</strong>! No transaction is ever started.
+          <p class="text-slate-400 text-[11px]">
+            <strong>Why:</strong> Spring creates a proxy <em>around</em> the bean. When <code class="font-mono text-rose-300">processOrder</code> is called, execution enters the real object. Inside the real object, <code class="font-mono text-rose-300">this</code> points to the plain Java instance, not the proxy wrapper!
+          </p>
         </div>
-
-        <div class="text-emerald-400 font-semibold pt-1">
-          The Senior Fix: Move <code class="font-mono">saveOrder()</code> to a separate dedicated <code class="font-mono">OrderWriterService</code> bean, or inject <code class="font-mono">OrderService</code> self-referentially via constructor/setter.
-        </div>
-      </div>
-    </section>
-
-    <!-- PART 3: Checked vs Unchecked Rollback -->
-    <section class="space-y-4">
-      <h2 class="text-xl font-bold text-white flex items-center gap-2">
-        <span class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-sm font-black">3</span>
-        Trap 2: The Default Rollback Rule (Checked vs. Unchecked Exceptions)
-      </h2>
-
-      <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3 text-xs">
-        <p class="text-slate-300 leading-relaxed">
-          Interviewers love asking: <em>"An exception was thrown inside a <code class="font-mono text-xs">@Transactional</code> method, but the database changes were STILL committed! Why?"</em>
-        </p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="p-3.5 rounded-lg bg-slate-950 border border-slate-800 space-y-1.5">
-            <div class="font-bold text-emerald-400">Unchecked Exceptions (Rolls Back)</div>
-            <p class="text-slate-400 text-[11px]">Subclasses of <code class="font-mono text-xs">RuntimeException</code> (e.g. <code class="font-mono text-xs">NullPointerException</code>, <code class="font-mono text-xs">IllegalArgumentException</code>, custom business exceptions extending RuntimeException). <strong>Spring rolls back by default.</strong></p>
+          <div class="p-4 rounded-xl bg-slate-900 border border-emerald-800/40 bg-emerald-950/20 space-y-2">
+            <div class="font-bold text-emerald-400">✅ Senior Solution 1: Clean Architectural Separation</div>
+            <pre class="code-font text-[11px] text-emerald-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>@Service
+public class OrderService {
+    // Inject the dedicated transactional collaborator:
+    private final OrderWriterService orderWriter;
+
+    public OrderService(OrderWriterService writer) {
+        this.orderWriter = writer;
+    }
+
+    public void processOrder(Order order) {
+        validateCart(order);
+        // Crosses Spring Bean boundary -> Hits the Proxy -> @Transactional works!
+        orderWriter.saveOrderWithAudit(order); 
+    }
+}</code></pre>
           </div>
 
-          <div class="p-3.5 rounded-lg bg-slate-950 border border-rose-800/40 bg-rose-950/20 space-y-1.5">
-            <div class="font-bold text-rose-400">Checked Exceptions (DOES NOT Roll Back!)</div>
-            <p class="text-slate-400 text-[11px]">Direct subclasses of <code class="font-mono text-xs">Exception</code> (e.g. <code class="font-mono text-xs">IOException</code>, <code class="font-mono text-xs">SQLException</code>). <strong>Spring assumes you will handle these, so it COMMITS by default!</strong></p>
+          <div class="p-4 rounded-xl bg-slate-900 border border-emerald-800/40 bg-emerald-950/20 space-y-2">
+            <div class="font-bold text-emerald-400">✅ Senior Solution 2: Programmatic TransactionTemplate</div>
+            <pre class="code-font text-[11px] text-emerald-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>@Service
+public class OrderService {
+    private final TransactionTemplate txTemplate;
+
+    public OrderService(TransactionTemplate tx) {
+        this.txTemplate = tx;
+    }
+
+    public void processOrder(Order order) {
+        validateCart(order);
+        // Explicit closure (works exactly like Prisma $transaction!)
+        txTemplate.executeWithoutResult(status -> {
+            orderRepo.save(order);
+            auditRepo.save(new AuditLog("ORDER_CREATED"));
+        });
+    }
+}</code></pre>
           </div>
         </div>
 
-        <div class="p-3.5 rounded-lg bg-emerald-950/20 border border-emerald-800/40 text-emerald-300 text-xs">
-          <strong>The Golden Senior Rule:</strong> In enterprise code, always specify rollback explicitly:
-          <div class="mt-1 font-mono text-white bg-slate-950 p-2 rounded">
-            @Transactional(rollbackFor = Exception.class)
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- PART 4: Propagation Cheat Sheet -->
-    <section class="space-y-4">
-      <h2 class="text-xl font-bold text-white flex items-center gap-2">
-        <span class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center text-sm font-black">4</span>
-        Transaction Propagation Levels Explained
-      </h2>
-
-      <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900 text-xs">
-        <table class="w-full text-left">
-          <thead class="bg-slate-950 border-b border-slate-800 text-slate-400 uppercase">
-            <tr>
-              <th class="p-3 font-semibold">Propagation</th>
-              <th class="p-3 font-semibold">If Transaction Exists</th>
-              <th class="p-3 font-semibold">If No Transaction Exists</th>
-              <th class="p-3 font-semibold">Real-World Use Case</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-800 text-slate-300">
-            <tr>
-              <td class="p-3 font-bold font-mono text-indigo-400">REQUIRED (Default)</td>
-              <td class="p-3">Joins existing</td>
-              <td class="p-3">Creates new</td>
-              <td class="p-3 text-slate-400">Standard business logic. All steps succeed or fail together.</td>
-            </tr>
-            <tr>
-              <td class="p-3 font-bold font-mono text-amber-400">REQUIRES_NEW</td>
-              <td class="p-3">Suspends existing; creates brand new</td>
-              <td class="p-3">Creates new</td>
-              <td class="p-3 text-slate-400">Audit logs & security alerts that MUST save even if the main transaction fails and rolls back.</td>
-            </tr>
-            <tr>
-              <td class="p-3 font-bold font-mono text-emerald-400">MANDATORY</td>
-              <td class="p-3">Joins existing</td>
-              <td class="p-3 text-rose-400">Throws Exception!</td>
-              <td class="p-3 text-slate-400">Methods that must never be called outside a parent transaction.</td>
-            </tr>
-            <tr>
-              <td class="p-3 font-bold font-mono text-slate-400">NEVER</td>
-              <td class="p-3 text-rose-400">Throws Exception!</td>
-              <td class="p-3">Executes non-transactionally</td>
-              <td class="p-3 text-slate-400">Operations that must not hold locks or connection resources.</td>
-            </tr>
-          </tbody>
-        </table>
       </div>
     </section>
 

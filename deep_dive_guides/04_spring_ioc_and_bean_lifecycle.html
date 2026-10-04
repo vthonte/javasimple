@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Deep Dive: Spring IoC Container, Bean Scopes & Lifecycle</title>
+  <title>Deep Dive: Spring IoC & Dependency Injection (Express vs NestJS vs Spring)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .code-font { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
@@ -11,7 +11,6 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
 
-  <!-- Header -->
   <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-6 py-3.5 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <a href="03_collections_and_streams.html" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-semibold">
@@ -27,145 +26,177 @@
     </div>
   </header>
 
-  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-12">
+  <main class="max-w-5xl w-full mx-auto px-6 py-10 space-y-12">
     
-    <!-- Title -->
     <div class="space-y-3 border-b border-slate-800 pb-8">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold">
-        Deep Dive 04 • Enterprise Spring Framework
+        Deep Dive 04 • Enterprise Architecture & DI Patterns
       </div>
       <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
-        Spring Inversion of Control (IoC), Bean Lifecycle & Dependency Injection Patterns
+        Dependency Injection in Code: Express.js vs. NestJS vs. Spring Boot
       </h1>
       <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
-        Understand how the Spring ApplicationContext manages object lifecycles, why Constructor Injection is strictly preferred over <code class="font-mono text-rose-400 text-xs">@Autowired</code> field injection, and how Bean Scopes behave in multi-threaded web applications.
+        Let's inspect how dependencies are created and injected across Node.js (manual/Express), TypeScript (NestJS), and modern Spring Boot with constructor injection.
       </p>
     </div>
 
-    <!-- PART 1: IoC Concept -->
+    <!-- CODE LAB 1: Building a Service Layer with Dependencies -->
     <section class="space-y-4">
       <h2 class="text-xl font-bold text-white flex items-center gap-2">
         <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-black">1</span>
-        Inversion of Control (IoC): Why You Never Call <code class="font-mono text-xs">new Service()</code>
+        Code Lab 1: Wiring Controller $\rightarrow$ Service $\rightarrow$ Repository
       </h2>
-      <p class="text-sm text-slate-300 leading-relaxed">
-        In traditional code, class A decides when and how to instantiate class B:
-      </p>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+      <div class="space-y-4 text-xs">
+        
+        <!-- Express / Node.js -->
         <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
-          <div class="font-bold text-rose-400">Traditional Tight Coupling</div>
-          <pre class="code-font text-[11px] text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>public class OrderController {
-    // Controller creates its own dependency!
-    private PaymentService paymentService = new StripePaymentService();
-    // Cannot mock in unit tests!
-    // Cannot swap with PayPal without changing code!
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-emerald-400">1. Node.js (Express - Manual Factory / Imports)</span>
+            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px]">No Built-in Container</span>
+          </div>
+          <pre class="code-font text-[11px] text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>// user.service.js
+import db from '../db.js';
+import emailClient from '../mailer.js';
+
+class UserService {
+  constructor(database = db, mailer = emailClient) {
+    this.db = database; // manual default assignment
+    this.mailer = mailer;
+  }
+
+  async registerUser(email) {
+    const user = await this.db.users.create({ data: { email } });
+    await this.mailer.sendWelcomeEmail(email);
+    return user;
+  }
+}
+
+// user.controller.js
+const userService = new UserService(); // Developer manually instantiates singletons!
+router.post('/register', (req, res) => userService.registerUser(req.body.email));</code></pre>
+        </div>
+
+        <!-- NestJS (TypeScript Node) -->
+        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-sky-400">2. Node.js (NestJS - TypeScript IoC Container)</span>
+            <span class="px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 text-[10px]">Reflection-based DI (Inspired by Spring!)</span>
+          </div>
+          <pre class="code-font text-[11px] text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>// user.service.ts
+@Injectable()
+export class UserService {
+  constructor(
+    private readonly userRepo: UserRepository,
+    private readonly mailer: MailerService
+  ) {}
+
+  async registerUser(email: string) {
+    const user = await this.userRepo.create(email);
+    await this.mailer.sendWelcome(email);
+    return user;
+  }
+}
+
+// user.controller.ts
+@Controller('users')
+export class UserController {
+  constructor(private readonly userService: UserService) {} // NestJS auto-injects!
+
+  @Post('register')
+  register(@Body('email') email: string) {
+    return this.userService.registerUser(email);
+  }
 }</code></pre>
         </div>
 
-        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
-          <div class="font-bold text-emerald-400">Spring Inversion of Control (IoC)</div>
-          <pre class="code-font text-[11px] text-emerald-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>@RestController
-public class OrderController {
-    private final PaymentService paymentService;
+        <!-- Spring Boot Java 21 -->
+        <div class="p-4 rounded-xl bg-slate-900 border border-indigo-500/40 bg-indigo-950/20 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-indigo-300">3. Spring Boot (Modern Java 21 - Constructor Injection)</span>
+            <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px]">Enterprise Production Standard</span>
+          </div>
+          <pre class="code-font text-[11px] text-indigo-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>// 1. Service Layer
+@Service
+public class UserService {
+    private final UserRepository userRepository;
+    private final MailerService mailerService;
 
-    // Spring's IoC container passes the instance in!
-    public OrderController(PaymentService paymentService) {
-        this.paymentService = paymentService;
+    // Notice: NO @Autowired needed! Spring 4.3+ automatically injects constructor params
+    public UserService(UserRepository userRepository, MailerService mailerService) {
+        this.userRepository = userRepository;
+        this.mailerService = mailerService;
+    }
+
+    public User registerUser(String email) {
+        User user = userRepository.save(new User(email));
+        mailerService.sendWelcome(email);
+        return user;
+    }
+}
+
+// 2. Controller Layer
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity&lt;User&gt; register(@RequestBody RegisterRequest req) {
+        return ResponseEntity.ok(userService.registerUser(req.email()));
     }
 }</code></pre>
+          <div class="text-[11px] text-emerald-400">
+            <strong>Why NestJS and Spring look identical:</strong> NestJS was explicitly designed by copying Spring Framework's architecture! If you understand NestJS DI, you already understand 95% of Spring's IoC container.
+          </div>
         </div>
+
       </div>
     </section>
 
-    <!-- PART 2: Bean Lifecycle -->
+    <!-- CODE LAB 2: Bean Lifecycle Hook in Action -->
     <section class="space-y-4">
       <h2 class="text-xl font-bold text-white flex items-center gap-2">
-        <span class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-sm font-black">2</span>
-        The Complete Spring Bean Lifecycle (Step-by-Step)
+        <span class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm font-black">2</span>
+        Code Lab 2: Lifecycle Callbacks (@PostConstruct & @PreDestroy)
       </h2>
+      <p class="text-sm text-slate-300">
+        In Node.js, you initialize resources right at startup in <code class="font-mono text-xs">index.js</code>. In Spring, beans manage their own startup and shutdown cleanly:
+      </p>
 
-      <div class="p-6 rounded-xl bg-slate-900 border border-slate-800 space-y-4 text-xs">
-        <div class="space-y-3">
-          <div class="p-3 rounded-lg bg-slate-950 border border-slate-800 flex items-start gap-3">
-            <span class="w-6 h-6 rounded-full bg-indigo-500 text-white font-bold flex items-center justify-center shrink-0">1</span>
-            <div>
-              <div class="font-bold text-white">Component Scanning & Metadata Parsing</div>
-              <p class="text-slate-400 mt-0.5">Spring scans packages for <code class="font-mono text-indigo-400">@Component</code>, <code class="font-mono text-indigo-400">@Service</code>, <code class="font-mono text-indigo-400">@Repository</code>, <code class="font-mono text-indigo-400">@RestController</code> and creates <code class="font-mono text-indigo-400">BeanDefinition</code> objects.</p>
-            </div>
-          </div>
+      <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 text-xs">
+        <pre class="code-font text-[11px] text-emerald-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>@Component
+public class CacheWarmerManager {
 
-          <div class="p-3 rounded-lg bg-slate-950 border border-slate-800 flex items-start gap-3">
-            <span class="w-6 h-6 rounded-full bg-indigo-500 text-white font-bold flex items-center justify-center shrink-0">2</span>
-            <div>
-              <div class="font-bold text-white">Instantiation</div>
-              <p class="text-slate-400 mt-0.5">The JVM invokes the class constructor using reflection. Dependencies are resolved from the IoC container graph.</p>
-            </div>
-          </div>
+    private final RedisTemplate&lt;String, String&gt; redisTemplate;
+    private final ProductRepository productRepo;
 
-          <div class="p-3 rounded-lg bg-slate-950 border border-slate-800 flex items-start gap-3">
-            <span class="w-6 h-6 rounded-full bg-indigo-500 text-white font-bold flex items-center justify-center shrink-0">3</span>
-            <div>
-              <div class="font-bold text-white">Populate Properties & Awareness Interfaces</div>
-              <p class="text-slate-400 mt-0.5">Spring injects <code class="font-mono text-amber-400">@Value</code> configurations and satisfies <code class="font-mono text-amber-400">ApplicationContextAware</code> / <code class="font-mono text-amber-400">BeanNameAware</code> if implemented.</p>
-            </div>
-          </div>
+    public CacheWarmerManager(RedisTemplate&lt;String, String&gt; redis, ProductRepository repo) {
+        this.redisTemplate = redis;
+        this.productRepo = repo;
+    }
 
-          <div class="p-3 rounded-lg bg-slate-950 border border-amber-500/30 bg-amber-950/20 flex items-start gap-3">
-            <span class="w-6 h-6 rounded-full bg-amber-500 text-white font-bold flex items-center justify-center shrink-0">4</span>
-            <div>
-              <div class="font-bold text-amber-300">@PostConstruct Initialization Callback</div>
-              <p class="text-slate-400 mt-0.5">Methods annotated with <code class="font-mono text-amber-400">@PostConstruct</code> execute immediately after dependencies are wired. Use this to warm local caches, verify third-party connections, or prepare data.</p>
-            </div>
-          </div>
+    // Runs automatically AFTER dependency injection completes on startup:
+    @PostConstruct
+    public void warmPopularProductsCache() {
+        log.info("Warming up product cache on startup...");
+        List&lt;Product&gt; topProducts = productRepo.findTop100ByOrderByPopularityDesc();
+        topProducts.forEach(p -> redisTemplate.opsForValue().set("prod:" + p.getId(), p.toJson()));
+        log.info("Product cache successfully warmed!");
+    }
 
-          <div class="p-3 rounded-lg bg-slate-950 border border-emerald-500/30 bg-emerald-950/20 flex items-start gap-3">
-            <span class="w-6 h-6 rounded-full bg-emerald-500 text-white font-bold flex items-center justify-center shrink-0">5</span>
-            <div>
-              <div class="font-bold text-emerald-300">Ready to Serve Traffic</div>
-              <p class="text-slate-400 mt-0.5">The bean is stored in the ApplicationContext singleton cache and handles live incoming HTTP and business calls.</p>
-            </div>
-          </div>
-
-          <div class="p-3 rounded-lg bg-slate-950 border border-rose-500/30 bg-rose-950/20 flex items-start gap-3">
-            <span class="w-6 h-6 rounded-full bg-rose-500 text-white font-bold flex items-center justify-center shrink-0">6</span>
-            <div>
-              <div class="font-bold text-rose-300">@PreDestroy Destruction Callback</div>
-              <p class="text-slate-400 mt-0.5">When the Spring Boot application shuts down (SIGTERM in Kubernetes / Docker), methods annotated with <code class="font-mono text-rose-400">@PreDestroy</code> execute for graceful cleanup (closing thread pools, flushing buffers, disconnecting sockets).</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- PART 3: Bean Scopes -->
-    <section class="space-y-4">
-      <h2 class="text-xl font-bold text-white flex items-center gap-2">
-        <span class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm font-black">3</span>
-        Spring Bean Scopes (Crucial for Multi-Threading)
-      </h2>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
-          <div class="font-bold text-indigo-400">Singleton (Default)</div>
-          <p class="text-slate-400 leading-relaxed">
-            Only <strong>1 instance</strong> per Spring IoC Container. Shared across all concurrent HTTP requests. Must be <strong>stateless</strong>! If you store user-specific mutable state in a field, requests will overwrite each other's data!
-          </p>
-        </div>
-
-        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
-          <div class="font-bold text-amber-400">Prototype</div>
-          <p class="text-slate-400 leading-relaxed">
-            A <strong>new instance</strong> is created every time the bean is requested from the container. Useful for stateful objects that should not be shared across threads.
-          </p>
-        </div>
-
-        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
-          <div class="font-bold text-emerald-400">Request & Session (Web)</div>
-          <p class="text-slate-400 leading-relaxed">
-            <code class="font-mono text-xs">@RequestScope</code> creates a bean bound to the lifecycle of a single HTTP request. Destroyed when the HTTP response completes.
-          </p>
-        </div>
+    // Runs automatically when application receives SIGTERM (graceful shutdown in K8s):
+    @PreDestroy
+    public void flushAndDisconnect() {
+        log.info("Graceful shutdown received. Flushing write buffers...");
+        redisTemplate.getConnectionFactory().getConnection().flushDb();
+        log.info("Shutdown completed safely.");
+    }
+}</code></pre>
       </div>
     </section>
 
