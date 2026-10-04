@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -15,14 +15,14 @@
   <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-6 py-3.5 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <a href="06_transaction_management_traps.html" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-semibold">
-        ← Previous: @Transactional
+        â† Previous: @Transactional
       </a>
       <span class="text-slate-600">|</span>
       <span class="text-xs text-slate-400 font-mono">Guide 7 of 8</span>
     </div>
     <div class="flex items-center gap-2">
       <a href="08_production_outage_triage.html" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors">
-        Next: Outage Triage →
+        Next: Outage Triage â†’
       </a>
     </div>
   </header>
@@ -32,7 +32,7 @@
     <!-- Title -->
     <div class="space-y-3 border-b border-slate-800 pb-8">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20 text-xs font-semibold">
-        Deep Dive 07 • Distributed Systems (4-7 Yrs Bar)
+        Deep Dive 07 â€¢ Distributed Systems (4-7 Yrs Bar)
       </div>
       <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
         Microservices Boundaries, Distributed Data Consistency (Saga/Outbox) & Resiliency
@@ -124,7 +124,7 @@ public void placeOrder(Order order) {
           <p class="text-slate-400 leading-relaxed">
             A centralized <strong>Saga Orchestrator</strong> (e.g. Temporal, Camunda, or a custom state machine service) directs all steps:
             <br><br>
-            "OrderOrchestrator calls Payment ➔ calls Inventory ➔ confirms Order".
+            "OrderOrchestrator calls Payment âž” calls Inventory âž” confirms Order".
             <br><br>
             If Inventory fails: Orchestrator explicitly invokes <code class="font-mono text-[11px]">refundPayment()</code> compensating transaction. State is visible in one place.
           </p>
@@ -168,13 +168,15 @@ public class PaymentGatewayClient {
     <!-- Navigation -->
     <div class="border-t border-slate-800 pt-6 flex items-center justify-between">
       <a href="06_transaction_management_traps.html" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 font-semibold">
-        ← Previous: @Transactional
+        â† Previous: @Transactional
       </a>
       <a href="08_production_outage_triage.html" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md shadow-indigo-600/30">
-        Next Guide: Production Outage Triage →
+        Next Guide: Production Outage Triage â†’
       </a>
     </div>
 
   </main>
+  <script src="voice_narrator.js"></script>
 </body>
 </html>
+

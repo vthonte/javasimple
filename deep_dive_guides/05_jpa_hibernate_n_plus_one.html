@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -14,14 +14,14 @@
   <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-6 py-3.5 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <a href="04_spring_ioc_and_bean_lifecycle.html" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-semibold">
-        ← Previous: Spring IoC
+        â† Previous: Spring IoC
       </a>
       <span class="text-slate-600">|</span>
       <span class="text-xs text-slate-400 font-mono">Guide 5 of 8</span>
     </div>
     <div class="flex items-center gap-2">
       <a href="06_transaction_management_traps.html" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors">
-        Next: @Transactional Traps →
+        Next: @Transactional Traps â†’
       </a>
     </div>
   </header>
@@ -30,7 +30,7 @@
     
     <div class="space-y-3 border-b border-slate-800 pb-8">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 text-xs font-semibold">
-        Deep Dive 05 • Code Mechanics: ORM & Database Performance
+        Deep Dive 05 â€¢ Code Mechanics: ORM & Database Performance
       </div>
       <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
         Data Access in Code: Prisma / Mongoose vs. Spring Data JPA & Hibernate
@@ -120,7 +120,7 @@ public class Order {
         
         <!-- Flawed Code & Log -->
         <div class="p-5 rounded-xl bg-slate-900 border border-rose-800/40 bg-rose-950/20 space-y-3">
-          <div class="text-rose-400 font-bold text-sm">❌ The Flawed Java Code:</div>
+          <div class="text-rose-400 font-bold text-sm">âŒ The Flawed Java Code:</div>
           <pre class="code-font text-[11px] text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>@Transactional(readOnly = true)
 public List&lt;UserSummaryDTO&gt; getUserSummaries() {
     List&lt;User&gt; users = userRepository.findAll(); // 1 query
@@ -148,7 +148,7 @@ SELECT id, amount, user_id FROM orders WHERE user_id = 3;
 
         <!-- Optimized Code & Log -->
         <div class="p-5 rounded-xl bg-slate-900 border border-emerald-800/40 bg-emerald-950/20 space-y-3">
-          <div class="text-emerald-400 font-bold text-sm">✅ The Senior Fix: JOIN FETCH</div>
+          <div class="text-emerald-400 font-bold text-sm">âœ… The Senior Fix: JOIN FETCH</div>
           <pre class="code-font text-[11px] text-emerald-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>public interface UserRepository extends JpaRepository&lt;User, Long&gt; {
 
     // Eagerly joins orders into memory in a single SQL operation:
@@ -171,13 +171,15 @@ LEFT OUTER JOIN orders o ON u.id = o.user_id;
     <!-- Navigation -->
     <div class="border-t border-slate-800 pt-6 flex items-center justify-between">
       <a href="04_spring_ioc_and_bean_lifecycle.html" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 font-semibold">
-        ← Previous: Spring IoC
+        â† Previous: Spring IoC
       </a>
       <a href="06_transaction_management_traps.html" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md shadow-indigo-600/30">
-        Next Guide: @Transactional Traps & Propagation →
+        Next Guide: @Transactional Traps & Propagation â†’
       </a>
     </div>
 
   </main>
+  <script src="voice_narrator.js"></script>
 </body>
 </html>
+

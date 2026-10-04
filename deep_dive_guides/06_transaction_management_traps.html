@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -14,14 +14,14 @@
   <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-6 py-3.5 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <a href="05_jpa_hibernate_n_plus_one.html" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-semibold">
-        ← Previous: JPA & N+1 Problem
+        â† Previous: JPA & N+1 Problem
       </a>
       <span class="text-slate-600">|</span>
       <span class="text-xs text-slate-400 font-mono">Guide 6 of 8</span>
     </div>
     <div class="flex items-center gap-2">
       <a href="07_microservices_and_resiliency.html" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors">
-        Next: Microservices & Resiliency →
+        Next: Microservices & Resiliency â†’
       </a>
     </div>
   </header>
@@ -30,7 +30,7 @@
     
     <div class="space-y-3 border-b border-slate-800 pb-8">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-semibold">
-        Deep Dive 06 • Code Mechanics: Transactions & Proxies
+        Deep Dive 06 â€¢ Code Mechanics: Transactions & Proxies
       </div>
       <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
         Transaction Management in Code: Node.js Transactions vs. Spring @Transactional
@@ -117,7 +117,7 @@ public class BankTransferService {
       <div class="space-y-4 text-xs">
         
         <div class="p-5 rounded-xl bg-slate-900 border border-rose-800/40 bg-rose-950/20 space-y-2">
-          <div class="font-bold text-rose-400 text-sm">❌ The Broken Code (Self-Invocation):</div>
+          <div class="font-bold text-rose-400 text-sm">âŒ The Broken Code (Self-Invocation):</div>
           <pre class="code-font text-[11px] text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>@Service
 public class OrderService {
 
@@ -140,7 +140,7 @@ public class OrderService {
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="p-4 rounded-xl bg-slate-900 border border-emerald-800/40 bg-emerald-950/20 space-y-2">
-            <div class="font-bold text-emerald-400">✅ Senior Solution 1: Clean Architectural Separation</div>
+            <div class="font-bold text-emerald-400">âœ… Senior Solution 1: Clean Architectural Separation</div>
             <pre class="code-font text-[11px] text-emerald-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>@Service
 public class OrderService {
     // Inject the dedicated transactional collaborator:
@@ -159,7 +159,7 @@ public class OrderService {
           </div>
 
           <div class="p-4 rounded-xl bg-slate-900 border border-emerald-800/40 bg-emerald-950/20 space-y-2">
-            <div class="font-bold text-emerald-400">✅ Senior Solution 2: Programmatic TransactionTemplate</div>
+            <div class="font-bold text-emerald-400">âœ… Senior Solution 2: Programmatic TransactionTemplate</div>
             <pre class="code-font text-[11px] text-emerald-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>@Service
 public class OrderService {
     private final TransactionTemplate txTemplate;
@@ -186,13 +186,15 @@ public class OrderService {
     <!-- Navigation -->
     <div class="border-t border-slate-800 pt-6 flex items-center justify-between">
       <a href="05_jpa_hibernate_n_plus_one.html" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 font-semibold">
-        ← Previous: JPA & N+1 Problem
+        â† Previous: JPA & N+1 Problem
       </a>
       <a href="07_microservices_and_resiliency.html" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md shadow-indigo-600/30">
-        Next Guide: Microservices & Resiliency →
+        Next Guide: Microservices & Resiliency â†’
       </a>
     </div>
 
   </main>
+  <script src="voice_narrator.js"></script>
 </body>
 </html>
+
