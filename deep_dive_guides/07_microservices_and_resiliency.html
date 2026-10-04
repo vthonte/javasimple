@@ -137,7 +137,7 @@ public void placeOrder(Order order) {
           <p class="text-slate-600 leading-relaxed">
             Each service acts independently and listens to domain events from Kafka.
             <br><br>
-            Order Service emits <code class="font-mono text-sm">OrderCreated</code> $\rightarrow$ Payment Service listens and charges card, emits <code class="font-mono text-sm">PaymentSuccess</code> $\rightarrow$ Inventory Service listens and reserves stock.
+            Order Service emits <code class="font-mono text-sm">OrderCreated</code> → Payment Service listens and charges card, emits <code class="font-mono text-sm">PaymentSuccess</code> → Inventory Service listens and reserves stock.
             <br><br>
             <strong>Pros:</strong> Simple, decoupled. <br>
             <strong>Cons:</strong> Hard to debug when 8+ services are involved; cyclic dependencies.
@@ -205,6 +205,7 @@ public class PaymentGatewayClient {
   <script src="gemini_assistant.js"></script>
 </body>
 </html>
+
 
 
 
