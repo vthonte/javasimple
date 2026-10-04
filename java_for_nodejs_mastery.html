@@ -1,0 +1,976 @@
+<!-- This file is also saved in your project root for direct access -->
+<!-- Simply double click or open in Chrome/Edge to use anytime -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java & Spring Boot Mastery for Senior Node.js Engineers</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); }
+    ::-webkit-scrollbar-thumb { background: rgba(100,116,139,0.3); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(100,116,139,0.5); }
+    .code-font { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 600; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased min-h-screen flex flex-col font-sans selection:bg-indigo-500/20">
+
+  <!-- Top Sticky Navigation Bar -->
+  <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-amber-500 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-indigo-500/25">
+        ☕
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-base font-bold tracking-tight text-white">Java & Spring Boot Accelerator</h1>
+          <span class="badge bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">Node.js $\rightarrow$ Java (4-7 Yrs Bar)</span>
+        </div>
+        <p class="text-xs text-slate-400">Zero-to-Senior Full Enterprise Transition in 1–4 Hours</p>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="flex items-center gap-2 text-xs">
+      <div class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-400">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span>Target: 4-7 Yrs Senior Backend / Microservices</span>
+      </div>
+      <button onclick="document.getElementById('rosetta').scrollIntoView({behavior: 'smooth'})" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition-colors shadow-sm">
+        Start Reading
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="flex-1 flex max-w-[1600px] w-full mx-auto">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="w-72 shrink-0 border-r border-slate-800 p-4 hidden lg:block sticky top-[61px] h-[calc(100vh-61px)] overflow-y-auto">
+      <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500 px-3 mb-2">Curriculum Roadmap</div>
+      <nav class="space-y-1" id="sidebarNav">
+        <a href="#rosetta" onclick="setActiveNav(this)" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 transition-all">
+          <span>🔄</span> <span>1. Node vs Java Rosetta Stone</span>
+        </a>
+        <a href="#core-java" onclick="setActiveNav(this)" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition-all">
+          <span>⚡</span> <span>2. Core Java (Memory & Concurrency)</span>
+        </a>
+        <a href="#collections" onclick="setActiveNav(this)" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition-all">
+          <span>📦</span> <span>3. Collections & Streams Mastery</span>
+        </a>
+        <a href="#spring-core" onclick="setActiveNav(this)" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition-all">
+          <span>🌱</span> <span>4. Spring IoC & Bean Lifecycle</span>
+        </a>
+        <a href="#jpa-database" onclick="setActiveNav(this)" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition-all">
+          <span>💾</span> <span>5. JPA, Hibernate & N+1 Traps</span>
+        </a>
+        <a href="#transactions" onclick="setActiveNav(this)" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition-all">
+          <span>🛡️</span> <span>6. @Transactional Pitfalls</span>
+        </a>
+        <a href="#microservices" onclick="setActiveNav(this)" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition-all">
+          <span>🌐</span> <span>7. Microservices & Resiliency</span>
+        </a>
+        <a href="#incidents" onclick="setActiveNav(this)" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition-all">
+          <span>🚨</span> <span>8. Production Incident War Room</span>
+        </a>
+        <a href="#interview-simulator" onclick="setActiveNav(this)" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition-all">
+          <span>🎯</span> <span>9. Senior Interview Simulator</span>
+        </a>
+        <a href="#soft-skills" onclick="setActiveNav(this)" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition-all">
+          <span>🤝</span> <span>10. Stakeholder & System Design</span>
+        </a>
+      </nav>
+
+      <!-- Speed Tracker -->
+      <div class="mt-8 p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+        <div class="flex items-center justify-between text-xs mb-1.5">
+          <span class="font-semibold text-slate-300">Study Session</span>
+          <span class="text-indigo-400 font-mono" id="studyTimer">00:00:00</span>
+        </div>
+        <p class="text-[11px] text-slate-400 mb-2">Designed for high-density comprehension in 1–4 hrs.</p>
+        <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden">
+          <div class="bg-indigo-600 h-full rounded-full transition-all duration-300" id="readingProgress" style="width: 10%"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 p-6 lg:p-10 space-y-16 overflow-x-hidden">
+
+      <!-- HERO BANNER -->
+      <section class="rounded-2xl p-8 bg-gradient-to-br from-indigo-950/60 via-slate-900 to-purple-950/50 border border-indigo-500/30 shadow-xl relative overflow-hidden">
+        <div class="max-w-3xl space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 text-xs font-semibold">
+            <span>🚀</span> Senior Engineer Accelerator: Node.js to Java 21 & Spring Boot
+          </div>
+          <h2 class="text-3xl lg:text-4xl font-black tracking-tight text-white">
+            Bridge 5 Years of Node.js Experience Directly into High-Tier Java Architecture
+          </h2>
+          <p class="text-sm lg:text-base text-slate-300 leading-relaxed">
+            As a strong Node.js engineer, you already understand HTTP, REST, asynchronous I/O, database persistence, and system design. 
+            You don't need junior syntax lessons. This interactive dashboard bridges your existing mental models into Java's multi-threaded JVM runtime, Spring Boot enterprise patterns, and production troubleshooting required for a <strong>4–7 years experience bar</strong>.
+          </p>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-center">
+              <div class="text-lg font-bold text-indigo-400">1:1</div>
+              <div class="text-[11px] text-slate-400">Node vs Spring Mappings</div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-center">
+              <div class="text-lg font-bold text-amber-400">Virtual Threads</div>
+              <div class="text-[11px] text-slate-400">Java 21 vs Event Loop</div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-center">
+              <div class="text-lg font-bold text-rose-400">N+1 Traps</div>
+              <div class="text-[11px] text-slate-400">Hibernate vs Prisma/Mongoose</div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-center">
+              <div class="text-lg font-bold text-emerald-400">War Room</div>
+              <div class="text-[11px] text-slate-400">Live Incident Triage</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 1: ROSETTA STONE -->
+      <section id="rosetta" class="space-y-6 scroll-mt-20">
+        <div class="border-b border-slate-800 pb-4 flex items-center justify-between">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-indigo-500">Module 01</span>
+            <h3 class="text-2xl font-bold text-white">The Node.js $\leftrightarrow$ Java / Spring Boot Rosetta Stone</h3>
+          </div>
+          <span class="badge bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">Mental Model Alignment</span>
+        </div>
+
+        <p class="text-sm text-slate-400">
+          Everything you know in Node.js has a direct counterpart in Spring Boot. Explore the interactive equivalence matrix below:
+        </p>
+
+        <!-- Comparison Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          
+          <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 hover:border-indigo-500/40 transition-all space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase text-emerald-400">Concurrency Architecture</span>
+              <span class="badge bg-emerald-500/20 text-emerald-400">Runtime</span>
+            </div>
+            <div>
+              <div class="text-xs font-semibold text-slate-400">Node.js:</div>
+              <div class="text-xs text-slate-200 font-mono bg-slate-950 p-1.5 rounded mt-0.5 border border-slate-800">Single-threaded Event Loop (libuv) + Worker Threads</div>
+            </div>
+            <div>
+              <div class="text-xs font-semibold text-slate-400">Java (21+):</div>
+              <div class="text-xs text-indigo-300 font-mono bg-indigo-950/40 border border-indigo-800/40 p-1.5 rounded mt-0.5">Platform OS Threads (1MB stack) + Virtual Threads (Loom)</div>
+            </div>
+            <p class="text-[12px] text-slate-400 leading-relaxed">
+              In Node, I/O is non-blocking by default. In Java historically, 1 request = 1 OS thread. With Java 21 <strong>Virtual Threads</strong>, millions of concurrent lightweight threads run without blocking OS threads, giving Node-like scale with synchronous code simplicity.
+            </p>
+          </div>
+
+          <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 hover:border-indigo-500/40 transition-all space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase text-amber-400">Interceptors & Middlewares</span>
+              <span class="badge bg-amber-500/20 text-amber-400">HTTP Pipeline</span>
+            </div>
+            <div>
+              <div class="text-xs font-semibold text-slate-400">Express / Fastify:</div>
+              <div class="text-xs text-slate-200 font-mono bg-slate-950 p-1.5 rounded mt-0.5 border border-slate-800">app.use((req, res, next) =&gt; { ... })</div>
+            </div>
+            <div>
+              <div class="text-xs font-semibold text-slate-400">Spring Boot:</div>
+              <div class="text-xs text-amber-300 font-mono bg-amber-950/40 border border-amber-800/40 p-1.5 rounded mt-0.5">Filter (Servlet) $\rightarrow$ Interceptor $\rightarrow$ @ControllerAdvice</div>
+            </div>
+            <p class="text-[12px] text-slate-400 leading-relaxed">
+              Express has 1 flat middleware chain. Spring separates concerns into 3 concentric rings: <strong>Filters</strong> (security, raw bytes, CORS), <strong>Interceptors</strong> (handler level pre/post), and <strong>@ControllerAdvice</strong> (body transform & errors).
+            </p>
+          </div>
+
+          <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 hover:border-indigo-500/40 transition-all space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase text-rose-400">Data Access / ORM</span>
+              <span class="badge bg-rose-500/20 text-rose-400">Database</span>
+            </div>
+            <div>
+              <div class="text-xs font-semibold text-slate-400">Node.js:</div>
+              <div class="text-xs text-slate-200 font-mono bg-slate-950 p-1.5 rounded mt-0.5 border border-slate-800">Prisma / TypeORM / Knex / Mongoose</div>
+            </div>
+            <div>
+              <div class="text-xs font-semibold text-slate-400">Spring Boot:</div>
+              <div class="text-xs text-rose-300 font-mono bg-rose-950/40 border border-rose-800/40 p-1.5 rounded mt-0.5">Spring Data JPA + Hibernate + JDBC Client</div>
+            </div>
+            <p class="text-[12px] text-slate-400 leading-relaxed">
+              Spring Data generates SQL queries dynamically just from repository method names like <code class="text-xs text-rose-300">findByEmailAndStatus(...)</code>! Hibernate manages dirty checking, L1 cache session, and ACID transactions automatically.
+            </p>
+          </div>
+
+          <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 hover:border-indigo-500/40 transition-all space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase text-sky-400">Inversion of Control (IoC)</span>
+              <span class="badge bg-sky-500/20 text-sky-400">Architecture</span>
+            </div>
+            <div>
+              <div class="text-xs font-semibold text-slate-400">Node.js (NestJS / Modules):</div>
+              <div class="text-xs text-slate-200 font-mono bg-slate-950 p-1.5 rounded mt-0.5 border border-slate-800">@Injectable(), constructor(private svc: Svc)</div>
+            </div>
+            <div>
+              <div class="text-xs font-semibold text-slate-400">Spring Boot:</div>
+              <div class="text-xs text-sky-300 font-mono bg-sky-950/40 border border-sky-800/40 p-1.5 rounded mt-0.5">@Service, @Component, Constructor Injection</div>
+            </div>
+            <p class="text-[12px] text-slate-400 leading-relaxed">
+              If you used NestJS, Spring's IoC is identical. Spring manages singleton bean instances in an ApplicationContext, automatically autowiring dependencies via constructors without <code class="text-xs">new Service()</code> calls.
+            </p>
+          </div>
+
+          <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 hover:border-indigo-500/40 transition-all space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase text-purple-400">Exception Handling</span>
+              <span class="badge bg-purple-500/20 text-purple-400">Reliability</span>
+            </div>
+            <div>
+              <div class="text-xs font-semibold text-slate-400">Express:</div>
+              <div class="text-xs text-slate-200 font-mono bg-slate-950 p-1.5 rounded mt-0.5 border border-slate-800">app.use((err, req, res, next) =&gt; ...)</div>
+            </div>
+            <div>
+              <div class="text-xs font-semibold text-slate-400">Spring Boot:</div>
+              <div class="text-xs text-purple-300 font-mono bg-purple-950/40 border border-purple-800/40 p-1.5 rounded mt-0.5">@RestControllerAdvice + @ExceptionHandler</div>
+            </div>
+            <p class="text-[12px] text-slate-400 leading-relaxed">
+              Throw typed Java exceptions anywhere in services or repositories (<code class="text-xs text-purple-300">throw new ResourceNotFoundException()</code>). Spring's central advice intercepts it, maps it to HTTP status code, and serializes clean JSON.
+            </p>
+          </div>
+
+          <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 hover:border-indigo-500/40 transition-all space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase text-cyan-400">Build & Dependencies</span>
+              <span class="badge bg-cyan-500/20 text-cyan-400">Tooling</span>
+            </div>
+            <div>
+              <div class="text-xs font-semibold text-slate-400">Node.js:</div>
+              <div class="text-xs text-slate-200 font-mono bg-slate-950 p-1.5 rounded mt-0.5 border border-slate-800">package.json, npm / pnpm / yarn, dist/index.js</div>
+            </div>
+            <div>
+              <div class="text-xs font-semibold text-slate-400">Java:</div>
+              <div class="text-xs text-cyan-300 font-mono bg-cyan-950/40 border border-cyan-800/40 p-1.5 rounded mt-0.5">pom.xml (Maven) or build.gradle, app.jar</div>
+            </div>
+            <p class="text-[12px] text-slate-400 leading-relaxed">
+              Maven wrapper (<code class="text-xs text-cyan-300">./mvnw</code>) bundles all dependencies and Tomcat server into an executable "Fat JAR". Run anywhere with <code class="text-xs text-cyan-300">java -jar app.jar</code>.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SECTION 2: CORE JAVA CONCURRENCY & MEMORY -->
+      <section id="core-java" class="space-y-6 scroll-mt-20">
+        <div class="border-b border-slate-800 pb-4 flex items-center justify-between">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-amber-500">Module 02</span>
+            <h3 class="text-2xl font-bold text-white">Core Java Concurrency, Memory & Virtual Threads</h3>
+          </div>
+          <span class="badge bg-amber-500/20 text-amber-400 border border-amber-500/30">Critical Senior Interview Topic</span>
+        </div>
+
+        <div class="p-4 rounded-xl bg-amber-950/30 border border-amber-800/40 text-xs text-amber-200 leading-relaxed">
+          <strong>Why Interviewers Test Concurrency Thoroughly:</strong> In Node.js, you rarely worry about race conditions or shared mutable state in memory because code runs on a single thread. In Java, <strong>multiple threads execute the same code simultaneously</strong>. If two threads modify the same object, memory corruption or deadlock occurs unless you understand locks, memory models, and atomicity.
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="p-6 rounded-xl bg-slate-900 border border-slate-800 space-y-4">
+            <h4 class="font-bold text-sm text-white flex items-center gap-2">
+              <span>⚙️</span> The 3 Concurrency Models Compared
+            </h4>
+            
+            <div class="space-y-3 text-xs">
+              <div class="p-3 rounded-lg bg-slate-950 border border-slate-800">
+                <div class="font-bold text-emerald-400 mb-1">1. Node.js Event Loop Model</div>
+                <p class="text-slate-400">1 main thread. Non-blocking I/O callbacks queued in libuv. CPU-heavy loops block ALL incoming requests for everyone.</p>
+              </div>
+
+              <div class="p-3 rounded-lg bg-slate-950 border border-slate-800">
+                <div class="font-bold text-sky-400 mb-1">2. Traditional Java (ThreadPool / Tomcat)</div>
+                <p class="text-slate-400">Platform OS Threads (1 thread = ~1MB stack memory). Typically limited to 200–1,000 threads. When waiting for DB or Redis, thread sits idle blocking OS memory.</p>
+              </div>
+
+              <div class="p-3 rounded-lg bg-slate-950 border border-indigo-500/40 bg-indigo-950/20">
+                <div class="font-bold text-indigo-400 mb-1">3. Modern Java 21 (Virtual Threads / Project Loom)</div>
+                <p class="text-slate-400">Millions of lightweight threads managed by the JVM (bytes each). When a Virtual Thread does blocking I/O, JVM unmounts it from the carrier OS thread. <strong>Best of both worlds: simple synchronous code with Node.js async scale!</strong></p>
+              </div>
+            </div>
+
+            <div class="mt-4 p-3.5 rounded-lg bg-slate-950 border border-slate-800">
+              <div class="text-[11px] font-semibold text-slate-400 uppercase mb-1">How to enable Virtual Threads in Spring Boot 3/4:</div>
+              <code class="text-xs text-indigo-400 font-mono">spring.threads.virtual.enabled=true</code>
+              <p class="text-[11px] text-slate-400 mt-1">That's it! Tomcat immediately shifts from 200 OS threads to unbounded virtual threads per HTTP request.</p>
+            </div>
+          </div>
+
+          <div class="p-6 rounded-xl bg-slate-900 border border-slate-800 space-y-4">
+            <h4 class="font-bold text-sm text-white flex items-center gap-2">
+              <span>🔒</span> Handling Shared State (Race Conditions)
+            </h4>
+            <p class="text-xs text-slate-400">
+              In Node.js, <code class="font-mono text-xs">count++</code> is safe because JavaScript is single-threaded. In Java, multiple HTTP requests hit the same singleton controller simultaneously!
+            </p>
+
+            <div class="space-y-3">
+              <div class="p-3 rounded-lg bg-rose-950/30 border border-rose-800/40">
+                <div class="flex items-center justify-between text-xs font-bold text-rose-400 mb-1">
+                  <span>❌ Thread Unsafe (Race Condition Bug)</span>
+                </div>
+                <pre class="code-font text-[11px] text-rose-200 overflow-x-auto"><code>@Service
+public class OrderCounterService {
+    private int counter = 0; // Shared mutable state!
+
+    public void increment() {
+        counter++; // NOT atomic! Reads, increments, writes.
+                   // 2 threads collide -> data loss!
+    }
+}</code></pre>
+              </div>
+
+              <div class="p-3 rounded-lg bg-emerald-950/30 border border-emerald-800/40">
+                <div class="flex items-center justify-between text-xs font-bold text-emerald-400 mb-1">
+                  <span>✅ Thread Safe (Modern Atomic / Locks)</span>
+                </div>
+                <pre class="code-font text-[11px] text-emerald-200 overflow-x-auto"><code>@Service
+public class OrderCounterService {
+    // Option A: Lock-free CPU CAS (Compare-And-Swap) - FASTEST
+    private final AtomicInteger counter = new AtomicInteger(0);
+
+    public int increment() {
+        return counter.incrementAndGet(); // Thread safe!
+    }
+
+    // Option B: ReentrantLock / Synchronized for multi-step blocks
+    private final ReentrantLock lock = new ReentrantLock();
+    public void processCritical() {
+        lock.lock();
+        try { /* safe multi-step update */ }
+        finally { lock.unlock(); }
+    }
+}</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 rounded-xl bg-slate-900 border border-slate-800 space-y-4">
+          <h4 class="font-bold text-sm text-white flex items-center gap-2">
+            <span>🧠</span> JVM Memory Architecture vs V8 Engine (Node.js)
+          </h4>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+            <div class="p-4 rounded-lg bg-slate-950 border border-slate-800 space-y-2">
+              <div class="font-bold text-indigo-400">1. Stack Memory</div>
+              <p class="text-slate-400">Each thread has its private Stack. Stores primitive local variables and references to objects. Fast, allocated and cleared automatically when methods return. Overflow causes <code class="font-mono text-rose-400">StackOverflowError</code>.</p>
+            </div>
+            <div class="p-4 rounded-lg bg-slate-950 border border-slate-800 space-y-2">
+              <div class="font-bold text-indigo-400">2. Heap Memory</div>
+              <p class="text-slate-400">Shared by all threads. Stores all <code class="font-mono">new Object()</code> instances. Managed by the Garbage Collector (Young Gen / Eden, Survivor, Old Gen). Exhaustion causes <code class="font-mono text-rose-400">OutOfMemoryError: Java heap space</code>.</p>
+            </div>
+            <div class="p-4 rounded-lg bg-slate-950 border border-slate-800 space-y-2">
+              <div class="font-bold text-indigo-400">3. Metaspace</div>
+              <p class="text-slate-400">Stores class definitions, bytecode, and method metadata in native OS memory (not heap). Replaced PermGen in Java 8. Grows automatically based on OS RAM.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 3: COLLECTIONS & STREAMS -->
+      <section id="collections" class="space-y-6 scroll-mt-20">
+        <div class="border-b border-slate-800 pb-4 flex items-center justify-between">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-purple-500">Module 03</span>
+            <h3 class="text-2xl font-bold text-white">Collections Framework & Streams (vs JS Array methods)</h3>
+          </div>
+          <span class="badge bg-purple-500/20 text-purple-400 border border-purple-500/30">Everyday Coding</span>
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900">
+          <table class="w-full text-xs text-left">
+            <thead class="bg-slate-950 border-b border-slate-800 text-slate-400 uppercase">
+              <tr>
+                <th class="p-3 font-semibold">Java Collection</th>
+                <th class="p-3 font-semibold">JS / Node Equivalent</th>
+                <th class="p-3 font-semibold">Time Complexity</th>
+                <th class="p-3 font-semibold">Thread Safe?</th>
+                <th class="p-3 font-semibold">When to use in Backend</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800">
+              <tr class="hover:bg-slate-950/50">
+                <td class="p-3 font-mono font-bold text-indigo-400">ArrayList&lt;T&gt;</td>
+                <td class="p-3 font-mono text-slate-400">Array []</td>
+                <td class="p-3 font-mono">O(1) get, O(N) insert/del</td>
+                <td class="p-3 text-rose-400 font-semibold">No</td>
+                <td class="p-3 text-slate-400">Default list. High-speed index lookup. Fast appends.</td>
+              </tr>
+              <tr class="hover:bg-slate-950/50">
+                <td class="p-3 font-mono font-bold text-indigo-400">LinkedList&lt;T&gt;</td>
+                <td class="p-3 font-mono text-slate-400">Rare in JS</td>
+                <td class="p-3 font-mono">O(N) get, O(1) head/tail</td>
+                <td class="p-3 text-rose-400 font-semibold">No</td>
+                <td class="p-3 text-slate-400">Frequent insertions/deletions at start or middle. Queue/Deque.</td>
+              </tr>
+              <tr class="hover:bg-slate-950/50">
+                <td class="p-3 font-mono font-bold text-amber-400">HashMap&lt;K,V&gt;</td>
+                <td class="p-3 font-mono text-slate-400">Object / Map</td>
+                <td class="p-3 font-mono">O(1) average lookup</td>
+                <td class="p-3 text-rose-400 font-semibold">No</td>
+                <td class="p-3 text-slate-400">Standard key-value dictionary within a single method/thread.</td>
+              </tr>
+              <tr class="hover:bg-slate-950/50">
+                <td class="p-3 font-mono font-bold text-emerald-400">ConcurrentHashMap&lt;K,V&gt;</td>
+                <td class="p-3 font-mono text-slate-400">N/A (Single-threaded)</td>
+                <td class="p-3 font-mono">O(1) lock-free read</td>
+                <td class="p-3 text-emerald-400 font-semibold">Yes (Segment locks)</td>
+                <td class="p-3 text-slate-400">In-memory caches accessed by multiple threads/HTTP requests.</td>
+              </tr>
+              <tr class="hover:bg-slate-950/50">
+                <td class="p-3 font-mono font-bold text-purple-400">HashSet&lt;T&gt;</td>
+                <td class="p-3 font-mono text-slate-400">Set</td>
+                <td class="p-3 font-mono">O(1) contains</td>
+                <td class="p-3 text-rose-400 font-semibold">No</td>
+                <td class="p-3 text-slate-400">Deduplication, checking uniqueness of IDs or emails.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+            <div class="text-xs font-bold text-amber-400 flex items-center justify-between">
+              <span>JavaScript (Node.js) Functional Pipeline</span>
+              <span class="badge bg-amber-500/20 text-amber-400">Eager</span>
+            </div>
+            <pre class="code-font text-xs text-slate-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>// Eager evaluation: creates intermediate arrays in memory
+const activeUsers = users
+  .filter(user =&gt; user.isActive)
+  .map(user =&gt; user.email.toLowerCase())
+  .slice(0, 10);</code></pre>
+            <p class="text-[11px] text-slate-400">
+              JS array methods execute immediately and allocate a brand new array after every <code class="font-mono">.filter()</code> and <code class="font-mono">.map()</code>.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+            <div class="text-xs font-bold text-indigo-400 flex items-center justify-between">
+              <span>Java 8+ Stream Pipeline</span>
+              <span class="badge bg-indigo-500/20 text-indigo-400">Lazy & Optional Multi-Core</span>
+            </div>
+            <pre class="code-font text-xs text-slate-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>// Lazy evaluation: no work done until terminal operator (.toList())
+List&lt;String&gt; activeUsers = users.stream()
+  .filter(User::isActive)              // Method reference
+  .map(user -&gt; user.getEmail().toLowerCase())
+  .limit(10)
+  .toList();                          // Terminal operator
+
+// Bonus: Instant multi-core parallel processing!
+users.parallelStream().filter(...).toList();</code></pre>
+            <p class="text-[11px] text-slate-400">
+              Streams are <strong>lazy</strong>. Elements are pulled one at a time only when needed. Intermediate steps allocate zero arrays!
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 4: SPRING IOC & BEAN LIFECYCLE -->
+      <section id="spring-core" class="space-y-6 scroll-mt-20">
+        <div class="border-b border-slate-800 pb-4 flex items-center justify-between">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-500">Module 04</span>
+            <h3 class="text-2xl font-bold text-white">Spring IoC Container & Bean Lifecycle</h3>
+          </div>
+          <span class="badge bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Core Framework</span>
+        </div>
+
+        <div class="p-6 rounded-xl bg-slate-900 border border-slate-800 space-y-6">
+          <h4 class="font-bold text-sm text-white">The Spring Bean Lifecycle Walkthrough</h4>
+          
+          <div class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
+            <div class="p-3.5 rounded-lg bg-slate-950 border border-slate-800 text-center">
+              <div class="w-6 h-6 mx-auto mb-2 rounded-full bg-indigo-500 text-white font-bold flex items-center justify-center text-xs">1</div>
+              <div class="font-bold text-white">Instantiate</div>
+              <div class="text-[11px] text-slate-400 mt-1">Calls constructor via reflection</div>
+            </div>
+            <div class="p-3.5 rounded-lg bg-slate-950 border border-slate-800 text-center">
+              <div class="w-6 h-6 mx-auto mb-2 rounded-full bg-indigo-500 text-white font-bold flex items-center justify-center text-xs">2</div>
+              <div class="font-bold text-white">Populate</div>
+              <div class="text-[11px] text-slate-400 mt-1">Injects dependencies & @Value properties</div>
+            </div>
+            <div class="p-3.5 rounded-lg bg-slate-950 border border-amber-500/30 bg-amber-950/20 text-center">
+              <div class="w-6 h-6 mx-auto mb-2 rounded-full bg-amber-500 text-white font-bold flex items-center justify-center text-xs">3</div>
+              <div class="font-bold text-amber-400">@PostConstruct</div>
+              <div class="text-[11px] text-slate-400 mt-1">Custom initialization (warm caches, connect)</div>
+            </div>
+            <div class="p-3.5 rounded-lg bg-slate-950 border border-emerald-500/30 bg-emerald-950/20 text-center">
+              <div class="w-6 h-6 mx-auto mb-2 rounded-full bg-emerald-500 text-white font-bold flex items-center justify-center text-xs">4</div>
+              <div class="font-bold text-emerald-400">Ready to Serve</div>
+              <div class="text-[11px] text-slate-400 mt-1">Accepts live HTTP / business requests</div>
+            </div>
+            <div class="p-3.5 rounded-lg bg-slate-950 border border-rose-500/30 bg-rose-950/20 text-center">
+              <div class="w-6 h-6 mx-auto mb-2 rounded-full bg-rose-500 text-white font-bold flex items-center justify-center text-xs">5</div>
+              <div class="font-bold text-rose-400">@PreDestroy</div>
+              <div class="text-[11px] text-slate-400 mt-1">Graceful shutdown (close pools, flush)</div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-indigo-950/30 border border-indigo-800/40 space-y-2">
+            <div class="flex items-center justify-between text-xs font-bold text-indigo-400">
+              <span>Senior Interview Must-Know: Why `@Autowired` Field Injection is an Anti-Pattern</span>
+              <span class="badge bg-indigo-500/20 text-indigo-300">Clean Architecture</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs pt-1">
+              <div>
+                <span class="text-rose-400 font-semibold">❌ Bad Practice:</span>
+                <pre class="code-font text-[11px] text-rose-300 bg-slate-950 p-2 rounded mt-1 border border-slate-800"><code>@Service
+public class OrderService {
+    @Autowired // Field injection!
+    private PaymentClient paymentClient; 
+    // Cannot make field 'final'
+    // Impossible to unit test without Spring runner
+}</code></pre>
+              </div>
+              <div>
+                <span class="text-emerald-400 font-semibold">✅ Senior Clean Code Practice:</span>
+                <pre class="code-font text-[11px] text-emerald-300 bg-slate-950 p-2 rounded mt-1 border border-slate-800"><code>@Service
+public class OrderService {
+    private final PaymentClient paymentClient; // Immutable!
+
+    // Constructor injection (Spring auto-wires implicitly)
+    public OrderService(PaymentClient paymentClient) {
+        this.paymentClient = paymentClient;
+    }
+}</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 5: JPA, HIBERNATE & THE N+1 PROBLEM -->
+      <section id="jpa-database" class="space-y-6 scroll-mt-20">
+        <div class="border-b border-slate-800 pb-4 flex items-center justify-between">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-rose-500">Module 05</span>
+            <h3 class="text-2xl font-bold text-white">JPA, Hibernate & The Deadly N+1 Query Trap</h3>
+          </div>
+          <span class="badge bg-rose-500/20 text-rose-400 border border-rose-500/30">#1 Performance Bottleneck</span>
+        </div>
+
+        <div class="p-6 rounded-xl bg-slate-900 border border-slate-800 space-y-5">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-sm text-white">The N+1 Query Problem in Action</h4>
+            <div class="flex items-center gap-2 text-xs">
+              <span class="text-slate-400">Simulated Users:</span>
+              <select id="userCountSelect" onchange="calculateNPlusOne()" class="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-white">
+                <option value="10">10 Users</option>
+                <option value="50" selected>50 Users</option>
+                <option value="100">100 Users</option>
+                <option value="500">500 Users</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div class="p-4 rounded-xl bg-rose-950/30 border border-rose-800/40 space-y-3">
+              <div class="flex items-center justify-between font-bold text-rose-400">
+                <span>❌ Naive Query (N+1 Hazard)</span>
+                <span id="naiveQueryBadge" class="badge bg-rose-500/20 text-rose-300">51 SQL Queries!</span>
+              </div>
+              <pre class="code-font text-[11px] text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>// 1. Fetches all users (1 query)
+List&lt;User&gt; users = userRepository.findAll();
+
+// 2. Accessing orders triggers 1 query PER user! (N queries)
+for (User user : users) {
+    System.out.println(user.getOrders().size());
+}</code></pre>
+              <div class="text-[11px] text-rose-300">
+                Total DB queries sent: <strong id="naiveQueryFormula" class="font-mono">1 + 50 = 51 queries</strong>! At scale, this exhausts your database connection pool instantly.
+              </div>
+            </div>
+
+            <div class="p-4 rounded-xl bg-emerald-950/30 border border-emerald-800/40 space-y-3">
+              <div class="flex items-center justify-between font-bold text-emerald-400">
+                <span>✅ Senior Solution: JOIN FETCH or @EntityGraph</span>
+                <span class="badge bg-emerald-500/20 text-emerald-300">1 Single SQL Query!</span>
+              </div>
+              <pre class="code-font text-[11px] text-emerald-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>public interface UserRepository extends JpaRepository&lt;User, Long&gt; {
+    // Solves N+1 in 1 clean SQL JOIN query!
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.orders")
+    List&lt;User&gt; findAllWithOrders();
+}</code></pre>
+              <div class="text-[11px] text-emerald-300">
+                Generated SQL: <code class="font-mono text-emerald-400">SELECT * FROM users u LEFT JOIN orders o ON u.id = o.user_id</code>. Total queries: <strong>Always 1</strong> regardless of user count!
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 6: @TRANSACTIONAL PITFALLS -->
+      <section id="transactions" class="space-y-6 scroll-mt-20">
+        <div class="border-b border-slate-800 pb-4 flex items-center justify-between">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-amber-500">Module 06</span>
+            <h3 class="text-2xl font-bold text-white">Spring @Transactional Traps & Propagation</h3>
+          </div>
+          <span class="badge bg-amber-500/20 text-amber-400 border border-amber-500/30">Data Integrity</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
+            <div class="text-xs font-bold text-rose-400">Trap 1: Self-Invocation (Proxy Bypass)</div>
+            <pre class="code-font text-[11px] text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>@Service
+public class OrderService {
+
+    public void checkout() {
+        // CALLING INTERNAL METHOD DIRECTLY!
+        // Spring AOP Proxy is bypassed! @Transactional is IGNORED!
+        this.saveOrder(); 
+    }
+
+    @Transactional
+    public void saveOrder() {
+        orderRepo.save(...);
+    }
+}</code></pre>
+            <p class="text-[12px] text-slate-400 leading-relaxed">
+              <strong>Why it fails:</strong> Spring's <code class="font-mono text-xs">@Transactional</code> works by wrapping your bean in a dynamic <strong>CGLIB Proxy</strong>. When method A calls method B inside the same class using <code class="font-mono text-xs">this.saveOrder()</code>, it calls the raw Java instance, bypassing Spring's proxy interceptor entirely!
+            </p>
+            <div class="text-xs text-emerald-400 font-semibold">
+              Fix: Move <code class="font-mono">saveOrder()</code> to a separate service bean, or inject <code class="font-mono">OrderService</code> into itself.
+            </div>
+          </div>
+
+          <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
+            <div class="text-xs font-bold text-rose-400">Trap 2: Default Rollback on Checked Exceptions</div>
+            <pre class="code-font text-[11px] text-rose-200 bg-slate-950 p-3 rounded-lg border border-slate-800 overflow-x-auto"><code>@Transactional
+public void processPayment() throws Exception {
+    paymentRepo.deductBalance();
+    
+    // Throws a CHECKED Exception (subclass of Exception, not RuntimeException)
+    if (externalGatewayFailed()) {
+        throw new Exception("Payment gateway timed out"); 
+        // BY DEFAULT: SPRING DOES NOT ROLLBACK ON CHECKED EXCEPTIONS!
+    }
+}</code></pre>
+            <p class="text-[12px] text-slate-400 leading-relaxed">
+              <strong>Why it fails:</strong> By default, Spring only rolls back on <strong>unchecked exceptions</strong> (<code class="font-mono text-xs">RuntimeException</code> and <code class="font-mono text-xs">Error</code>).
+            </p>
+            <div class="text-xs text-emerald-400 font-semibold">
+              Fix: Always write <code class="font-mono text-xs">@Transactional(rollbackFor = Exception.class)</code> to guarantee rollbacks on all exceptions.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 7: MICROSERVICES & RESILIENCY -->
+      <section id="microservices" class="space-y-6 scroll-mt-20">
+        <div class="border-b border-slate-800 pb-4 flex items-center justify-between">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-sky-500">Module 07</span>
+            <h3 class="text-2xl font-bold text-white">Microservices, Distributed Consistency & Resiliency</h3>
+          </div>
+          <span class="badge bg-sky-500/20 text-sky-400 border border-sky-500/30">System Design (4-7 Yrs)</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-4">
+            <h4 class="font-bold text-sm text-white flex items-center gap-2">
+              <span>💳</span> Distributed Transactions (Why 2PC Fails)
+            </h4>
+            <div class="space-y-3 text-xs">
+              <div class="p-3 rounded-lg bg-slate-950 border border-slate-800">
+                <div class="font-bold text-indigo-400">The Saga Pattern (Choreography vs Orchestration)</div>
+                <p class="text-slate-400 mt-1">A sequence of local transactions. Each service updates its DB and publishes an event (via Kafka/RabbitMQ). If step 3 fails, compensating transactions are triggered backwards to refund inventory and cancel order.</p>
+              </div>
+
+              <div class="p-3 rounded-lg bg-slate-950 border border-slate-800">
+                <div class="font-bold text-amber-400">Transactional Outbox Pattern</div>
+                <p class="text-slate-400 mt-1">Solves the dual-write problem: writing to DB and publishing to Kafka cannot be atomic. Save message into an <code class="font-mono text-xs">OUTBOX</code> database table in the same DB transaction! Debezium (CDC) or a worker pushes to Kafka reliably.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-4">
+            <h4 class="font-bold text-sm text-white flex items-center gap-2">
+              <span>⚡</span> Resiliency Patterns (Resilience4j)
+            </h4>
+            <div class="p-3.5 rounded-lg bg-slate-950 border border-slate-800">
+              <div class="text-xs font-bold text-emerald-400 mb-1">Circuit Breaker States:</div>
+              <div class="flex items-center gap-2 text-[11px] font-mono mb-2">
+                <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">CLOSED</span>
+                $\rightarrow$
+                <span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30">OPEN</span>
+                $\rightarrow$
+                <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">HALF-OPEN</span>
+              </div>
+              <pre class="code-font text-[11px] text-sky-200 bg-slate-900 p-2.5 rounded overflow-x-auto border border-slate-800"><code>@CircuitBreaker(name = "paymentService", fallbackMethod = "paymentFallback")
+@Retry(name = "paymentService")
+public PaymentResponse charge(PaymentRequest req) {
+    return restTemplate.postForObject(url, req, PaymentResponse.class);
+}
+
+// Fallback method executes when circuit trips:
+public PaymentResponse paymentFallback(PaymentRequest req, Throwable t) {
+    return new PaymentResponse("PENDING_OFFLINE_REVIEW");
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 8: INCIDENT WAR ROOM -->
+      <section id="incidents" class="space-y-6 scroll-mt-20">
+        <div class="border-b border-slate-800 pb-4 flex items-center justify-between">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-rose-500">Module 08</span>
+            <h3 class="text-2xl font-bold text-white">Production Incident War Room (Senior Debugging)</h3>
+          </div>
+          <span class="badge bg-rose-500/20 text-rose-400 border border-rose-500/30">4-7 Yrs On-Call Scenarios</span>
+        </div>
+
+        <div class="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden">
+          <div class="flex border-b border-slate-800 bg-slate-950 overflow-x-auto" id="incidentTabButtons">
+            <button onclick="showIncident(0)" class="incident-btn px-4 py-3 text-xs font-bold border-b-2 border-indigo-500 text-indigo-400">
+              🚨 Incident 1: 100% CPU Spike
+            </button>
+            <button onclick="showIncident(1)" class="incident-btn px-4 py-3 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-white">
+              🚨 Incident 2: OutOfMemoryError (OOM)
+            </button>
+            <button onclick="showIncident(2)" class="incident-btn px-4 py-3 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-white">
+              🚨 Incident 3: HikariCP Pool Exhaustion
+            </button>
+          </div>
+
+          <div class="p-6 space-y-4" id="incidentContent"></div>
+        </div>
+      </section>
+
+      <!-- SECTION 9: INTERVIEW SIMULATOR -->
+      <section id="interview-simulator" class="space-y-6 scroll-mt-20">
+        <div class="border-b border-slate-800 pb-4 flex items-center justify-between">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-500">Module 09</span>
+            <h3 class="text-2xl font-bold text-white">Interactive Code Review & Flaw Detection Challenge</h3>
+          </div>
+          <span class="badge bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Hands-on Practice</span>
+        </div>
+
+        <div class="p-6 rounded-xl bg-slate-900 border border-slate-800 space-y-4">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-sm text-white">Spot the 3 Critical Senior Flaws in this Spring Service:</h4>
+            <button onclick="revealQuizAnswers()" id="quizRevealBtn" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium">
+              Reveal Flaws & Solutions
+            </button>
+          </div>
+
+          <pre class="code-font text-xs text-amber-200 bg-slate-950 p-4 rounded-xl border border-slate-800 overflow-x-auto leading-relaxed"><code>@RestController
+public class OrderController {
+
+    @Autowired // Flaw 1: ?
+    private OrderRepository orderRepo;
+
+    private int requestCounter = 0; // Flaw 2: ?
+
+    @GetMapping("/orders/user/{id}")
+    @Transactional // Flaw 3: ?
+    public List&lt;OrderDTO&gt; getOrders(@PathVariable Long id) {
+        requestCounter++;
+        List&lt;Order&gt; orders = orderRepo.findAllByUserId(id);
+        // Triggers N+1 query when mapped to DTO:
+        return orders.stream()
+            .map(o -&gt; new OrderDTO(o.getId(), o.getItems().size())) 
+            .toList();
+    }
+}</code></pre>
+
+          <div id="quizAnswers" class="hidden space-y-3 pt-2">
+            <div class="p-3.5 rounded-lg bg-rose-950/30 border border-rose-800/40 text-xs text-rose-200">
+              <strong>Flaw 1 (Architecture):</strong> Direct field injection of Repository into Controller skips Service boundary and makes testing difficult. <em>Fix: Inject Service layer via constructor.</em>
+            </div>
+            <div class="p-3.5 rounded-lg bg-rose-950/30 border border-rose-800/40 text-xs text-rose-200">
+              <strong>Flaw 2 (Concurrency):</strong> Controllers are singletons shared across thousands of concurrent threads. <code class="font-mono text-xs">requestCounter++</code> is non-atomic and causes race conditions. <em>Fix: Use AtomicInteger or Micrometer Counter metric.</em>
+            </div>
+            <div class="p-3.5 rounded-lg bg-rose-950/30 border border-rose-800/40 text-xs text-rose-200">
+              <strong>Flaw 3 (Database Performance):</strong> Calling <code class="font-mono text-xs">o.getItems().size()</code> inside stream triggers N+1 SQL queries across the network! Furthermore, placing <code class="font-mono text-xs">@Transactional</code> on a GET endpoint keeps a database connection checked out for the entire HTTP serialization. <em>Fix: Use JOIN FETCH in repository and use read-only transactions at the Service layer.</em>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 10: STAKEHOLDER & SOFT SKILLS -->
+      <section id="soft-skills" class="space-y-6 scroll-mt-20">
+        <div class="border-b border-slate-800 pb-4 flex items-center justify-between">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-indigo-500">Module 10</span>
+            <h3 class="text-2xl font-bold text-white">Senior Behavioral, Client & Stakeholder Articulation</h3>
+          </div>
+          <span class="badge bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">The 4-7 Yrs Leadership Bar</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
+            <h4 class="font-bold text-sm text-indigo-400">1. "When should we choose Java over Node.js (or vice-versa)?"</h4>
+            <p class="text-slate-400 leading-relaxed">
+              <strong>How to articulate:</strong> "Node.js excels in fast prototyping, I/O-heavy BFF (Backend-for-Frontend) layers, and real-time WebSockets where development velocity and single-language full-stack JavaScript are priorities. Java and Spring Boot excel in complex enterprise domains requiring strict domain-driven design, multi-threaded CPU computational tasks, strict static type safety at scale, and bulletproof transaction management."
+            </p>
+          </div>
+
+          <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
+            <h4 class="font-bold text-sm text-emerald-400">2. "How do you handle ambiguous client requirements?"</h4>
+            <p class="text-slate-400 leading-relaxed">
+              <strong>How to articulate:</strong> "I never write code against assumptions. I schedule a brief 15-minute alignment with product/client stakeholders using visual sequence diagrams and concrete edge-case user stories. I document non-functional requirements early (latency SLAs, peak RPS, data retention, consistency trade-offs) so engineering and business share the same success criteria."
+            </p>
+          </div>
+
+          <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
+            <h4 class="font-bold text-sm text-amber-400">3. "How do you negotiate technical debt with Product Managers?"</h4>
+            <p class="text-slate-400 leading-relaxed">
+              <strong>How to articulate:</strong> "I frame tech debt in business terms, not engineering purity. Instead of saying 'we need to rewrite this query,' I explain: 'Optimizing this N+1 query reduces our AWS RDS database bill by 35% and cuts p99 checkout latency from 800ms to 90ms, directly impacting cart conversion.' I allocate 15-20% of every sprint capacity to technical hygiene."
+            </p>
+          </div>
+
+          <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
+            <h4 class="font-bold text-sm text-purple-400">4. "Agile / SAFe / Sprint Planning Experience"</h4>
+            <p class="text-slate-400 leading-relaxed">
+              <strong>How to articulate:</strong> "I participate actively in backlog refinement, story pointing with Planning Poker, and breaking large epic features into vertical slices that deliver testable user value every sprint. In retrospectives, I focus on blameless root-cause analysis for any missed sprint commitments or production defects."
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="pt-8 pb-12 border-t border-slate-800 text-center text-xs text-slate-500 space-y-2">
+        <p>Built for the 4–7 Years Senior Backend Engineer Bar (Core Java, Spring Boot, Microservices, Node.js).</p>
+        <p class="font-mono text-[11px]">Ready for interview review • Saved directly in your project root</p>
+      </footer>
+
+    </main>
+  </div>
+
+  <script>
+    let secondsElapsed = 0;
+    setInterval(() => {
+      secondsElapsed++;
+      const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
+      const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
+      const secs = String(secondsElapsed % 60).padStart(2, '0');
+      const timerEl = document.getElementById('studyTimer');
+      if (timerEl) timerEl.innerText = `${hrs}:${mins}:${secs}`;
+    }, 1000);
+
+    window.addEventListener('scroll', () => {
+      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      const bar = document.getElementById('readingProgress');
+      if (bar) bar.style.width = scrolled + "%";
+    });
+
+    function setActiveNav(el) {
+      document.querySelectorAll('#sidebarNav .nav-item').forEach(item => {
+        item.classList.remove('bg-indigo-600/20', 'text-indigo-400', 'border', 'border-indigo-500/30');
+        item.classList.add('text-slate-400');
+      });
+      el.classList.add('bg-indigo-600/20', 'text-indigo-400', 'border', 'border-indigo-500/30');
+      el.classList.remove('text-slate-400');
+    }
+
+    function calculateNPlusOne() {
+      const select = document.getElementById('userCountSelect');
+      const count = parseInt(select.value, 10);
+      const totalQueries = 1 + count;
+      document.getElementById('naiveQueryBadge').innerText = `${totalQueries} SQL Queries!`;
+      document.getElementById('naiveQueryFormula').innerText = `1 + ${count} = ${totalQueries} queries`;
+    }
+
+    const incidentData = [
+      {
+        title: "Incident 1: CPU Spikes to 100% on Production ECS / Kubernetes Pods",
+        symptoms: "Average response time jumps from 50ms to 12,000ms. CPU alarms firing. Kubernetes begins restarting pods due to failed liveness probes.",
+        triageSteps: [
+          { tool: "top -H -p <pid>", desc: "Identifies the specific OS thread ID (native thread) consuming the highest CPU inside the JVM container." },
+          { tool: "printf '%x\\n' <tid>", desc: "Converts thread ID to hexadecimal (nid) so you can search the thread dump." },
+          { tool: "jstack -l <pid> > dump.txt", desc: "Captures a live snapshot of all running Java threads and their stack traces." },
+          { tool: "grep -A 20 <nid_hex> dump.txt", desc: "Reveals exact Java line number. Common causes: Infinite loop, Catastrophic Regex backtracking, or HashMap resize deadlock." }
+        ],
+        solution: "Identify the runaway loop or uncompiled regex pattern. Deploy hotfix with bounded loop conditions and compiled Pattern instance."
+      },
+      {
+        title: "Incident 2: java.lang.OutOfMemoryError: Java heap space",
+        symptoms: "Application stops responding. Garbage Collection pause times (GC pauses) spike to 10+ seconds (Stop-The-World). Pods crash and restart with OOMKilled.",
+        triageSteps: [
+          { tool: "-XX:+HeapDumpOnOutOfMemoryError", desc: "Always configure this JVM flag in prod! Automatically saves a .hprof file on crash." },
+          { tool: "Eclipse Memory Analyzer (MAT)", desc: "Open the heap dump and check the 'Dominator Tree'. Instantly points to which Class holds 90% of heap memory." },
+          { tool: "ThreadLocal Leak Check", desc: "Check if a ThreadLocal variable was never cleared in a Servlet Filter (threadLocal.remove())." }
+        ],
+        solution: "Usually caused by unpaginated queries (repository.findAll() pulling 1M rows into RAM), unclosed static caches, or forgotten ThreadLocal instances."
+      },
+      {
+        title: "Incident 3: Connection Pool Timeout: Connection is not available, request timed out after 30000ms (HikariCP)",
+        symptoms: "All HTTP endpoints stall with HTTP 500. Application logs show HikariPool-1 - Connection is not available.",
+        triageSteps: [
+          { tool: "Analyze HikariCP Metrics", desc: "Check 'Active Connections' vs 'Idle Connections'. Active is pegged at maximum (e.g. 10/10) with 200 waiting threads." },
+          { tool: "Inspect @Transactional Scope", desc: "Find long-running network calls (Stripe/Email API calls) happening inside an open @Transactional method." }
+        ],
+        solution: "Never make third-party HTTP calls inside a database transaction! Open transactions only for the exact milliseconds needed to write to SQL."
+      }
+    ];
+
+    function showIncident(idx) {
+      const data = incidentData[idx];
+      const buttons = document.querySelectorAll('.incident-btn');
+      buttons.forEach((btn, i) => {
+        if (i === idx) {
+          btn.className = "incident-btn px-4 py-3 text-xs font-bold border-b-2 border-indigo-500 text-indigo-400";
+        } else {
+          btn.className = "incident-btn px-4 py-3 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-white";
+        }
+      });
+
+      const container = document.getElementById('incidentContent');
+      let stepsHtml = data.triageSteps.map(s => `
+        <div class="p-3 rounded-lg bg-slate-950 border border-slate-800">
+          <code class="font-mono text-xs text-indigo-400 font-bold">${s.tool}</code>
+          <p class="text-[11px] text-slate-400 mt-0.5">${s.desc}</p>
+        </div>
+      `).join('');
+
+      container.innerHTML = `
+        <div class="space-y-4">
+          <div>
+            <h5 class="font-bold text-sm text-white">${data.title}</h5>
+            <p class="text-xs text-rose-300 mt-1"><strong>Symptoms:</strong> ${data.symptoms}</p>
+          </div>
+          <div>
+            <div class="text-xs font-bold text-slate-400 uppercase mb-2">Senior Triage Protocol:</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+              ${stepsHtml}
+            </div>
+          </div>
+          <div class="p-3 rounded-lg bg-emerald-950/30 border border-emerald-800/40 text-xs text-emerald-300">
+            <strong>Permanent Architectural Fix:</strong> ${data.solution}
+          </div>
+        </div>
+      `;
+    }
+
+    showIncident(0);
+
+    function revealQuizAnswers() {
+      const el = document.getElementById('quizAnswers');
+      const btn = document.getElementById('quizRevealBtn');
+      if (el.classList.contains('hidden')) {
+        el.classList.remove('hidden');
+        btn.innerText = "Hide Answers";
+      } else {
+        el.classList.add('hidden');
+        btn.innerText = "Reveal Flaws & Solutions";
+      }
+    }
+  </script>
+</body>
+</html>
