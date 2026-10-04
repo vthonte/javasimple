@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -56,8 +56,8 @@
     
     <!-- Title -->
     <div class="space-y-3 border-b border-slate-200 pb-8">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20 text-xs font-semibold">
-        Deep Dive 07 â€¢ Distributed Systems (4-7 Yrs Bar)
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-700 border border-cyan-500/20 text-xs font-semibold">
+        Deep Dive 07 • Distributed Systems (4-7 Yrs Bar)
       </div>
       <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
         Microservices Boundaries, Distributed Data Consistency (Saga/Outbox) & Resiliency
@@ -65,6 +65,63 @@
       <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
         Why Two-Phase Commit (2PC) fails at scale, the Choreography vs Orchestration Saga pattern, solving the Dual-Write problem with the Transactional Outbox Pattern, and circuit breakers with Resilience4j.
       </p>
+    </div>
+
+    <!-- BEGINNER FRIENDLY / ELI5 BREAKDOWN -->
+    <section class="p-6 rounded-2xl bg-cyan-50/60 border border-cyan-200 space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">💡</span>
+          <h2 class="text-lg font-bold text-cyan-950">ELI5: The "Dual-Write" Ghost Order Nightmare</h2>
+        </div>
+        <span class="text-xs bg-cyan-200 text-cyan-900 font-semibold px-2.5 py-0.5 rounded-full">Beginner Mental Model</span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div class="p-4 bg-white rounded-xl border border-cyan-100 shadow-sm space-y-2">
+          <div class="font-bold text-rose-700">The Problem: Writing to DB AND Kafka</div>
+          <p class="text-slate-600 leading-relaxed">
+            You save an Order into PostgreSQL, and then send a message to Kafka: <code class="font-mono bg-slate-100 px-1 rounded text-rose-700">kafka.send("order-created")</code>. What happens if Kafka is down or network drops? <strong>The DB committed the order, but Kafka never got notified!</strong> Or what if Kafka sends the message, but the DB crashes during commit? Ghost payments happen!
+          </p>
+        </div>
+        <div class="p-4 bg-white rounded-xl border border-cyan-100 shadow-sm space-y-2">
+          <div class="font-bold text-emerald-700">The Senior Fix: Transactional Outbox Pattern</div>
+          <p class="text-slate-600 leading-relaxed">
+            Instead of calling Kafka directly, you write the event into an <code class="font-mono text-emerald-700">outbox_table</code> in the <strong>SAME database transaction</strong> as your order! Since it's inside 1 Postgres transaction, it is 100% atomic. A background engine (like Debezium CDC) streams rows from the outbox table to Kafka reliably.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- OUTBOX FLOWCHART -->
+    <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-3">
+      <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+        <span>📊</span> Transactional Outbox Architecture Visualized
+      </h3>
+      <div class="flex flex-col md:flex-row items-center justify-between gap-2 text-center text-xs font-mono">
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl w-full md:w-1/4">
+          <span class="font-bold text-slate-800 block text-xs">1. HTTP Request</span>
+          <code class="text-slate-600">POST /api/orders</code>
+          <p class="text-[10px] text-slate-500 mt-1">Customer creates order</p>
+        </div>
+        <div class="text-slate-400 font-bold hidden md:block">→</div>
+        <div class="p-3 bg-cyan-50 border border-cyan-200 rounded-xl w-full md:w-1/4">
+          <span class="font-bold text-cyan-800 block text-xs">2. Atomic SQL Transaction</span>
+          <code class="text-cyan-700">INSERT INTO orders; INSERT INTO outbox;</code>
+          <p class="text-[10px] text-slate-500 mt-1">100% ACID Guaranteed</p>
+        </div>
+        <div class="text-slate-400 font-bold hidden md:block">→</div>
+        <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl w-full md:w-1/4">
+          <span class="font-bold text-amber-800 block text-xs">3. CDC Relay (Debezium)</span>
+          <code class="text-amber-700">Reads WAL (Write-Ahead Log)</code>
+          <p class="text-[10px] text-slate-500 mt-1">Zero latency log reader</p>
+        </div>
+        <div class="text-slate-400 font-bold hidden md:block">→</div>
+        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl w-full md:w-1/4">
+          <span class="font-bold text-emerald-800 block text-xs">4. Message Broker</span>
+          <code class="text-emerald-700">Kafka / RabbitMQ Topic</code>
+          <p class="text-[10px] text-slate-500 mt-1">Guaranteed delivery to microservices</p>
+        </div>
+      </div>
     </div>
 
     <!-- PART 1: The Dual-Write Problem -->

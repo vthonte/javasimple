@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guide 00: Java Fundamentals for Node.js Beginners</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .code-font { font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Monaco, Consolas, monospace; }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0.75rem !important;
+      padding: 1.1rem !important;
+      font-size: 0.92rem !important;
+      line-height: 1.6 !important;
+      color: #1e293b !important;
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
+    }
+    code[class*="language-"] {
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
+      font-size: 0.92rem !important;
+      color: #1e293b !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
+
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="index.html" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-semibold">
+        ← Back to Table of Contents
+      </a>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-slate-500 font-mono">Guide 00 (Foundation)</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="01_concurrency_architecture.html" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition-colors">
+        Next: Concurrency Architecture →
+      </a>
+    </div>
+  </header>
+
+  <main class="max-w-5xl w-full mx-auto px-6 py-10 space-y-12">
+    
+    <!-- Hero Section -->
+    <div class="space-y-4 border-b border-slate-200 pb-8">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 border border-emerald-500/30 text-xs font-semibold">
+        🌱 Beginner Zero-to-One • Java Primer for Node.js Developers
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        Demystifying Java: From Node.js / JavaScript to Java & JVM
+      </h1>
+      <p class="text-slate-600 text-base leading-relaxed">
+        If you know JavaScript or TypeScript, you already know 70% of programming concepts. Java simply adds a strict compiler, static typing, and a virtual machine runtime. Let's build your mental bridge from scratch with no fluff or unhelpful jargon.
+      </p>
+    </div>
+
+    <!-- MENTAL MODEL / ELI5 SECTION -->
+    <section class="p-6 rounded-2xl bg-indigo-50/70 border border-indigo-200 space-y-4">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">💡</span>
+        <h2 class="text-xl font-bold text-indigo-950">ELI5: The JavaScript Mind vs. The Java Mind</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <div class="p-4 bg-white rounded-xl border border-indigo-100 shadow-sm space-y-2">
+          <div class="font-bold text-amber-700 flex items-center gap-1.5">
+            <span>⚡</span> JavaScript / Node.js
+          </div>
+          <ul class="space-y-1.5 text-slate-600 text-xs leading-relaxed">
+            <li>• <strong>Dynamic Typing:</strong> <code class="bg-slate-100 px-1 py-0.5 rounded text-amber-700">let x = "hello"; x = 42;</code> works without complaint.</li>
+            <li>• <strong>Interpreter + JIT (V8):</strong> Executes source code directly: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-700">node app.js</code>.</li>
+            <li>• <strong>Package Manager:</strong> <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-700">package.json</code> & <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-700">npm install</code>.</li>
+            <li>• <strong>Everything is an Object or Primitive:</strong> Functions are first-class citizens and can exist anywhere.</li>
+          </ul>
+        </div>
+        <div class="p-4 bg-white rounded-xl border border-indigo-100 shadow-sm space-y-2">
+          <div class="font-bold text-indigo-700 flex items-center gap-1.5">
+            <span>☕</span> Java & JVM
+          </div>
+          <ul class="space-y-1.5 text-slate-600 text-xs leading-relaxed">
+            <li>• <strong>Static Typing:</strong> <code class="bg-slate-100 px-1 py-0.5 rounded text-indigo-700">String x = "hello"; x = 42;</code> fails at compile-time!</li>
+            <li>• <strong>Compile to Bytecode:</strong> <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-700">javac App.java</code> creates <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-700">App.class</code>, run by <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-700">java App</code>.</li>
+            <li>• <strong>Build Tool:</strong> <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-700">pom.xml</code> (Maven) or <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-700">build.gradle</code> (Gradle).</li>
+            <li>• <strong>Strict Class Structure:</strong> Every function (method) MUST live inside a <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-700">class</code>.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ARCHITECTURE FLOWCHART: COMPILATION & RUNTIME -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+        <span class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm font-black">1</span>
+        How Java Actually Runs: The Architecture Flowchart
+      </h2>
+      <p class="text-sm text-slate-600">
+        Node.js reads JS text files directly. Java is a two-phase engine: First, it compiles human code into universal byte instructions (<code class="text-xs bg-slate-100 px-1 rounded">.class</code>). Then, the Java Virtual Machine (JVM) executes it at native CPU speed.
+      </p>
+
+      <!-- Visual Flowchart -->
+      <div class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-3 text-center text-xs font-mono">
+          <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl w-full md:w-1/4">
+            <span class="font-bold text-amber-800 block text-sm">Source Code</span>
+            <code class="text-slate-600">UserService.java</code>
+            <p class="text-[11px] text-slate-500 mt-1">Human readable Java</p>
+          </div>
+          <div class="text-slate-400 font-bold text-lg hidden md:block">→ javac →</div>
+          <div class="text-slate-400 font-bold text-lg md:hidden">↓ javac ↓</div>
+          <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl w-full md:w-1/4">
+            <span class="font-bold text-blue-800 block text-sm">Bytecode</span>
+            <code class="text-slate-600">UserService.class</code>
+            <p class="text-[11px] text-slate-500 mt-1">Universal JVM instructions</p>
+          </div>
+          <div class="text-slate-400 font-bold text-lg hidden md:block">→ JVM →</div>
+          <div class="text-slate-400 font-bold text-lg md:hidden">↓ JVM ↓</div>
+          <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl w-full md:w-1/4">
+            <span class="font-bold text-emerald-800 block text-sm">Native Machine Code</span>
+            <code class="text-slate-600">x86_64 / ARM CPU</code>
+            <p class="text-[11px] text-slate-500 mt-1">JIT Compiled & Executed</p>
+          </div>
+        </div>
+        <div class="p-3 bg-slate-50 border border-slate-100 rounded-lg text-xs text-slate-600">
+          <strong>Why this matters:</strong> "Write Once, Run Anywhere". You can compile Java bytecode on macOS, and the exact same <code class="font-mono">.class</code> file runs without re-compilation on an Ubuntu Linux server or Windows laptop.
+        </div>
+      </div>
+    </section>
+
+    <!-- ROSETTA STONE: NODE.JS VS JAVA FUNDAMENTALS -->
+    <section class="space-y-6">
+      <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+        <span class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center text-sm font-black">2</span>
+        The Side-by-Side Rosetta Stone: Common Node Patterns in Java
+      </h2>
+
+      <!-- Concept 1: Hello World & Entrypoint -->
+      <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+          <h3 class="font-bold text-slate-900 text-base">A. Entry Point: How your app starts</h3>
+          <span class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-full font-medium">Concept 1</span>
+        </div>
+        <p class="text-xs text-slate-600">
+          In Node, execution starts from line 1 of your entry file (e.g., <code class="font-mono">server.js</code>). In Java, execution always begins at the method signature <code class="font-mono text-indigo-600">public static void main(String[] args)</code>.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <div class="text-xs font-bold text-amber-700 mb-1">Node.js (app.js)</div>
+            <pre class="language-javascript"><code class="language-javascript">// Just run: node app.js
+console.log("Hello, World!");
+
+// Defining a function
+function greet(name) {
+  return `Hello, ${name}!`;
+}</code></pre>
+          </div>
+          <div>
+            <div class="text-xs font-bold text-indigo-700 mb-1">Java (App.java)</div>
+            <pre class="language-java"><code class="language-java">public class App {
+  // Entry point of the entire application
+  public static void main(String[] args) {
+    System.out.println("Hello, World!");
+  }
+
+  // Method must be declared with return type & arg type
+  public static String greet(String name) {
+    return "Hello, " + name + "!";
+  }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Concept 2: Variables & Types -->
+      <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+          <h3 class="font-bold text-slate-900 text-base">B. Variables & Data Types (Primitives vs Objects)</h3>
+          <span class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-full font-medium">Concept 2</span>
+        </div>
+        <p class="text-xs text-slate-600">
+          Java has 8 lightweight "primitives" (<code class="font-mono">int, boolean, double, long, etc.</code>) stored directly in stack memory, and reference "Objects" (<code class="font-mono">String, List, User</code>) stored in heap memory. Modern Java (10+) also allows <code class="font-mono text-indigo-600">var</code> for type inference, just like TypeScript!
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <div class="text-xs font-bold text-amber-700 mb-1">JavaScript / TypeScript</div>
+            <pre class="language-javascript"><code class="language-javascript">let age = 30;              // number
+let price = 19.99;          // number
+let active = true;          // boolean
+let name = "Alice";         // string
+let tags = ["admin", "dev"]; // Array</code></pre>
+          </div>
+          <div>
+            <div class="text-xs font-bold text-indigo-700 mb-1">Java (Explicit vs var in Java 10+)</div>
+            <pre class="language-java"><code class="language-java">int age = 30;               // 32-bit integer primitive
+double price = 19.99;       // 64-bit floating point primitive
+boolean active = true;      // boolean primitive
+String name = "Alice";      // Object reference
+
+// Java 10+ type inference (type is still static!):
+var age2 = 30;              // inferred as int
+var tags = List.of("admin", "dev"); // List<String></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Concept 3: Objects & Classes vs JSON -->
+      <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+          <h3 class="font-bold text-slate-900 text-base">C. Creating Data Models (Plain Objects vs Records)</h3>
+          <span class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-full font-medium">Concept 3</span>
+        </div>
+        <p class="text-xs text-slate-600">
+          In Node, you frequently pass raw object literals: <code class="font-mono">{ id: 1, email: "..." }</code>. In Java 8, developers wrote verbose classes with getters/setters (or Lombok). In Modern Java (16+), we have <code class="font-mono text-indigo-600">record</code>, which creates immutable DTOs in a single line!
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <div class="text-xs font-bold text-amber-700 mb-1">JavaScript / TypeScript</div>
+            <pre class="language-javascript"><code class="language-javascript">// In JS, an inline object:
+const user = { id: 101, email: "alice@work.com" };
+console.log(user.email);
+
+// In TS Interface:
+interface User {
+  id: number;
+  email: string;
+}</code></pre>
+          </div>
+          <div>
+            <div class="text-xs font-bold text-indigo-700 mb-1">Java (Modern Record vs Old Java 8 Class)</div>
+            <pre class="language-java"><code class="language-java">// Modern Java (16+): 1 line record!
+// Auto-generates getters, constructor, equals, hashCode, toString
+public record User(Long id, String email) {}
+
+// Usage:
+User user = new User(101L, "alice@work.com");
+System.out.println(user.email()); // getter is user.email()</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Concept 4: Packages & Project Structure -->
+      <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+          <h3 class="font-bold text-slate-900 text-base">D. Project Structure & Dependency Management (npm vs Maven)</h3>
+          <span class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-full font-medium">Concept 4</span>
+        </div>
+        <p class="text-xs text-slate-600">
+          Node uses folders and <code class="font-mono">package.json</code>. Java uses reverse-domain package names (e.g. <code class="font-mono">com.mycompany.app</code>) that mirror the physical folder structure, managed by Maven's <code class="font-mono">pom.xml</code>.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs font-mono space-y-2">
+            <div class="font-bold text-amber-800">Node.js Directory Layout</div>
+            <div class="text-slate-600 leading-relaxed">
+              my-node-app/<br>
+              ├── package.json  (dependencies)<br>
+              ├── node_modules/ (installed libs)<br>
+              └── src/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;├── controllers/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;├── services/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;└── index.js
+            </div>
+          </div>
+          <div class="p-3 bg-indigo-50/50 rounded-xl border border-indigo-200 text-xs font-mono space-y-2">
+            <div class="font-bold text-indigo-800">Standard Maven (Java) Directory Layout</div>
+            <div class="text-slate-600 leading-relaxed">
+              my-java-app/<br>
+              ├── pom.xml (dependencies & plugins)<br>
+              └── src/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;├── main/java/com/mycompany/app/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── controller/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── service/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── Application.java<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;└── main/resources/application.properties
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Concept 5: Null Handling & Optional -->
+      <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+          <h3 class="font-bold text-slate-900 text-base">E. Null Pointer Exceptions (NPE) vs undefined</h3>
+          <span class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-full font-medium">Concept 5</span>
+        </div>
+        <p class="text-xs text-slate-600">
+          In JS, accessing a property on undefined gives: <code class="font-mono text-rose-600">TypeError: Cannot read properties of undefined</code>. In Java, it throws a <code class="font-mono text-rose-600">NullPointerException</code>. Java 8 introduced <code class="font-mono text-indigo-600">Optional&lt;T&gt;</code> to eliminate null checks safely.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <div class="text-xs font-bold text-amber-700 mb-1">Node.js (Optional Chaining & Nullish Coalescing)</div>
+            <pre class="language-javascript"><code class="language-javascript">const user = findUser(123);
+
+// Optional chaining (?.) and fallback (??)
+const email = user?.email ?? "no-email@test.com";
+console.log(email);</code></pre>
+          </div>
+          <div>
+            <div class="text-xs font-bold text-indigo-700 mb-1">Java (java.util.Optional)</div>
+            <pre class="language-java"><code class="language-java">Optional&lt;User&gt; userOpt = userRepository.findById(123L);
+
+// Functional transformation with fallback
+String email = userOpt
+    .map(User::email)
+    .orElse("no-email@test.com");
+
+System.out.println(email);</code></pre>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- INTERACTIVE KNOWLEDGE CHECK -->
+    <section class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
+      <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+        <span>🎯</span> Quick Self-Check: Test Your Mental Model
+      </h3>
+      <div class="space-y-4 text-sm" id="quizContainer">
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+          <p class="font-semibold text-slate-800">1. Why does Java compile to .class files rather than compiling straight to binary machine code?</p>
+          <div class="space-y-1.5 text-xs">
+            <button onclick="checkAnswer(this, true)" class="w-full text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 hover:border-indigo-300 transition-colors">
+              A) So bytecode can run on ANY operating system that has a JVM (Write Once, Run Anywhere).
+            </button>
+            <button onclick="checkAnswer(this, false)" class="w-full text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 hover:border-indigo-300 transition-colors">
+              B) Because Java cannot run on 64-bit processors directly.
+            </button>
+          </div>
+          <div class="result hidden text-xs font-semibold p-2 rounded"></div>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+          <p class="font-semibold text-slate-800">2. In modern Java (16+), what is the cleanest equivalent to a lightweight TypeScript data object or DTO?</p>
+          <div class="space-y-1.5 text-xs">
+            <button onclick="checkAnswer(this, false)" class="w-full text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 hover:border-indigo-300 transition-colors">
+              A) A class with private variables and 40 lines of getters, setters, and equals methods.
+            </button>
+            <button onclick="checkAnswer(this, true)" class="w-full text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 hover:border-indigo-300 transition-colors">
+              B) A <code class="font-mono text-indigo-600 font-bold">record</code> (e.g., <code class="font-mono">public record User(Long id, String name) {}</code>).
+            </button>
+          </div>
+          <div class="result hidden text-xs font-semibold p-2 rounded"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation Footer -->
+    <div class="flex items-center justify-between pt-6 border-t border-slate-200">
+      <a href="index.html" class="px-4 py-2 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-semibold">
+        ← Curriculum Index
+      </a>
+      <a href="01_concurrency_architecture.html" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-200 transition-all">
+        Proceed to Guide 1: Concurrency Architecture →
+      </a>
+    </div>
+
+  </main>
+
+  <script>
+    function checkAnswer(button, isCorrect) {
+      const parent = button.closest('div.space-y-2');
+      const result = parent.querySelector('.result');
+      result.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
+      
+      if (isCorrect) {
+        result.classList.add('bg-emerald-100', 'text-emerald-800');
+        result.innerHTML = '✅ Correct! Exactly right.';
+      } else {
+        result.classList.add('bg-rose-100', 'text-rose-800');
+        result.innerHTML = '❌ Not quite. Review the explanation above and try again.';
+      }
+    }
+  </script>
+
+  <script src="voice_narrator.js"></script>
+  <script src="gemini_assistant.js"></script>
+</body>
+</html>

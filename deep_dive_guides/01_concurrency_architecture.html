@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -54,8 +54,8 @@
   <main class="max-w-5xl w-full mx-auto px-6 py-10 space-y-12">
     
     <div class="space-y-3 border-b border-slate-200 pb-8">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-semibold">
-        Deep Dive 01 â€¢ Concurrency Architecture & Code Evolution
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-700 border border-amber-500/20 text-xs font-semibold">
+        Deep Dive 01 • Concurrency Architecture & Code Evolution
       </div>
       <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
         Concurrency in Code: Node.js vs. Java 8 (CompletableFuture) vs. Java 21 (Virtual Threads)
@@ -63,6 +63,61 @@
       <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
         Let's inspect the bare-metal code for running 10,000 concurrent HTTP requests, handling race conditions on shared memory, and comparing asynchronous promises with virtual threads.
       </p>
+    </div>
+
+    <!-- BEGINNER FRIENDLY / ELI5 BREAKDOWN -->
+    <section class="p-6 rounded-2xl bg-amber-50/60 border border-amber-200 space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">💡</span>
+          <h2 class="text-lg font-bold text-amber-950">ELI5: The Restaurant Analogy (Event Loop vs Threads)</h2>
+        </div>
+        <span class="text-xs bg-amber-200 text-amber-900 font-semibold px-2.5 py-0.5 rounded-full">Beginner Mental Model</span>
+      </div>
+      <p class="text-xs text-slate-700 leading-relaxed">
+        How does a server handle 1,000 customers at the same time? Here are the 3 ways servers do it:
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+        <div class="p-3.5 bg-white rounded-xl border border-amber-100 shadow-sm space-y-1.5">
+          <span class="font-bold text-emerald-700 block">1. Node.js (1 Super Waiter)</span>
+          <p class="text-slate-600">One waiter takes an order, sends it to the kitchen (I/O), and immediately moves to the next table. When food is ready, the waiter brings it. <em>Fast for waiting, but if the waiter stops to do math (CPU), everyone freezes!</em></p>
+        </div>
+        <div class="p-3.5 bg-white rounded-xl border border-amber-100 shadow-sm space-y-1.5">
+          <span class="font-bold text-sky-700 block">2. Traditional Java (200 Waiters)</span>
+          <p class="text-slate-600">Hire a separate waiter for every customer. Each waiter stands at the table waiting for food. <em>Simple to code, but hiring 10,000 waiters exhausts memory (each OS thread takes ~1MB RAM)!</em></p>
+        </div>
+        <div class="p-3.5 bg-white rounded-xl border border-amber-100 shadow-sm space-y-1.5">
+          <span class="font-bold text-indigo-700 block">3. Java 21 Virtual Threads (Magic)</span>
+          <p class="text-slate-600">1,000,000 imaginary waiters managed by just 8 real waiters. When an imaginary waiter waits for a DB query, it steps aside with zero memory penalty. <em>The simplicity of synchronous code with the scalability of async Node!</em></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ARCHITECTURE FLOWCHART -->
+    <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-3">
+      <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+        <span>📊</span> Concurrency Architecture Visualized
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-center text-xs font-mono">
+        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-1">
+          <span class="font-bold text-emerald-800">Node.js libuv</span>
+          <div class="text-[11px] text-slate-600">Single Main Thread</div>
+          <div class="text-[11px] text-emerald-700">Async Non-blocking Sockets</div>
+          <div class="text-[10px] text-slate-500">Event Loop + 4 Threadpool workers</div>
+        </div>
+        <div class="p-3 bg-sky-50 border border-sky-200 rounded-xl space-y-1">
+          <span class="font-bold text-sky-800">Java 8 Platform Threads</span>
+          <div class="text-[11px] text-slate-600">1 Request = 1 OS Thread</div>
+          <div class="text-[11px] text-sky-700">Tomcat Thread Pool (default 200)</div>
+          <div class="text-[10px] text-slate-500">Blocks OS thread on DB queries</div>
+        </div>
+        <div class="p-3 bg-indigo-50 border border-indigo-200 rounded-xl space-y-1">
+          <span class="font-bold text-indigo-800">Java 21 Project Loom</span>
+          <div class="text-[11px] text-slate-600">Virtual Threads (Loom)</div>
+          <div class="text-[11px] text-indigo-700">Unmounts from OS thread on I/O</div>
+          <div class="text-[10px] text-slate-500">Scale to 1,000,000+ concurrent tasks</div>
+        </div>
+      </div>
     </div>
 
     <!-- CODE LAB 1: Fetching multiple services in parallel -->

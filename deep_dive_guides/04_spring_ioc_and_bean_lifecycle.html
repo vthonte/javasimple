@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -54,8 +54,8 @@
   <main class="max-w-5xl w-full mx-auto px-6 py-10 space-y-12">
     
     <div class="space-y-3 border-b border-slate-200 pb-8">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold">
-        Deep Dive 04 â€¢ Enterprise Architecture & DI Patterns
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 text-sky-700 border border-sky-500/20 text-xs font-semibold">
+        Deep Dive 04 • Enterprise Architecture & DI Patterns
       </div>
       <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
         Dependency Injection in Code: Express.js vs. NestJS vs. Spring Boot
@@ -63,6 +63,64 @@
       <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
         Let's inspect how dependencies are created and injected across Node.js (manual/Express), TypeScript (NestJS), and modern Spring Boot with constructor injection.
       </p>
+    </div>
+
+    <!-- BEGINNER FRIENDLY / ELI5 BREAKDOWN -->
+    <section class="p-6 rounded-2xl bg-sky-50/60 border border-sky-200 space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">💡</span>
+          <h2 class="text-lg font-bold text-sky-950">ELI5: Building furniture yourself vs. Calling a Butler (IoC)</h2>
+        </div>
+        <span class="text-xs bg-sky-200 text-sky-900 font-semibold px-2.5 py-0.5 rounded-full">Beginner Mental Model</span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div class="p-4 bg-white rounded-xl border border-sky-100 shadow-sm space-y-2">
+          <div class="font-bold text-amber-700">Without IoC (Express / Plain Node)</div>
+          <p class="text-slate-600 leading-relaxed">
+            Every file manually builds its own tools: <code class="font-mono bg-slate-100 px-1 rounded text-amber-700">const db = new Database(); const service = new UserService(db);</code>. If <code class="font-mono">Database</code> needs a new connection pool config, you must update 50 files manually. Unit testing is painful because swapping mock databases requires monkey patching.
+          </p>
+        </div>
+        <div class="p-4 bg-white rounded-xl border border-sky-100 shadow-sm space-y-2">
+          <div class="font-bold text-sky-700">With Spring IoC (The Automated Butler)</div>
+          <p class="text-slate-600 leading-relaxed">
+            You just mark a class with <code class="font-mono bg-slate-100 px-1 rounded text-sky-700">@Service</code>. Spring starts up, scans your project, creates the single instance of your Database, creates your Service, injects the DB into your service constructor, and wires everything automatically. You never type <code class="font-mono text-sky-700">new</code> again!
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- IOC LIFECYCLE FLOWCHART -->
+    <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-3">
+      <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+        <span>📊</span> Spring Bean Lifecycle Under the Hood
+      </h3>
+      <div class="flex flex-col md:flex-row items-center justify-between gap-2 text-center text-xs font-mono">
+        <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl w-full md:w-1/5">
+          <span class="font-bold text-slate-800 block text-xs">1. Instantiation</span>
+          <p class="text-[10px] text-slate-500 mt-1">Calls Constructor with injected dependencies</p>
+        </div>
+        <div class="text-slate-400 font-bold hidden md:block">→</div>
+        <div class="p-2.5 bg-sky-50 border border-sky-200 rounded-xl w-full md:w-1/5">
+          <span class="font-bold text-sky-800 block text-xs">2. Populate Properties</span>
+          <p class="text-[10px] text-slate-500 mt-1">Sets any @Value / config fields</p>
+        </div>
+        <div class="text-slate-400 font-bold hidden md:block">→</div>
+        <div class="p-2.5 bg-amber-50 border border-amber-200 rounded-xl w-full md:w-1/5">
+          <span class="font-bold text-amber-800 block text-xs">3. Post-Construct</span>
+          <p class="text-[10px] text-slate-500 mt-1">Executes @PostConstruct setup logic</p>
+        </div>
+        <div class="text-slate-400 font-bold hidden md:block">→</div>
+        <div class="p-2.5 bg-purple-50 border border-purple-200 rounded-xl w-full md:w-1/5">
+          <span class="font-bold text-purple-800 block text-xs">4. CGLIB Proxying</span>
+          <p class="text-[10px] text-slate-500 mt-1">Wraps bean for @Transactional / @Security</p>
+        </div>
+        <div class="text-slate-400 font-bold hidden md:block">→</div>
+        <div class="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl w-full md:w-1/5">
+          <span class="font-bold text-emerald-800 block text-xs">5. Ready for Traffic</span>
+          <p class="text-[10px] text-slate-500 mt-1">Singleton Bean serves incoming HTTP requests</p>
+        </div>
+      </div>
     </div>
 
     <!-- CODE LAB 1: Building a Service Layer with Dependencies -->

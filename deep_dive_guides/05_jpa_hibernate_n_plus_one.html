@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -54,8 +54,8 @@
   <main class="max-w-5xl w-full mx-auto px-6 py-10 space-y-12">
     
     <div class="space-y-3 border-b border-slate-200 pb-8">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 text-xs font-semibold">
-        Deep Dive 05 â€¢ Code Mechanics: ORM & Database Performance
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 text-rose-700 border border-rose-500/20 text-xs font-semibold">
+        Deep Dive 05 • Code Mechanics: ORM & Database Performance
       </div>
       <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
         Data Access in Code: Prisma / Mongoose vs. Spring Data JPA & Hibernate
@@ -63,6 +63,51 @@
       <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
         Let's inspect the actual SQL queries generated behind the scenes by Prisma vs. Spring Data JPA, and how the N+1 query problem looks in code and query logs.
       </p>
+    </div>
+
+    <!-- BEGINNER FRIENDLY / ELI5 BREAKDOWN -->
+    <section class="p-6 rounded-2xl bg-rose-50/60 border border-rose-200 space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">💡</span>
+          <h2 class="text-lg font-bold text-rose-950">ELI5: The Grocery Shopping Trip (The N+1 Query Trap)</h2>
+        </div>
+        <span class="text-xs bg-rose-200 text-rose-900 font-semibold px-2.5 py-0.5 rounded-full">Beginner Mental Model</span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div class="p-4 bg-white rounded-xl border border-rose-100 shadow-sm space-y-2">
+          <div class="font-bold text-rose-700">The Naive Way (N+1 Query Storm)</div>
+          <p class="text-slate-600 leading-relaxed">
+            You need 50 grocery items. You make <strong>1 trip</strong> to the store to get the list (1 query). Then, for every single item on the list, you drive back to the store separately (50 queries)! Total: <strong>51 network round trips</strong>. In JPA, accessing a lazy collection in a loop triggers a new SQL query per row, crushing your database!
+          </p>
+        </div>
+        <div class="p-4 bg-white rounded-xl border border-rose-100 shadow-sm space-y-2">
+          <div class="font-bold text-emerald-700">The Senior Fix (JOIN FETCH / Single Trip)</div>
+          <p class="text-slate-600 leading-relaxed">
+            You go to the grocery store <strong>once</strong> and load all 50 items into the car at the same time using a SQL <code class="font-mono text-emerald-700 font-bold">JOIN</code>. Total: <strong>1 single query</strong>. In JPA, you fix N+1 using <code class="font-mono bg-slate-100 px-1 rounded text-emerald-700">JOIN FETCH u.orders</code> or <code class="font-mono text-emerald-700">@EntityGraph</code>.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- N+1 FLOWCHART -->
+    <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-3">
+      <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+        <span>📊</span> N+1 Problem vs JOIN FETCH Visualized
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+        <div class="p-3 bg-rose-50 border border-rose-200 rounded-xl space-y-1.5">
+          <span class="font-bold text-rose-800">❌ Default Lazy Loading in a Loop</span>
+          <div class="text-[11px] text-slate-600">Query 1: <code class="text-rose-700">SELECT * FROM users;</code> (Returns 100 rows)</div>
+          <div class="text-[11px] text-slate-600">Query 2..101: <code class="text-rose-700">SELECT * FROM orders WHERE user_id = ?;</code></div>
+          <div class="text-[10px] text-rose-600 font-bold">💥 101 separate DB roundtrips = Database pool starvation</div>
+        </div>
+        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-1.5">
+          <span class="font-bold text-emerald-800">✅ Senior Fix: JOIN FETCH</span>
+          <div class="text-[11px] text-slate-600">Query 1: <code class="text-emerald-700">SELECT u, o FROM User u JOIN FETCH u.orders;</code></div>
+          <div class="text-[10px] text-emerald-700 font-bold">🚀 1 single query returns all Users and Orders together!</div>
+        </div>
+      </div>
     </div>
 
     <!-- CODE LAB 1: Defining Entities and Relationships -->

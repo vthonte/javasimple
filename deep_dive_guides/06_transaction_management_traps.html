@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -54,15 +54,72 @@
   <main class="max-w-5xl w-full mx-auto px-6 py-10 space-y-12">
     
     <div class="space-y-3 border-b border-slate-200 pb-8">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-semibold">
-        Deep Dive 06 â€¢ Code Mechanics: Transactions & Proxies
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-700 border border-amber-500/20 text-xs font-semibold">
+        Deep Dive 06 • Code Mechanics: Transactions & Proxies
       </div>
       <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
         Transaction Management in Code: Node.js Transactions vs. Spring @Transactional
       </h1>
       <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
-        Let's compare how manual ACID transactions are written in Node.js (Prisma/Knex) versus Spring's declarative <code class="font-mono text-amber-400 text-xs">@Transactional</code>, and see the exact CGLIB proxy bypass bug in code.
+        Let's compare how manual ACID transactions are written in Node.js (Prisma/Knex) versus Spring's declarative <code class="font-mono text-amber-700 text-xs">@Transactional</code>, and see the exact CGLIB proxy bypass bug in code.
       </p>
+    </div>
+
+    <!-- BEGINNER FRIENDLY / ELI5 BREAKDOWN -->
+    <section class="p-6 rounded-2xl bg-amber-50/60 border border-amber-200 space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">💡</span>
+          <h2 class="text-lg font-bold text-amber-950">ELI5: The Security Guard at the Door (CGLIB Proxies)</h2>
+        </div>
+        <span class="text-xs bg-amber-200 text-amber-900 font-semibold px-2.5 py-0.5 rounded-full">Beginner Mental Model</span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div class="p-4 bg-white rounded-xl border border-amber-100 shadow-sm space-y-2">
+          <div class="font-bold text-amber-700">How @Transactional Actually Works</div>
+          <p class="text-slate-600 leading-relaxed">
+            Spring does not rewrite your Java code. Instead, Spring creates a <strong>Proxy object (Security Guard)</strong> that wraps your service. When an external caller invokes your method, the Guard opens a DB transaction (<code class="font-mono text-amber-700">BEGIN</code>), lets your code run, and if no exception occurs, tells the DB to <code class="font-mono text-amber-700">COMMIT</code>.
+          </p>
+        </div>
+        <div class="p-4 bg-white rounded-xl border border-amber-100 shadow-sm space-y-2">
+          <div class="font-bold text-rose-700">The Infamous "Self-Invocation" Trap</div>
+          <p class="text-slate-600 leading-relaxed">
+            If Method A calls Method B <strong>inside the same class</strong> via <code class="font-mono text-rose-700">this.methodB()</code>, you bypassed the Security Guard at the front door! Method B's <code class="font-mono text-rose-700">@Transactional</code> annotation is completely ignored, and NO transaction is opened!
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROXY FLOWCHART -->
+    <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-3">
+      <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+        <span>📊</span> Spring CGLIB Proxy Wrapper Visualized
+      </h3>
+      <div class="flex flex-col md:flex-row items-center justify-between gap-2 text-center text-xs font-mono">
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl w-full md:w-1/4">
+          <span class="font-bold text-slate-800 block text-xs">1. HTTP Controller</span>
+          <code class="text-slate-600">orderService.create()</code>
+          <p class="text-[10px] text-slate-500 mt-1">Calls the service bean</p>
+        </div>
+        <div class="text-slate-400 font-bold hidden md:block">→</div>
+        <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl w-full md:w-1/4">
+          <span class="font-bold text-amber-800 block text-xs">2. Spring CGLIB Proxy</span>
+          <code class="text-amber-700">EntityManager.begin()</code>
+          <p class="text-[10px] text-slate-500 mt-1">Intercepts call & opens TX</p>
+        </div>
+        <div class="text-slate-400 font-bold hidden md:block">→</div>
+        <div class="p-3 bg-sky-50 border border-sky-200 rounded-xl w-full md:w-1/4">
+          <span class="font-bold text-sky-800 block text-xs">3. Real Service Logic</span>
+          <code class="text-slate-600">user.deduct(); order.save();</code>
+          <p class="text-[10px] text-slate-500 mt-1">Your business logic executes</p>
+        </div>
+        <div class="text-slate-400 font-bold hidden md:block">→</div>
+        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl w-full md:w-1/4">
+          <span class="font-bold text-emerald-800 block text-xs">4. Proxy Auto-Commit</span>
+          <code class="text-emerald-700">tx.commit() / rollback()</code>
+          <p class="text-[10px] text-slate-500 mt-1">Closes DB connection cleanly</p>
+        </div>
+      </div>
     </div>
 
     <!-- CODE LAB 1: Transfer Money between 2 Accounts -->
