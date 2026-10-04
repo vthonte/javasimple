@@ -3,329 +3,359 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Senior Java & Spring Boot Deep Dive Curriculum (4-7 Yrs Bar)</title>
+  <title>Senior Java & Spring Boot Curriculum: 27-Step Sequential Tour</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Prism.js One Dark IDE Syntax Highlighting -->
+  <!-- Prism.js Syntax Highlighting -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-    <style>
+  <style>
     pre[class*="language-"] {
-      background: #f6f8fa !important;
-      border: 1px solid #d0d7de !important;
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
       border-radius: 0.75rem !important;
-      padding: 1.1rem !important;
-      font-size: 0.92rem !important;
+      padding: 1rem !important;
+      font-size: 0.9rem !important;
       line-height: 1.6 !important;
-      color: #24292f !important;
-      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
-      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
-    }
-    code[class*="language-"] {
-      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, Menlo, monospace !important;
-      font-size: 0.92rem !important;
-      color: #24292f !important;
+      color: #1e293b !important;
     }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20">
 
-  <main class="max-w-4xl w-full mx-auto px-6 py-12 space-y-10">
+  <main class="max-w-5xl w-full mx-auto px-6 py-12 space-y-12">
     
+    <!-- Hero Banner with Progress & Guided Tour Launch -->
     <div class="space-y-4 border-b border-slate-200 pb-8 text-center sm:text-left">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-700 border border-indigo-500/30 text-xs font-semibold">
-        🚀 Guided Tour Mode • Zero to Pro Sequential Learning
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-700 border border-indigo-500/30 text-xs font-semibold">
+        🚀 Guided Tour Mode • 27 Sequential Lessons
       </div>
       <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-        Java & Spring Boot Architecture for Node.js Engineers
+        Java & Spring Boot Mastery Tour for Node.js Engineers
       </h1>
       <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
-        Master all 27 core topics sequentially in a continuous interactive tour. Complete each lesson one after the other with built-in progress tracking and floating tour navigation.
+        Every topic is sequentially numbered from <strong>Lesson 01 (Beginner Foundations)</strong> up to <strong>Lesson 27 (Senior On-Call War Room)</strong>. Complete them one after the other with built-in progress tracking.
       </p>
 
       <!-- GUIDED TOUR CALLOUT BANNER -->
-      <div class="mt-4 p-5 rounded-2xl bg-gradient-to-r from-indigo-600 to-emerald-600 text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="mt-4 p-6 rounded-2xl bg-gradient-to-r from-indigo-600 to-emerald-600 text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
         <div class="space-y-1 text-center sm:text-left">
-          <div class="font-extrabold text-base sm:text-lg flex items-center justify-center sm:justify-start gap-2">
-            <span>🗺️</span> 27-Step Guided Tour: Start from Lesson 1
+          <div class="font-extrabold text-lg flex items-center justify-center sm:justify-start gap-2">
+            <span>🗺️</span> Start the Guided Tour from Lesson 01
           </div>
-          <p class="text-xs text-indigo-100">
-            Follow the sequential path: Java Fundamentals → Spring Boot Newbie → Concurrency → ORM → Distributed Sagas → Production On-Call.
+          <p class="text-xs text-indigo-100 leading-relaxed">
+            Progress step-by-step: Java Basics → Spring Boot Newbie → Concurrency → ORM & Transactions → Distributed Sagas → Production On-Call.
           </p>
         </div>
         <div class="flex items-center gap-3">
-          <a href="00_java_fundamentals_for_beginners.html" class="px-5 py-2.5 rounded-xl bg-white text-indigo-900 hover:bg-indigo-50 text-xs font-black shadow-md transition-all whitespace-nowrap">
-            Start Guided Tour (Lesson 1) →
+          <a href="00_java_fundamentals_for_beginners.html" class="px-6 py-3 rounded-xl bg-white text-indigo-900 hover:bg-indigo-50 text-xs font-black shadow-lg transition-all whitespace-nowrap">
+            Start Lesson 01 →
           </a>
         </div>
       </div>
     </div>
 
-    <!-- Guides Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- 6 SEQUENTIAL TRACKS -->
+    <div class="space-y-10">
 
-      <a href="00_java_fundamentals_for_beginners.html" class="md:col-span-2 p-6 rounded-2xl bg-gradient-to-r from-emerald-50 to-indigo-50 border-2 border-emerald-300 hover:border-emerald-500 shadow-sm hover:shadow transition-all space-y-3 group">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-200/80 px-2.5 py-0.5 rounded-full">🌱 Guide 00 • Start Here If Java is New</span>
-          <span class="text-xs font-semibold text-emerald-800 group-hover:translate-x-1 transition-transform">Beginner Foundation Guide →</span>
+      <!-- TRACK 1 -->
+      <section class="space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+          <div class="font-black text-emerald-800 text-sm uppercase tracking-wider flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center text-xs font-black">1</span>
+            Track 1: Java & JVM Foundations (From Node.js to Java)
+          </div>
+          <span class="text-xs text-slate-500 font-mono">Lessons 01 – 05</span>
         </div>
-        <h2 class="text-xl font-black text-slate-900 group-hover:text-emerald-900 transition-colors">
-          Java Fundamentals from Scratch for Node.js Engineers
-        </h2>
-        <p class="text-xs text-slate-700 leading-relaxed">
-          From dynamic JS to static Java: JVM bytecode architecture, entry points (<code class="font-mono text-emerald-800">public static void main</code>), static vs instance, Records vs TypeScript types, <code class="font-mono text-emerald-800">pom.xml</code> vs <code class="font-mono text-emerald-800">package.json</code>, Optional vs undefined, and interactive knowledge checks.
-        </p>
-      </a>
-
-      <a href="01_concurrency_architecture.html" class="p-6 rounded-2xl bg-white shadow-sm border border-slate-200 hover:border-indigo-500/40 hover:bg-white shadow-sm/80 transition-all space-y-3 group">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold uppercase text-amber-600">Guide 01</span>
-          <span class="text-xs text-indigo-600 group-hover:translate-x-1 transition-transform">Read Deep Dive →</span>
-        </div>
-        <h2 class="text-lg font-bold text-slate-900 group-hover:text-indigo-800 transition-colors">
-          Concurrency Architecture: Event Loop vs. Threads vs. Virtual Threads
-        </h2>
-        <p class="text-xs text-slate-600 leading-relaxed">
-          How libuv event loop compares with JVM Platform Threads and Java 21 Virtual Threads. CPU-bound vs I/O-bound scaling and thread pinning caveats.
-        </p>
-      </a>
-
-      <a href="02_memory_and_garbage_collection.html" class="p-6 rounded-2xl bg-white shadow-sm border border-slate-200 hover:border-indigo-500/40 hover:bg-white shadow-sm/80 transition-all space-y-3 group">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold uppercase text-emerald-400">Page 2</span>
-          <span class="text-xs text-indigo-400 group-hover:translate-x-1 transition-transform">Read Deep Dive â†’</span>
-        </div>
-        <h2 class="text-lg font-bold text-slate-900 group-hover:text-emerald-800 transition-colors">
-          JVM Memory Management, Garbage Collection & Leaks
-        </h2>
-        <p class="text-xs text-slate-600 leading-relaxed">
-          Stack vs Heap vs Metaspace, G1GC vs ZGC sub-millisecond algorithms, ThreadLocal memory leaks, and Eclipse MAT Dominator Tree analysis.
-        </p>
-      </a>
-
-      <a href="03_collections_and_streams.html" class="p-6 rounded-2xl bg-white shadow-sm border border-slate-200 hover:border-indigo-500/40 hover:bg-white shadow-sm/80 transition-all space-y-3 group">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold uppercase text-purple-400">Page 3</span>
-          <span class="text-xs text-indigo-400 group-hover:translate-x-1 transition-transform">Read Deep Dive â†’</span>
-        </div>
-        <h2 class="text-lg font-bold text-slate-900 group-hover:text-purple-300 transition-colors">
-          Collections Framework Internals & Streams API
-        </h2>
-        <p class="text-xs text-slate-600 leading-relaxed">
-          HashMap hashing, bucket collisions, and treeification in Java 8+. ConcurrentHashMap segment locks. Java lazy streams vs eager JS array methods.
-        </p>
-      </a>
-
-      <a href="04_spring_ioc_and_bean_lifecycle.html" class="p-6 rounded-2xl bg-white shadow-sm border border-slate-200 hover:border-indigo-500/40 hover:bg-white shadow-sm/80 transition-all space-y-3 group">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold uppercase text-sky-400">Page 4</span>
-          <span class="text-xs text-indigo-400 group-hover:translate-x-1 transition-transform">Read Deep Dive â†’</span>
-        </div>
-        <h2 class="text-lg font-bold text-slate-900 group-hover:text-sky-300 transition-colors">
-          Spring IoC Container & Bean Lifecycle
-        </h2>
-        <p class="text-xs text-slate-600 leading-relaxed">
-          How Spring instantiates singletons without <code class="font-mono text-xs">new</code>. The full lifecycle from constructor to @PostConstruct and @PreDestroy. Why field @Autowired is an anti-pattern.
-        </p>
-      </a>
-
-      <a href="05_jpa_hibernate_n_plus_one.html" class="p-6 rounded-2xl bg-white shadow-sm border border-slate-200 hover:border-indigo-500/40 hover:bg-white shadow-sm/80 transition-all space-y-3 group">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold uppercase text-rose-400">Page 5</span>
-          <span class="text-xs text-indigo-400 group-hover:translate-x-1 transition-transform">Read Deep Dive â†’</span>
-        </div>
-        <h2 class="text-lg font-bold text-slate-900 group-hover:text-rose-800 transition-colors">
-          JPA, Hibernate & The Deadly N+1 Query Trap
-        </h2>
-        <p class="text-xs text-slate-600 leading-relaxed">
-          Entity states (Managed vs Detached), automatic dirty checking, how Lazy loading triggers query storms, and senior fixes using JOIN FETCH and @EntityGraph.
-        </p>
-      </a>
-
-      <a href="06_transaction_management_traps.html" class="p-6 rounded-2xl bg-white shadow-sm border border-slate-200 hover:border-indigo-500/40 hover:bg-white shadow-sm/80 transition-all space-y-3 group">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold uppercase text-amber-400">Page 6</span>
-          <span class="text-xs text-indigo-400 group-hover:translate-x-1 transition-transform">Read Deep Dive â†’</span>
-        </div>
-        <h2 class="text-lg font-bold text-slate-900 group-hover:text-amber-300 transition-colors">
-          @Transactional Pitfalls, CGLIB Proxies & Propagation
-        </h2>
-        <p class="text-xs text-slate-600 leading-relaxed">
-          Self-invocation proxy bypass bug, default checked exception rollback behavior, and when to use Propagation.REQUIRES_NEW for audit logs.
-        </p>
-      </a>
-
-      <a href="07_microservices_and_resiliency.html" class="p-6 rounded-2xl bg-white shadow-sm border border-slate-200 hover:border-indigo-500/40 hover:bg-white shadow-sm/80 transition-all space-y-3 group">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold uppercase text-cyan-400">Page 7</span>
-          <span class="text-xs text-indigo-400 group-hover:translate-x-1 transition-transform">Read Deep Dive â†’</span>
-        </div>
-        <h2 class="text-lg font-bold text-slate-900 group-hover:text-cyan-300 transition-colors">
-          Microservices Boundaries, Sagas & Resiliency
-        </h2>
-        <p class="text-xs text-slate-600 leading-relaxed">
-          Solving the Dual-Write problem using the Transactional Outbox Pattern with Debezium CDC. Sagas (Orchestration vs Choreography), and Resilience4j circuit breakers.
-        </p>
-      </a>
-
-      <a href="08_production_outage_triage.html" class="p-6 rounded-2xl bg-white shadow-sm border border-slate-200 hover:border-indigo-500/40 hover:bg-white shadow-sm/80 transition-all space-y-3 group">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold uppercase text-rose-500">Page 8</span>
-          <span class="text-xs text-indigo-400 group-hover:translate-x-1 transition-transform">Read Deep Dive â†’</span>
-        </div>
-        <h2 class="text-lg font-bold text-slate-900 group-hover:text-rose-800 transition-colors">
-          Production Outage Triage (Live War Room)
-        </h2>
-        <p class="text-xs text-slate-600 leading-relaxed">
-          Step-by-step terminal command sequences for 100% CPU spikes with top/jstack, HikariCP connection pool timeouts, and thread deadlocks.
-        </p>
-      </a>
-
-    </div>
-
-    <!-- INDEPENDENT TOPIC ENCYCLOPEDIA SECTION -->
-    <section class="space-y-6 pt-6 border-t border-slate-200">
-      <div class="space-y-2">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-xs font-semibold">
-          📚 Dedicated Topic Encyclopedia • Beginner to Pro Deep Dives
-        </div>
-        <h2 class="text-2xl font-black text-slate-900 tracking-tight">
-          Comprehensive Single-Topic Encyclopedia
-        </h2>
-        <p class="text-xs text-slate-600 leading-relaxed">
-          Need a standalone deep dive into a specific mechanism? Explore these focused, cross-linked topic guides:
-        </p>
-      </div>
-
-      <!-- Track 2: Spring Boot Fundamentals (For Newbies) -->
-      <div class="space-y-2">
-        <div class="font-bold text-emerald-800 text-xs uppercase tracking-wider flex items-center gap-1.5">
-          <span>🌱</span> Track 2: Spring Boot Fundamentals (Newbie Zero-to-One)
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
-          <a href="topics/spring_boot_for_beginners.html" class="p-3.5 bg-emerald-50/50 border border-emerald-200 hover:border-emerald-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-emerald-800 group-hover:underline">Spring Boot 101 →</span>
-            <p class="text-[11px] text-slate-600">Why it exists, Starters vs npm, and running embedded Tomcat.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs">
+          <a href="00_java_fundamentals_for_beginners.html" class="p-4 bg-white border border-slate-200 hover:border-emerald-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-emerald-700 font-mono">Lesson 01</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-emerald-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Java Fundamentals from Scratch</h3>
+            <p class="text-[11px] text-slate-600">Bytecode compilation, main entrypoint, primitives vs Objects, Records, and Optional.</p>
           </a>
-          <a href="topics/spring_boot_auto_configuration.html" class="p-3.5 bg-emerald-50/50 border border-emerald-200 hover:border-emerald-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-emerald-800 group-hover:underline">Auto-Configuration Magic →</span>
-            <p class="text-[11px] text-slate-600">@ConditionalOnClass, @ConditionalOnMissingBean, and --debug report.</p>
+          <a href="topics/jvm.html" class="p-4 bg-white border border-slate-200 hover:border-emerald-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-emerald-700 font-mono">Lesson 02</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-emerald-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">JVM Architecture & JIT Compiler</h3>
+            <p class="text-[11px] text-slate-600">ClassLoader hierarchy, bytecode execution, Interpreter vs C1/C2 JIT compilation.</p>
           </a>
-          <a href="topics/rest_controllers_and_routing.html" class="p-3.5 bg-emerald-50/50 border border-emerald-200 hover:border-emerald-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-emerald-800 group-hover:underline">REST Controllers & Routing →</span>
-            <p class="text-[11px] text-slate-600">Express vs @RestController, @PathVariable, and @Valid request validation.</p>
+          <a href="topics/memory_management.html" class="p-4 bg-white border border-slate-200 hover:border-emerald-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-emerald-700 font-mono">Lesson 03</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-emerald-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">JVM Memory Management</h3>
+            <p class="text-[11px] text-slate-600">Stack frames vs Heap (Eden, Survivor, Tenured), 16-byte Object Headers, ThreadLocal leaks.</p>
           </a>
-          <a href="topics/global_exception_handling.html" class="p-3.5 bg-emerald-50/50 border border-emerald-200 hover:border-emerald-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-emerald-800 group-hover:underline">Global Exception Handling →</span>
-            <p class="text-[11px] text-slate-600">@RestControllerAdvice, RFC 7807 ProblemDetail, and Express error middleware.</p>
+          <a href="topics/garbage_collection.html" class="p-4 bg-white border border-slate-200 hover:border-emerald-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-emerald-700 font-mono">Lesson 04</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-emerald-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Modern Garbage Collection (G1/ZGC)</h3>
+            <p class="text-[11px] text-slate-600">Stop-The-World elimination, ZGC sub-millisecond pauses, and container JVM flags.</p>
           </a>
-          <a href="topics/configuration_and_profiles.html" class="p-3.5 bg-emerald-50/50 border border-emerald-200 hover:border-emerald-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-emerald-800 group-hover:underline">Config & Spring Profiles →</span>
-            <p class="text-[11px] text-slate-600">application.yml, switching dev/prod profiles, and @ConfigurationProperties.</p>
-          </a>
-          <a href="topics/spring_boot_testing.html" class="p-3.5 bg-emerald-50/50 border border-emerald-200 hover:border-emerald-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-emerald-800 group-hover:underline">Testing (JUnit 5 & Mockito) →</span>
-            <p class="text-[11px] text-slate-600">Pure Unit Tests, MockMvc web slice testing, and AssertJ assertions.</p>
-          </a>
-          <a href="topics/spring_boot_actuator.html" class="p-3.5 bg-emerald-50/50 border border-emerald-200 hover:border-emerald-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-emerald-800 group-hover:underline">Actuator & Observability →</span>
-            <p class="text-[11px] text-slate-600">Kubernetes liveness/readiness probes, metrics, and thread dumps.</p>
+          <a href="topics/collections_internals.html" class="p-4 bg-white border border-slate-200 hover:border-emerald-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-emerald-700 font-mono">Lesson 05</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-emerald-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Collections Internals & Hashing</h3>
+            <p class="text-[11px] text-slate-600">HashMap bucket arrays, treeification at 8 items, and hashCode/equals contract.</p>
           </a>
         </div>
-      </div>
+      </section>
 
-      <!-- Core Mechanics & Senior Topics -->
-      <div class="space-y-2 pt-4">
-        <div class="font-bold text-indigo-800 text-xs uppercase tracking-wider flex items-center gap-1.5">
-          <span>⚙️</span> Tracks 1, 3, 4, 5 & 6: Core Runtime, Concurrency, Security, ORM & On-Call
+      <!-- TRACK 2 -->
+      <section class="space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+          <div class="font-black text-sky-800 text-sm uppercase tracking-wider flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-sky-100 text-sky-800 flex items-center justify-center text-xs font-black">2</span>
+            Track 2: Spring Boot Fundamentals (The Newbie Track)
+          </div>
+          <span class="text-xs text-slate-500 font-mono">Lessons 06 – 12</span>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
-          <a href="topics/virtual_threads.html" class="p-3.5 bg-white border border-slate-200 hover:border-indigo-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-indigo-700 group-hover:underline">Virtual Threads (Loom) →</span>
-            <p class="text-[11px] text-slate-600">Carrier threads, unmounting mechanics, and thread pinning traps.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs">
+          <a href="topics/spring_boot_for_beginners.html" class="p-4 bg-white border border-slate-200 hover:border-sky-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-sky-700 font-mono">Lesson 06</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-sky-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Spring Boot 101 for Beginners</h3>
+            <p class="text-[11px] text-slate-600">Why Spring Boot exists, Starters vs npm, embedded Tomcat, and @SpringBootApplication.</p>
           </a>
-          <a href="topics/event_loop.html" class="p-3.5 bg-white border border-slate-200 hover:border-emerald-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-emerald-700 group-hover:underline">Node.js Event Loop →</span>
-            <p class="text-[11px] text-slate-600">libuv 6 phases, poll queue, nextTick priority, and threadpool traps.</p>
+          <a href="topics/spring_boot_auto_configuration.html" class="p-4 bg-white border border-slate-200 hover:border-sky-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-sky-700 font-mono">Lesson 07</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-sky-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Auto-Configuration Demystified</h3>
+            <p class="text-[11px] text-slate-600">@ConditionalOnClass, @ConditionalOnMissingBean, and inspecting conditions via --debug.</p>
           </a>
-          <a href="topics/threads_in_java.html" class="p-3.5 bg-white border border-slate-200 hover:border-sky-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-sky-700 group-hover:underline">Java Platform Threads →</span>
-            <p class="text-[11px] text-slate-600">1:1 OS kernel mapping, ThreadPoolExecutor internals, and rejection policies.</p>
+          <a href="topics/rest_controllers_and_routing.html" class="p-4 bg-white border border-slate-200 hover:border-sky-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-sky-700 font-mono">Lesson 08</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-sky-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">REST Controllers & Routing</h3>
+            <p class="text-[11px] text-slate-600">Express vs @RestController, @PathVariable, @RequestParam, and @Valid request validation.</p>
           </a>
-          <a href="topics/streams_and_lambdas.html" class="p-3.5 bg-white border border-slate-200 hover:border-purple-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-purple-700 group-hover:underline">Streams API & Lambdas →</span>
-            <p class="text-[11px] text-slate-600">Lazy assembly pipeline vs JS eager array duplication & parallelStream trap.</p>
+          <a href="topics/global_exception_handling.html" class="p-4 bg-white border border-slate-200 hover:border-sky-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-sky-700 font-mono">Lesson 09</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-sky-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Global Exception Handling</h3>
+            <p class="text-[11px] text-slate-600">@RestControllerAdvice, RFC 7807 ProblemDetail, and Express error middleware equivalence.</p>
           </a>
-          <a href="topics/completable_future_and_reactive.html" class="p-3.5 bg-white border border-slate-200 hover:border-purple-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-purple-700 group-hover:underline">CompletableFuture & Reactive →</span>
-            <p class="text-[11px] text-slate-600">JS Promise mapping, thenApply vs thenCompose, and WebFlux vs Loom.</p>
+          <a href="topics/configuration_and_profiles.html" class="p-4 bg-white border border-slate-200 hover:border-sky-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-sky-700 font-mono">Lesson 10</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-sky-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Configuration & Spring Profiles</h3>
+            <p class="text-[11px] text-slate-600">application.yml, switching dev/stage/prod profiles, and type-safe @ConfigurationProperties.</p>
           </a>
-          <a href="topics/collections_internals.html" class="p-3.5 bg-white border border-slate-200 hover:border-purple-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-purple-700 group-hover:underline">Collections Internals →</span>
-            <p class="text-[11px] text-slate-600">HashMap hashing, treeification at 8 items, and hashCode/equals contract.</p>
+          <a href="topics/spring_boot_testing.html" class="p-4 bg-white border border-slate-200 hover:border-sky-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-sky-700 font-mono">Lesson 11</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-sky-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Spring Boot Testing (JUnit 5 & Mockito)</h3>
+            <p class="text-[11px] text-slate-600">Pure Unit Tests with Mockito, Web Slice Tests with @WebMvcTest, and MockMvc.</p>
           </a>
-          <a href="topics/jvm.html" class="p-3.5 bg-white border border-slate-200 hover:border-purple-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-purple-700 group-hover:underline">JVM & JIT Compiler →</span>
-            <p class="text-[11px] text-slate-600">ClassLoaders, Bytecode execution, Interpreter vs C1/C2 JIT compilation.</p>
+          <a href="topics/spring_boot_actuator.html" class="p-4 bg-white border border-slate-200 hover:border-sky-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-sky-700 font-mono">Lesson 12</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-sky-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Actuator & Production Observability</h3>
+            <p class="text-[11px] text-slate-600">Kubernetes liveness and readiness health checks, metrics, and thread dumps.</p>
           </a>
-          <a href="topics/memory_management.html" class="p-3.5 bg-white border border-slate-200 hover:border-emerald-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-emerald-700 group-hover:underline">JVM Memory Management →</span>
-            <p class="text-[11px] text-slate-600">Stack vs Heap vs Metaspace, Object headers, and ThreadLocal leaks.</p>
+        </div>
+      </section>
+
+      <!-- TRACK 3 -->
+      <section class="space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+          <div class="font-black text-purple-800 text-sm uppercase tracking-wider flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-purple-100 text-purple-800 flex items-center justify-center text-xs font-black">3</span>
+            Track 3: Concurrency, Threads & Async Pipelines
+          </div>
+          <span class="text-xs text-slate-500 font-mono">Lessons 13 – 17</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs">
+          <a href="topics/event_loop.html" class="p-4 bg-white border border-slate-200 hover:border-purple-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-purple-700 font-mono">Lesson 13</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-purple-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Node.js Event Loop & libuv</h3>
+            <p class="text-[11px] text-slate-600">6 loop phases, microtask queue priority, nextTick, and threadpool blocking traps.</p>
           </a>
-          <a href="topics/garbage_collection.html" class="p-3.5 bg-white border border-slate-200 hover:border-amber-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-amber-700 group-hover:underline">Garbage Collection (GC) →</span>
-            <p class="text-[11px] text-slate-600">G1GC vs ZGC sub-millisecond pauses, colored pointers, and JVM flags.</p>
+          <a href="topics/threads_in_java.html" class="p-4 bg-white border border-slate-200 hover:border-purple-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-purple-700 font-mono">Lesson 14</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-purple-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Java Platform Threads & Pools</h3>
+            <p class="text-[11px] text-slate-600">1:1 OS kernel mapping, ThreadPoolExecutor internals, and CallerRunsPolicy backpressure.</p>
           </a>
-          <a href="topics/spring_ioc.html" class="p-3.5 bg-white border border-slate-200 hover:border-sky-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-sky-700 group-hover:underline">Spring IoC & Scopes →</span>
-            <p class="text-[11px] text-slate-600">ApplicationContext, Singleton vs Prototype, and circular dependencies.</p>
+          <a href="topics/virtual_threads.html" class="p-4 bg-white border border-slate-200 hover:border-purple-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-purple-700 font-mono">Lesson 15</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-purple-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Java 21 Virtual Threads (Loom)</h3>
+            <p class="text-[11px] text-slate-600">Carrier threads, continuation unmounting, and avoiding synchronized thread pinning.</p>
           </a>
-          <a href="topics/spring_security_and_jwt.html" class="p-3.5 bg-white border border-slate-200 hover:border-indigo-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-indigo-700 group-hover:underline">Spring Security & JWT →</span>
+          <a href="topics/streams_and_lambdas.html" class="p-4 bg-white border border-slate-200 hover:border-purple-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-purple-700 font-mono">Lesson 16</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-purple-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Streams API & Lazy Pipelines</h3>
+            <p class="text-[11px] text-slate-600">Lazy assembly pipeline vs JS eager array duplication, and the parallelStream trap.</p>
+          </a>
+          <a href="topics/completable_future_and_reactive.html" class="p-4 bg-white border border-slate-200 hover:border-purple-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-purple-700 font-mono">Lesson 17</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-purple-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">CompletableFuture & Reactive Systems</h3>
+            <p class="text-[11px] text-slate-600">JS Promise mapping, thenApply vs thenCompose, and WebFlux vs Virtual Threads.</p>
+          </a>
+        </div>
+      </section>
+
+      <!-- TRACK 4 -->
+      <section class="space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+          <div class="font-black text-indigo-800 text-sm uppercase tracking-wider flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-indigo-100 text-indigo-800 flex items-center justify-center text-xs font-black">4</span>
+            Track 4: Spring Framework Internals & Security
+          </div>
+          <span class="text-xs text-slate-500 font-mono">Lessons 18 – 20</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs">
+          <a href="topics/spring_ioc.html" class="p-4 bg-white border border-slate-200 hover:border-indigo-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-indigo-700 font-mono">Lesson 18</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-indigo-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Spring IoC Container & Bean Lifecycle</h3>
+            <p class="text-[11px] text-slate-600">ApplicationContext, Singleton vs Prototype, and fixing circular dependencies.</p>
+          </a>
+          <a href="topics/spring_security_and_jwt.html" class="p-4 bg-white border border-slate-200 hover:border-indigo-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-indigo-700 font-mono">Lesson 19</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-indigo-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Spring Security & Stateless JWT</h3>
             <p class="text-[11px] text-slate-600">SecurityFilterChain, stateless Bearer filters, and @PreAuthorize RBAC.</p>
           </a>
-          <a href="topics/spring_aop_and_proxies.html" class="p-3.5 bg-white border border-slate-200 hover:border-indigo-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-indigo-700 group-hover:underline">Spring AOP & Proxies →</span>
+          <a href="topics/spring_aop_and_proxies.html" class="p-4 bg-white border border-slate-200 hover:border-indigo-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-indigo-700 font-mono">Lesson 20</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-indigo-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Spring AOP & Dynamic Proxies</h3>
             <p class="text-[11px] text-slate-600">JDK Dynamic vs CGLIB bytecode subclassing, and custom timing aspects.</p>
           </a>
-          <a href="topics/hibernate_and_jpa.html" class="p-3.5 bg-white border border-slate-200 hover:border-rose-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-rose-700 group-hover:underline">Hibernate & JPA Internals →</span>
-            <p class="text-[11px] text-slate-600">Persistence Context, 4 entity states, and automatic dirty checking.</p>
+        </div>
+      </section>
+
+      <!-- TRACK 5 -->
+      <section class="space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+          <div class="font-black text-rose-800 text-sm uppercase tracking-wider flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-rose-100 text-rose-800 flex items-center justify-center text-xs font-black">5</span>
+            Track 5: Database Persistence, ORM & Transactions
+          </div>
+          <span class="text-xs text-slate-500 font-mono">Lessons 21 – 23</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs">
+          <a href="topics/hibernate_and_jpa.html" class="p-4 bg-white border border-slate-200 hover:border-rose-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-rose-700 font-mono">Lesson 21</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-rose-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Hibernate & JPA Internals</h3>
+            <p class="text-[11px] text-slate-600">Persistence Context, 4 entity states, and automatic dirty checking (no .save()!).</p>
           </a>
-          <a href="topics/n_plus_one_and_performance.html" class="p-3.5 bg-white border border-slate-200 hover:border-rose-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-rose-700 group-hover:underline">N+1 Problem & Fixes →</span>
-            <p class="text-[11px] text-slate-600">JOIN FETCH, @EntityGraph, and avoiding in-memory pagination OOMs.</p>
+          <a href="topics/n_plus_one_and_performance.html" class="p-4 bg-white border border-slate-200 hover:border-rose-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-rose-700 font-mono">Lesson 22</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-rose-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">The N+1 Query Trap & Fixes</h3>
+            <p class="text-[11px] text-slate-600">JOIN FETCH, @EntityGraph, batch size, and avoiding in-memory pagination OOMs.</p>
           </a>
-          <a href="topics/transactions_and_isolation.html" class="p-3.5 bg-white border border-slate-200 hover:border-amber-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-amber-700 group-hover:underline">Transactions & Isolation →</span>
-            <p class="text-[11px] text-slate-600">ACID levels, REQUIRED vs REQUIRES_NEW, and @Version optimistic locks.</p>
+          <a href="topics/transactions_and_isolation.html" class="p-4 bg-white border border-slate-200 hover:border-rose-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-rose-700 font-mono">Lesson 23</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-rose-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Transactions & Isolation Levels</h3>
+            <p class="text-[11px] text-slate-600">ACID levels, rollback rules, REQUIRED vs REQUIRES_NEW, and @Version optimistic locks.</p>
           </a>
-          <a href="topics/distributed_transactions_saga.html" class="p-3.5 bg-white border border-slate-200 hover:border-cyan-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-cyan-700 group-hover:underline">Distributed Sagas & Outbox →</span>
+        </div>
+      </section>
+
+      <!-- TRACK 6 -->
+      <section class="space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+          <div class="font-black text-cyan-800 text-sm uppercase tracking-wider flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-cyan-100 text-cyan-800 flex items-center justify-center text-xs font-black">6</span>
+            Track 6: Distributed Systems & Production On-Call Ops
+          </div>
+          <span class="text-xs text-slate-500 font-mono">Lessons 24 – 27</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs">
+          <a href="topics/distributed_transactions_saga.html" class="p-4 bg-white border border-slate-200 hover:border-cyan-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-cyan-700 font-mono">Lesson 24</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-cyan-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Distributed Sagas & Outbox Pattern</h3>
             <p class="text-[11px] text-slate-600">Dual-Write bug, Debezium CDC Outbox, and Choreography vs Orchestration.</p>
           </a>
-          <a href="topics/resilience_and_circuit_breakers.html" class="p-3.5 bg-white border border-slate-200 hover:border-cyan-400 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-cyan-700 group-hover:underline">Resilience & Circuit Breakers →</span>
+          <a href="topics/resilience_and_circuit_breakers.html" class="p-4 bg-white border border-slate-200 hover:border-cyan-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-cyan-700 font-mono">Lesson 25</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-cyan-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Resilience & Circuit Breakers</h3>
             <p class="text-[11px] text-slate-600">Resilience4j CLOSED/OPEN/HALF_OPEN states, retries, and fallbacks.</p>
           </a>
-          <a href="topics/profiling_and_debugging.html" class="p-3.5 bg-white border border-slate-200 hover:border-rose-500 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-rose-800 group-hover:underline">Profiling & JFR →</span>
+          <a href="topics/profiling_and_debugging.html" class="p-4 bg-white border border-slate-200 hover:border-rose-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-rose-700 font-mono">Lesson 26</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-rose-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Production Profiling & JFR</h3>
             <p class="text-[11px] text-slate-600">Async-profiler flame graphs, JDK Flight Recorder, and HeapDump on OOM.</p>
           </a>
-          <a href="topics/production_outage_playbooks.html" class="p-3.5 bg-white border border-slate-200 hover:border-rose-500 rounded-xl space-y-1 block transition-all group">
-            <span class="font-bold text-rose-800 group-hover:underline">Outage Incident Playbooks →</span>
+          <a href="topics/production_outage_playbooks.html" class="p-4 bg-white border border-slate-200 hover:border-rose-500 rounded-xl space-y-1.5 block shadow-sm hover:shadow transition-all group">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-rose-700 font-mono">Lesson 27</span>
+              <span class="text-[10px] text-slate-400 group-hover:text-rose-600">Start →</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-sm">Live Outage Playbooks (P0/P1)</h3>
             <p class="text-[11px] text-slate-600">100% CPU thread triage (top/jstack), HikariCP pool exhaustion & deadlocks.</p>
           </a>
         </div>
-      </div>
-    </section>
+      </section>
+
+    </div>
 
     <!-- Back to project -->
-    <div class="p-4 rounded-xl bg-white shadow-sm/60 border border-slate-200 text-center text-xs text-slate-600">
-      All files are saved in your local folder: <code class="font-mono text-indigo-400">c:\Users\chait\Downloads\projects\javasimple\deep_dive_guides\</code>
+    <div class="p-4 rounded-xl bg-white shadow-sm border border-slate-200 text-center text-xs text-slate-600">
+      All files are saved in your local folder: <code class="font-mono text-indigo-600">c:\Users\chait\Downloads\projects\javasimple\deep_dive_guides\</code>
     </div>
 
   </main>
@@ -333,8 +363,3 @@
   <script src="gemini_assistant.js"></script>
 </body>
 </html>
-
-
-
-
-
