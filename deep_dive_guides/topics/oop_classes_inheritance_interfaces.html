@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 03: Core OOP (Classes, Inheritance, Interfaces & Polymorphism)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <style>
+    pre[class*="language-"] {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0.75rem !important;
+      padding: 1rem !important;
+      font-size: 0.9rem !important;
+      font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col font-sans selection:bg-indigo-500/20 pb-28">
+
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="../index.html" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-semibold">
+        ← Tour Hub
+      </a>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-emerald-700 font-mono font-bold">Track 1: Java Foundations</span>
+      <span class="text-slate-300">|</span>
+      <span class="text-xs text-slate-500 font-mono">Lesson 03: OOP & Interfaces</span>
+    </div>
+    <div>
+      <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">Core Beginner</span>
+    </div>
+  </header>
+
+  <main class="max-w-4xl w-full mx-auto px-6 py-10 space-y-10">
+    
+    <div class="space-y-3 border-b border-slate-200 pb-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
+        🏛️ Object-Oriented Programming • The 4 Pillars
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        Core OOP in Java: Classes, Inheritance, Interfaces & Polymorphism
+      </h1>
+      <p class="text-slate-600 text-base leading-relaxed">
+        Building your object-oriented mental model: Encapsulation (access modifiers), Inheritance (extends & super), Abstraction (Abstract Classes vs Interfaces), and Runtime Polymorphism (Method Overriding vs Overloading).
+      </p>
+    </div>
+
+    <!-- ELI5 MENTAL MODEL -->
+    <section class="p-6 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-3">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">💡</span>
+        <h2 class="text-lg font-bold text-emerald-950">ELI5: The Blueprint, The Family Tree, and The USB Port</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+        <div class="p-3.5 bg-white rounded-xl border border-emerald-100 shadow-sm space-y-1.5">
+          <span class="font-bold text-emerald-800 block">1. Class vs Object (Blueprint vs Car)</span>
+          <p class="text-slate-600">A <code class="font-mono text-emerald-700">class Car</code> is just an architectural drawing. When you type <code class="font-mono text-emerald-700">new Car()</code>, physical steel is stamped and a real object drives off the assembly line into memory.</p>
+        </div>
+        <div class="p-3.5 bg-white rounded-xl border border-emerald-100 shadow-sm space-y-1.5">
+          <span class="font-bold text-sky-800 block">2. Inheritance (DNA Inheritance)</span>
+          <p class="text-slate-600"><code class="font-mono text-sky-700">class ElectricCar extends Car</code>. ElectricCar inherits engine starts and steering from its parent, but overrides fueling to use a battery charger.</p>
+        </div>
+        <div class="p-3.5 bg-white rounded-xl border border-emerald-100 shadow-sm space-y-1.5">
+          <span class="font-bold text-purple-800 block">3. Interface (The USB Port Contract)</span>
+          <p class="text-slate-600">A USB interface doesn't care if you plug in a mouse, keyboard, or flash drive. Any device that implements the standard USB pins works seamlessly!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PILLAR 1 & 2: INHERITANCE & POLYMORPHISM -->
+    <section class="space-y-6">
+      <h2 class="text-xl font-bold text-slate-900">1. Inheritance & Method Overriding (@Override)</h2>
+
+      <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3 text-xs">
+        <pre class="language-java"><code class="language-java">// Parent Base Class
+public class PaymentGateway {
+    protected final String merchantId; // protected = accessible to subclasses
+
+    public PaymentGateway(String merchantId) {
+        this.merchantId = merchantId;
+    }
+
+    public void processPayment(double amount) {
+        System.out.println("Processing generic transaction of $" + amount);
+    }
+}
+
+// Subclass inherits via 'extends'
+public class StripeGateway extends PaymentGateway {
+
+    public StripeGateway(String merchantId) {
+        super(merchantId); // Calls parent constructor!
+    }
+
+    // Runtime Polymorphism: Overriding parent behavior
+    @Override
+    public void processPayment(double amount) {
+        System.out.println("Charging $" + amount + " via Stripe API for " + merchantId);
+    }
+}</code></pre>
+      </div>
+    </section>
+
+    <!-- PILLAR 3: INTERFACES (CONTRACTS) -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold text-slate-900">2. Interfaces: The Universal Contract</h2>
+        <span class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-full font-semibold">Clean Architecture Foundation</span>
+      </div>
+      <p class="text-xs text-slate-600">
+        In Java, a class can only extend <strong>1 single parent class</strong> (no multiple inheritance diamond problem). But a class can implement <strong>unlimited interfaces</strong>!
+      </p>
+
+      <pre class="language-java"><code class="language-java">// The Interface: Defines WHAT must be done, not HOW.
+public interface NotificationService {
+    void sendNotification(String to, String message);
+
+    // Java 8+ Default Methods: Optional default implementation!
+    default boolean isUrgent() {
+        return false;
+    }
+}
+
+// Implementation 1: Email
+@Service
+public class EmailNotificationService implements NotificationService {
+    @Override
+    public void sendNotification(String to, String message) {
+        System.out.println("Sending SMTP Email to " + to + ": " + message);
+    }
+}
+
+// Implementation 2: SMS
+@Service
+public class SmsNotificationService implements NotificationService {
+    @Override
+    public void sendNotification(String to, String message) {
+        System.out.println("Sending Twilio SMS to " + to + ": " + message);
+    }
+}</code></pre>
+
+      <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1.5">
+        <span class="font-bold text-slate-800">💡 Why this matters for Spring Boot:</span>
+        <p class="text-slate-600">
+          Your Controller depends on the interface <code class="font-mono text-indigo-700">NotificationService</code>, NOT the concrete class! During tests, you can easily swap in a mock without changing your controller code. This is the <strong>Dependency Inversion Principle (DIP)</strong> in SOLID design.
+        </p>
+      </div>
+    </section>
+
+    <!-- ABSTRACT CLASSES VS INTERFACES -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-slate-900">Abstract Class vs Interface: When to Use Which?</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+        <div class="p-4 bg-sky-50 border border-sky-200 rounded-xl space-y-2">
+          <div class="font-bold text-sky-800 text-sm">Abstract Class (is-a)</div>
+          <p class="text-slate-600 font-sans">
+            • Used when classes share <strong>state (instance fields)</strong> and constructors.<br>
+            • A class can only extend ONE abstract class.<br>
+            • Example: <code class="font-mono">BaseEntity</code> with <code class="font-mono">id, createdAt, updatedAt</code> fields inherited by all database models.
+          </p>
+        </div>
+        <div class="p-4 bg-purple-50 border border-purple-200 rounded-xl space-y-2">
+          <div class="font-bold text-purple-800 text-sm">Interface (can-do)</div>
+          <p class="text-slate-600 font-sans">
+            • Pure behavioral contract (no state, no mutable fields).<br>
+            • A class can implement MULTIPLE interfaces.<br>
+            • Example: <code class="font-mono">Serializable, Comparable, Runnable, EventListener</code>.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cross-Links -->
+    <div class="p-4 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 flex flex-wrap items-center justify-between gap-3">
+      <span>Read next: <a href="jvm.html" class="text-indigo-600 font-semibold hover:underline">Lesson 04: JVM Architecture & JIT Compiler</a></span>
+      <a href="../index.html" class="text-slate-900 font-bold hover:underline">Back to Curriculum Index →</a>
+    </div>
+
+  </main>
+  <script src="../voice_narrator.js"></script>
+  <script src="../gemini_assistant.js"></script>
+  <script src="../tour_navigation.js"></script>
+</body>
+</html>
